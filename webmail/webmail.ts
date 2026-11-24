@@ -101,14 +101,14 @@ class ConsistencyError extends Error {
 
 const zindexes = {
 	splitter: '1',
-	compose: '2',
+	compose: '5',
 	searchView: '3',
 	searchbar: '4',
-	popup: '5',
-	popover: '5',
-	attachments: '5',
-	shortcut: '6',
-	login: '7',
+	popup: '6',
+	popover: '6',
+	attachments: '6',
+	shortcut: '7',
+	login: '8',
 }
 
 // Buttons and input elements.
@@ -1846,7 +1846,7 @@ const compose = (opts: ComposeOptions, listMailboxes: listMailboxes, setLocation
 		}
 
 		const recipientSecurityTitle = 'Description of security mechanisms recipient domains may implement:\n1. STARTTLS: Opportunistic (unverified) TLS with STARTTLS, successfully negotiated during the most recent delivery attempt.\n2. MTA-STS: For PKIX/WebPKI-verified TLS.\n3. DNSSEC: MX DNS records are DNSSEC-signed.\n4. DANE: First delivery destination host implements DANE for verified TLS.\n5. RequireTLS: SMTP extension for verified TLS delivery into recipient mailbox, support detected during the most recent delivery attempt.\n\nChecks STARTTLS, DANE and RequireTLS cover the most recently used delivery path, not necessarily all possible delivery paths.\n\nThe bars below the input field indicate implementation status by the recipient domain:\n- Red, not implemented/unsupported\n- Green, implemented/supported\n- Gray, error while determining\n- Absent/white, unknown or skipped (e.g. no previous delivery attempt, or DANE check skipped due to DNSSEC-lookup error)'
-		const root = dom.span(
+		const root = dom.span(dom._class('recipientAddress'),
 			autosizeElem=dom.span(
 				dom._class('autosize'),
 				inputElem=dom.input(
@@ -1903,7 +1903,7 @@ const compose = (opts: ComposeOptions, listMailboxes: listMailboxes, setLocation
 				),
 			),
 			' ',
-			dom.clickbutton('-', style({padding: '0 .25em'}), attr.arialabel('Remove address.'), attr.title('Remove address.'), function click() {
+			dom.clickbutton('×', dom._class('recipientRemove'), attr.arialabel('Remove address.'), attr.title('Remove address.'), function click() {
 				remove()
 				if (single && views.length === 0) {
 					btn.style.display = ''
@@ -6271,7 +6271,7 @@ const newSearchView = (searchbarElem: HTMLInputElement, mailboxlistView: Mailbox
 	ensureCSS('.searchTable td', {padding: '.25em'})
 
 	const root = dom.div(
-		css('searchOverlay', {position: 'absolute', left: 0, right: 0, top: 0, bottom: 0, backgroundColor: styles.overlayBackgroundColor, zIndex: zindexes.compose}),
+		css('searchOverlay', {position: 'absolute', left: 0, right: 0, top: 0, bottom: 0, backgroundColor: styles.overlayBackgroundColor, zIndex: zindexes.searchView}),
 		function click(e: MouseEvent) {
 			e.stopPropagation()
 			searchViewClose()
@@ -6866,8 +6866,8 @@ const init = async () => {
 						),
 						' ',
 						dom.clickbutton(
-							'x',
-							style({padding: '0 .25em'}),
+							'Clear filters',
+							dom._class('refineClear'),
 							attr.arialabel('Clear refinement filters.'),
 							attr.title('Clear refinement filters.'),
 							async function click(e: MouseEvent) {

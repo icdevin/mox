@@ -1444,14 +1444,14 @@
 	};
 	var zindexes = {
 		splitter: "1",
-		compose: "2",
+		compose: "5",
 		searchView: "3",
 		searchbar: "4",
-		popup: "5",
-		popover: "5",
-		attachments: "5",
-		shortcut: "6",
-		login: "7"
+		popup: "6",
+		popover: "6",
+		attachments: "6",
+		shortcut: "7",
+		login: "8"
 	};
 	ensureCSS(".button", { display: "inline-block" });
 	ensureCSS("button, .button, select", { backgroundColor: styles.buttonBackground, border: "1px solid", borderColor: styles.buttonBorderColor, borderRadius: ".15em", padding: "0 .15em" });
@@ -2725,7 +2725,7 @@
 				});
 			}, "fetchRecipientSecurity");
 			const recipientSecurityTitle = "Description of security mechanisms recipient domains may implement:\n1. STARTTLS: Opportunistic (unverified) TLS with STARTTLS, successfully negotiated during the most recent delivery attempt.\n2. MTA-STS: For PKIX/WebPKI-verified TLS.\n3. DNSSEC: MX DNS records are DNSSEC-signed.\n4. DANE: First delivery destination host implements DANE for verified TLS.\n5. RequireTLS: SMTP extension for verified TLS delivery into recipient mailbox, support detected during the most recent delivery attempt.\n\nChecks STARTTLS, DANE and RequireTLS cover the most recently used delivery path, not necessarily all possible delivery paths.\n\nThe bars below the input field indicate implementation status by the recipient domain:\n- Red, not implemented/unsupported\n- Green, implemented/supported\n- Gray, error while determining\n- Absent/white, unknown or skipped (e.g. no previous delivery attempt, or DANE check skipped due to DNSSEC-lookup error)";
-			const root = dom.span(autosizeElem = dom.span(dom._class("autosize"), inputElem = dom.input(focusPlaceholder("Jane <jane@example.org>"), style({ width: "auto" }), attr.value(addr), newAddressComplete(), accountSettings?.ShowAddressSecurity ? attr.title(recipientSecurityTitle) : [], /* @__PURE__ */ __name(function keydown(e) {
+			const root = dom.span(dom._class("recipientAddress"), autosizeElem = dom.span(dom._class("autosize"), inputElem = dom.input(focusPlaceholder("Jane <jane@example.org>"), style({ width: "auto" }), attr.value(addr), newAddressComplete(), accountSettings?.ShowAddressSecurity ? attr.title(recipientSecurityTitle) : [], /* @__PURE__ */ __name(function keydown(e) {
 				if (e.key === "Backspace" && e.ctrlKey && inputElem.value === "" && !(isTo && views.length === 1)) {
 					remove();
 				} else if (e.key === "=" && e.ctrlKey) {
@@ -2761,7 +2761,7 @@
 				margin: "0 1px",
 				borderBottom: "1.5px solid",
 				borderBottomColor: "transparent"
-			}))), " ", dom.clickbutton("-", style({ padding: "0 .25em" }), attr.arialabel("Remove address."), attr.title("Remove address."), /* @__PURE__ */ __name(function click() {
+			}))), " ", dom.clickbutton("\xD7", dom._class("recipientRemove"), attr.arialabel("Remove address."), attr.title("Remove address."), /* @__PURE__ */ __name(function click() {
 				remove();
 				if (single && views.length === 0) {
 					btn.style.display = "";
@@ -5937,7 +5937,7 @@
 		}, "setPeriod");
 		const searchTableStyle = css("searchTable", { width: "100%" });
 		ensureCSS(".searchTable td", { padding: ".25em" });
-		const root = dom.div(css("searchOverlay", { position: "absolute", left: 0, right: 0, top: 0, bottom: 0, backgroundColor: styles.overlayBackgroundColor, zIndex: zindexes.compose }), /* @__PURE__ */ __name(function click(e) {
+		const root = dom.div(css("searchOverlay", { position: "absolute", left: 0, right: 0, top: 0, bottom: 0, backgroundColor: styles.overlayBackgroundColor, zIndex: zindexes.searchView }), /* @__PURE__ */ __name(function click(e) {
 			e.stopPropagation();
 			searchViewClose();
 		}, "click"), /* @__PURE__ */ __name(function keyup(e) {
@@ -6315,7 +6315,7 @@
 					await selectLabel();
 				}, "click")));
 			}), labels.length === 0 ? dom.div("No labels yet, set one on a message first.") : []));
-		}, "click"))), " ", dom.clickbutton("x", style({ padding: "0 .25em" }), attr.arialabel("Clear refinement filters."), attr.title("Clear refinement filters."), /* @__PURE__ */ __name(async function click(e) {
+		}, "click"))), " ", dom.clickbutton("Clear filters", dom._class("refineClear"), attr.arialabel("Clear refinement filters."), attr.title("Clear refinement filters."), /* @__PURE__ */ __name(async function click(e) {
 			settingsPut({ ...settings, refine: "" });
 			refineToggleActive(e.target);
 			await withStatus("Requesting messages", requestNewView(false));

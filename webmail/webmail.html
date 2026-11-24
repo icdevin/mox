@@ -136,7 +136,20 @@ button.threadToggle svg { width: 14px; height: 14px !important; flex-basis: 14px
 .readerModes .msgModeWarning { background: transparent; color: var(--colorMild); padding: 0; }
 .msgViewRoot > .scrollparent { min-height: 0; }
 .msgIframeHTML { inset: 0; border: 0; }
-.composePopup { border-radius: 10px; }
+.composePopup { width: 760px; min-width: min(40em, 95vw); border-radius: 10px; max-height: calc(100dvh - 16px); overflow-y: auto; }
+.composeFields > table { table-layout: fixed; }
+.composeFields td:first-child { width: 76px; }
+.composeFields input, .composeFields select { max-width: 100%; }
+.composeButtonsSpread { flex-wrap: wrap; }
+.composeButtonsSpread > div { min-width: 0; }
+.recipientAddress { position: relative; display: inline-flex; align-items: center; max-width: 100%; margin: 2px 4px 2px 0; }
+.recipientAddress .autosize { min-width: 0; max-width: 100%; }
+.recipientAddress input { padding-right: 34px; }
+button.recipientRemove { position: absolute; right: 4px; top: 50%; transform: translateY(-50%); width: 26px; height: 26px; min-height: 26px; padding: 0; border: 0; background: transparent; color: var(--colorMild); font-size: 20px; line-height: 1; display: grid; place-items: center; }
+button.recipientRemove:hover { background: var(--buttonHoverBackground); color: var(--color); }
+button.recipientRemove:focus-visible { outline-offset: -2px; }
+.msgListFilterSorting .refineClear { min-height: 28px; padding: 4px 8px; font-size: 12px; color: var(--colorMild); }
+
 .composePopup textarea { padding: 16px; line-height: 1.6; }
 .searchOverlay { position: fixed; }
 .searchContent { max-width: calc(100vw - 32px); max-height: calc(100dvh - 90px); overflow-y: auto; padding: 16px; border-radius: 10px; }
