@@ -3767,7 +3767,7 @@
 			attr.arialabel("Buttons and headers for message"),
 			msgbuttonElem = dom.div(dom._class("readerToolbar")),
 			dom.h1(dom._class("readerSubject"), mi.Envelope.Subject || "(no subject)"),
-			dom.div(attr.arialive("assertive"), dom.table(styleClasses.msgHeaders, msgheaderElem = dom.tbody()), msgheaderFullElem = dom.table(), msgattachmentElem = dom.div(), msgmodeElem = dom.div()),
+			dom.div(attr.arialive("assertive"), dom.table(styleClasses.msgHeaders, msgheaderElem = dom.tbody()), msgheaderFullElem = dom.table(), msgattachmentElem = dom.div(), msgmodeElem = dom.div(dom._class("readerModes"))),
 			// Explicit separator that separates headers from body, to
 			// prevent HTML messages from faking UI elements.
 			dom.div(css("headerBodySeparator", { height: "2px", backgroundColor: styles.borderColor }))
@@ -3973,10 +3973,10 @@
 				dom._kids(msgmodeElem);
 			} else {
 				const text = haveText && pm.ViewMode == ViewMode.ModeText;
-				dom._kids(msgmodeElem, dom.div(dom._class("pad"), msgHeaderSeparatorStyle, !haveText ? dom.span("HTML-only message", attr.title(htmlNote), msgModeWarningStyle, style({ marginRight: ".25em" })) : [], dom.span(dom._class("btngroup"), haveText ? textbtn = dom.clickbutton(text ? dom._class("active") : [], "Text", clickCmd(cmdShowText, shortcuts)) : [], htmlbtn = dom.clickbutton(text || !text && pm.ViewMode == ViewMode.ModeHTMLExt ? [] : dom._class("active"), "HTML", attr.title(htmlNote), /* @__PURE__ */ __name(async function click() {
+				dom._kids(msgmodeElem, dom.div(dom._class("pad"), msgHeaderSeparatorStyle, dom.span(dom._class("btngroup"), haveText ? textbtn = dom.clickbutton(text ? dom._class("active") : [], "Text", clickCmd(cmdShowText, shortcuts)) : [], htmlbtn = dom.clickbutton(text || !text && pm.ViewMode == ViewMode.ModeHTMLExt ? [] : dom._class("active"), "HTML", attr.title(htmlNote), /* @__PURE__ */ __name(async function click() {
 					showShortcut("T");
 					await cmdShowHTML();
-				}, "click")), htmlextbtn = dom.clickbutton(text || !text && pm.ViewMode != ViewMode.ModeHTMLExt ? [] : dom._class("active"), "HTML with external resources", attr.title(htmlNote), clickCmd(cmdShowHTMLExternal, shortcuts)))));
+				}, "click")), htmlextbtn = dom.clickbutton(text || !text && pm.ViewMode != ViewMode.ModeHTMLExt ? [] : dom._class("active"), "HTML + external resources", attr.title(htmlNote), clickCmd(cmdShowHTMLExternal, shortcuts)))));
 				if (text) {
 					loadText(pm);
 				} else if (pm.ViewMode == ViewMode.ModeHTMLExt) {
