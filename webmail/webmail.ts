@@ -83,7 +83,7 @@ Enable consistency checking in UI updates:
 */
 
 import {dom, style, attr, prop, ElemArg} from '../lib'
-import {css, ensureCSS, styles, styleClasses, equalAddress, formatAddress, formatAddressShort, formatEmail, loadMsgheaderView, isImage, renderText, formatDomain, join} from './lib'
+import {setDarkMode, css, ensureCSS, styles, styleClasses, equalAddress, formatAddress, formatAddressShort, formatEmail, loadMsgheaderView, isImage, renderText, formatDomain, join} from './lib'
 import * as api from './api'
 import * as icons from './icons'
 
@@ -160,9 +160,10 @@ let accountSettings: api.Settings
 let introboxMailbox: string = ''
 
 const defaultSettings = {
-	mailboxesWidth: 240,
+	theme: 'system',
+	mailboxesWidth: 160,
 	layout: 'auto', // Automatic switching between left/right and top/bottom layout, based on screen width.
-	leftWidthPct: 50, // Split in percentage of remaining width for left/right layout.
+	leftWidthPct: 33, // Split in percentage of remaining width for left/right layout.
 	topHeightPct: 40, // Split in percentage of remaining height for top/bottom layout.
 	msglistflagsWidth: 40, // Width in pixels of flags column in message list.
 	msglistageWidth: 70, // Width in pixels of age column.
@@ -208,6 +209,7 @@ const parseSettings = (): typeof defaultSettings => {
 		}
 
 		return {
+			theme: getString('theme', 'system', 'light', 'dark'),
 			refine: getString('refine'),
 			orderAsc: getBool('orderAsc'),
 			mailboxesWidth: getInt('mailboxesWidth'),
@@ -244,6 +246,17 @@ const settingsPut = (nsettings: typeof defaultSettings) => {
 }
 
 let settings = parseSettings()
+
+const systemTheme = window.matchMedia('(prefers-color-scheme: dark)')
+const applyTheme = () => {
+	let dark = settings.theme === 'dark'
+	if (settings.theme === 'system') {
+		dark = systemTheme.matches
+	}
+	setDarkMode(dark)
+}
+systemTheme.addEventListener('change', applyTheme)
+applyTheme()
 
 // All addresses for this account, can include "@domain" wildcard, User is empty in
 // that case. Set when SSE connection is initialized.
@@ -1096,6 +1109,9 @@ const popover = (target: HTMLElement, opts: {transparent?: boolean, fullscreen?:
 			...kids,
 		),
 	)
+	if (opts.transparent && !opts.fullscreen) {
+		content.classList.add('popoverMenu')
+	}
 	document.body.appendChild(root)
 	const first = root.querySelector('input, select, textarea, button')
 	if (first && first instanceof HTMLElement) {
@@ -2820,6 +2836,33 @@ const newMsgitemView = (mi: api.MessageItem, msglistView: MsglistView, otherMail
 		// the caller also call redraw on MsglistView.
 		const active = msgitemView.root && msgitemView.root.classList.contains('active')
 		const focus = msgitemView.root && msgitemView.root.classList.contains('focus')
+		let threadToggle: HTMLButtonElement | undefined
+		if (!msgitemView.parent && msgitemView.kids.length > 0) {
+			let label = 'Collapse thread.'
+			if (msgitemView.collapsed) {
+				label = 'Expand thread.'
+			}
+			threadToggle = dom.clickbutton(dom._class('threadToggle'),
+				icons.chevronRight(),
+				dom.span('' + (1 + msgitemView.descendants().length)),
+				attr.title(label), attr.arialabel(label),
+				function dblclick(e: MouseEvent) { e.stopPropagation() },
+				function click(e: MouseEvent) {
+					e.stopPropagation()
+					if (settings.threading === api.ThreadMode.ThreadOn) {
+						withStatus('Saving thread expand/collapse', client.ThreadCollapse([msgitemView.messageitem.Message.ID], !msgitemView.collapsed))
+					}
+					if (msgitemView.collapsed) {
+						msglistView.threadExpand(msgitemView)
+					} else {
+						msglistView.threadCollapse(msgitemView)
+						msglistView.viewportEnsureMessages()
+					}
+				},
+			)
+			threadToggle.setAttribute('aria-expanded', String(!msgitemView.collapsed))
+		}
+
 		const elem = dom.div(
 			msgItemStyle,
 			active ? dom._class('active') : [],
@@ -2859,27 +2902,12 @@ const newMsgitemView = (mi: api.MessageItem, msglistView: MsglistView, otherMail
 				dom.div(
 					css('msgItemFlagsSpread', {display: 'flex', justifyContent: 'space-between'}),
 					dom.div(flagList(msgitemView)),
-					!msgitemView.parent && msgitemView.kids.length > 0 && msgitemView.collapsed ?
-						dom.clickbutton('' + (1+msgitemView.descendants().length), attr.tabindex('-1'), attr.title('Expand thread.'), attr.arialabel('Expand thread.'), function click(e: MouseEvent) {
-							e.stopPropagation() // Prevent selection.
-							if (settings.threading === api.ThreadMode.ThreadOn) {
-								withStatus('Saving thread expanded', client.ThreadCollapse([msgitemView.messageitem.Message.ID], false))
-							}
-							msglistView.threadExpand(msgitemView)
-						}) : [],
-					!msgitemView.parent && msgitemView.kids.length > 0 && !msgitemView.collapsed ?
-						dom.clickbutton('-', style({width: '1em'}), attr.tabindex('-1'), attr.title('Collapse thread.'), attr.arialabel('Collapse thread.'), function click(e: MouseEvent) {
-							e.stopPropagation() // Prevent selection.
-							if (settings.threading === api.ThreadMode.ThreadOn) {
-								withStatus('Saving thread expanded', client.ThreadCollapse([msgitemView.messageitem.Message.ID], true))
-							}
-							msglistView.threadCollapse(msgitemView)
-							msglistView.viewportEnsureMessages()
-						}) : [],
+
 				),
 			),
 			dom.div(msgItemCellStyle, dom._class('msgItemFrom'),
 				dom.div(css('msgItemFromSpread', {display: 'flex', justifyContent: 'space-between'}),
+					threadToggle || [],
 					dom.div(
 						dom._class('silenttitle'),
 						css('msgItemFromText', {whiteSpace: 'nowrap', overflow: 'hidden'}),
@@ -3307,7 +3335,8 @@ const newMsgView = (miv: MsgitemView, msglistView: MsglistView, listMailboxes: l
 	const msgmetaElem = dom.div(
 		css('msgmeta', {backgroundColor: styles.backgroundColorMild, borderBottom: '5px solid', borderBottomColor: ['white', 'black'], maxHeight: '90%', overflowY: 'auto'}),
 		attr.role('region'), attr.arialabel('Buttons and headers for message'),
-		msgbuttonElem=dom.div(),
+		msgbuttonElem=dom.div(dom._class('readerToolbar')),
+		dom.h1(dom._class('readerSubject'), mi.Envelope.Subject || '(no subject)'),
 		dom.div(
 			attr.arialive('assertive'),
 			dom.table(
@@ -3340,27 +3369,30 @@ const newMsgView = (miv: MsgitemView, msglistView: MsglistView, listMailboxes: l
 			dom.div(dom._class('pad'),
 				m.MailboxID === draftMailboxID ? dom.clickbutton('Edit', attr.title('Continue editing this draft message.'), clickCmd(cmdComposeDraft, shortcuts)) : [], ' ',
 				(!pm || !pm.ListReplyAddress) ? [] : dom.clickbutton('Reply to list', attr.title('Compose a reply to this mailing list.'), clickCmd(cmdReplyList, shortcuts)), ' ',
-				(pm && pm.ListReplyAddress && formatEmail(pm.ListReplyAddress) === fromAddress) ? [] : dom.clickbutton('Reply', attr.title('Compose a reply to the sender of this message.'), clickCmd(cmdReply, shortcuts)), ' ',
+				(pm && pm.ListReplyAddress && formatEmail(pm.ListReplyAddress) === fromAddress) ? [] : dom.clickbutton(icons.reply(), ' Reply', attr.title('Compose a reply to the sender of this message.'), clickCmd(cmdReply, shortcuts)), ' ',
 				(mi.Envelope.To || []).length <= 1 && (mi.Envelope.CC || []).length === 0 && (mi.Envelope.BCC || []).length === 0 ? [] :
 					dom.clickbutton('Reply all', attr.title('Compose a reply to all participants of this message.'), clickCmd(cmdReplyAll, shortcuts)), ' ',
-				dom.clickbutton('Forward', attr.title('Compose a forwarding message, optionally including attachments.'), clickCmd(cmdForward, shortcuts)), ' ',
-				dom.clickbutton('Archive', attr.title('Move to the Archive mailbox.'), clickCmd(msglistView.cmdArchive, shortcuts)), ' ',
+				dom.clickbutton(icons.forward(), ' Forward', attr.title('Compose a forwarding message, optionally including attachments.'), clickCmd(cmdForward, shortcuts)), ' ',
+				dom.clickbutton(icons.archive(), ' Archive', attr.title('Move to the Archive mailbox.'), clickCmd(msglistView.cmdArchive, shortcuts)), ' ',
 				m.MailboxID === trashMailboxID ?
 					dom.clickbutton('Delete', attr.title('Permanently delete message.'), clickCmd(msglistView.cmdDelete, shortcuts)) :
-					dom.clickbutton('Trash', attr.title('Move to the Trash mailbox.'), clickCmd(msglistView.cmdTrash, shortcuts)),
+					dom.clickbutton(icons.trash(), ' Trash', attr.title('Move to the Trash mailbox.'), clickCmd(msglistView.cmdTrash, shortcuts)),
 				' ',
-				dom.clickbutton('Junk', attr.title('Move to Junk mailbox, marking as junk and causing this message to be used in spam classification of new incoming messages.'), clickCmd(msglistView.cmdJunk, shortcuts)), ' ',
-				dom.clickbutton('Move to...', function click(e: MouseEvent) {
-					movePopover(e, listMailboxes(), [m])
-				}), ' ',
-				dom.clickbutton('Labels...', attr.title('Add/remove labels.'), function click(e: MouseEvent) {
-					labelsPopover(e, [m], possibleLabels)
-				}), ' ',
 				dom.clickbutton('More...', attr.title('Show more actions.'), function click(e: MouseEvent) {
 					popover(e.target! as HTMLElement, {transparent: true},
 						dom.div(
 							css('popupMore', {display: 'flex', flexDirection: 'column', gap: '.5ex', textAlign: 'right'}),
 							[
+								dom.clickbutton('Junk', attr.title('Move to Junk mailbox, marking as junk and causing this message to be used in spam classification of new incoming messages.'), clickCmd(msglistView.cmdJunk, shortcuts)),
+								dom.clickbutton('Move to...', function click(e: MouseEvent) {
+									movePopover(e, listMailboxes(), [m])
+								}),
+								dom.clickbutton('Labels...', attr.title('Add/remove labels.'), function click(e: MouseEvent) {
+									labelsPopover(e, [m], possibleLabels)
+								}),
+								dom.clickbutton('Toggle fixed-width text', attr.title('Switch plain text between proportional and monospace fonts for patches or aligned tables.'), function click() {
+									msgscrollElem.classList.toggle('readerFixedWidth')
+								}),
 								dom.clickbutton('Print', attr.title('Print message, opens in new tab and opens print dialog.'), clickCmd(cmdPrint, shortcuts)),
 								dom.clickbutton('Mark Not Junk', attr.title('Mark as not junk, causing this message to be used in spam classification of new incoming messages.'), clickCmd(msglistView.cmdMarkNotJunk, shortcuts)),
 								dom.clickbutton('Mark Read', clickCmd(msglistView.cmdMarkRead, shortcuts)),
@@ -3583,7 +3615,12 @@ const newMsgView = (miv: MsgitemView, msglistView: MsglistView, listMailboxes: l
 	renderAttachments()
 
 	const root = dom.div(css('msgViewRoot', {position: 'absolute', top: 0, right: 0, bottom: 0, left: 0, display: 'flex', flexDirection: 'column'}))
-	dom._kids(root, msgmetaElem, msgcontentElem)
+	dom._kids(root, msgmetaElem, msgcontentElem,
+		dom.div(dom._class('readerReply'),
+			dom.clickbutton(dom._class('replyPrimary'), icons.reply(), ' Reply', clickCmd(cmdReply, shortcuts)),
+			dom.clickbutton(icons.forward(), ' Forward', clickCmd(cmdForward, shortcuts)),
+		),
+	)
 
 	const loadText = (pm: api.ParsedMessage): void => {
 		// We render text ourselves so we can make links clickable and get any selected
@@ -6294,20 +6331,20 @@ const newSearchView = (searchbarElem: HTMLInputElement, mailboxlistView: Mailbox
 						dom.td('Received between', style({whiteSpace: 'nowrap'})),
 						dom.td(
 							style({lineHeight: 2}),
-							dom.div(
+							dom.div(dom._class('searchDates'),
 								oldestDate=dom.input(attr.type('date'), focusPlaceholder('2023-07-20'), changeHandlers),
 								oldestTime=dom.input(attr.type('time'), focusPlaceholder('23:10'), changeHandlers),
 								' ',
-								dom.clickbutton('x', style({padding: '0 .3em'}), attr.arialabel('Clear start date.'), attr.title('Clear start date.'), function click() {
+								dom.clickbutton('×', style({padding: '0 .3em'}), attr.arialabel('Clear start date.'), attr.title('Clear start date.'), function click() {
 									oldestDate.value = ''
 									oldestTime.value = ''
 									updateSearchbar()
 								}),
-								' and ',
+								dom.span(dom._class('searchDateSeparator'), 'and'),
 								newestDate=dom.input(attr.type('date'), focusPlaceholder('2023-07-20'), changeHandlers),
 								newestTime=dom.input(attr.type('time'), focusPlaceholder('23:10'), changeHandlers),
 								' ',
-								dom.clickbutton('x', style({padding: '0 .3em'}), attr.arialabel('Clear end date.'), attr.title('Clear end date.'), function click() {
+								dom.clickbutton('×', style({padding: '0 .3em'}), attr.arialabel('Clear end date.'), attr.title('Clear end date.'), function click() {
 									newestDate.value = ''
 									newestTime.value = ''
 									updateSearchbar()
@@ -6503,8 +6540,18 @@ const init = async () => {
 
 	;[moxversion, moxgoos, moxgoarch] = await client.Version()
 
+	const mailboxHeading = dom.h1(dom._class('mailboxHeading'), 'Inbox')
+
 	const updatePageTitle = () => {
 		const mb = mailboxlistView && mailboxlistView.activeMailbox()
+		let heading = 'All mail'
+		if (mb) {
+			heading = mb.Name
+		}
+		if (search.active) {
+			heading = 'Search results'
+		}
+		dom._kids(mailboxHeading, heading)
 		const addr = loginAddress ? loginAddress.User+'@'+formatDomain(loginAddress.Domain) : ''
 		if (!mb) {
 			document.title = [addr, 'Mox Webmail'].join(' - ')
@@ -6756,109 +6803,115 @@ const init = async () => {
 	const msgColumnDraggerStyle = css('msgColumnDragger', {position: 'absolute', top: 0, bottom: 0, width: '1px', backgroundColor: styles.popupBorderColor, left: '2.5px'})
 
 	let msglistElem = dom.div(css('msgList', {backgroundColor: styles.msglistBackgroundColor, position: 'absolute', left: '0', right: 0, top: 0, bottom: 0, display: 'flex', flexDirection: 'column'}),
-		dom.div(
-			attr.role('region'), attr.arialabel('Filter and sorting buttons for message list'),
-			css('msgListFilterSorting', {display: 'flex', justifyContent: 'space-between', backgroundColor: styles.backgroundColorMild, borderBottom: '1px solid', borderBottomColor: styles.borderColor, padding: '.25em .5em'}),
-			dom.div(
-				dom.h1('Refine:', css('refineTitle', {fontWeight: 'normal', fontSize: 'inherit', display: 'inline', margin: 0}), attr.title('Refine message listing with quick filters. These refinement filters are in addition to any search criteria, but the refine attachment filter overrides a search attachment criteria.')),
-				' ',
-				dom.span(dom._class('btngroup'),
-					refineUnreadBtn=dom.clickbutton(settings.refine === 'unread' ? dom._class('active') : [],
-						'Unread',
-						attr.title('Only show messages marked as unread.'),
-						async function click(e: MouseEvent) {
-							await refineToggle('unread', e.target! as HTMLButtonElement)
-						},
-					),
-					refineReadBtn=dom.clickbutton(settings.refine === 'read' ? dom._class('active') : [],
-						'Read',
-						attr.title('Only show messages marked as read.'),
-						async function click(e: MouseEvent) {
-							await refineToggle('read', e.target! as HTMLButtonElement)
-						},
-					),
-					refineAttachmentsBtn=dom.clickbutton(settings.refine === 'attachments' ? dom._class('active') : [],
-						'Attachments',
-						attr.title('Only show messages with attachments.'),
-						async function click(e: MouseEvent) {
-							await refineToggle('attachments', e.target! as HTMLButtonElement)
-						},
-					),
-					refineFlaggedBtn=dom.clickbutton(settings.refine === 'flagged' ? dom._class('active') : [],
-						'Flagged',
-						attr.title('Only show flagged/starred messages.'),
-						async function click(e: MouseEvent) {
-							await refineToggle('flagged', e.target! as HTMLButtonElement)
-						},
-					),
-					refineLabelBtn=dom.clickbutton(settings.refine.startsWith('label:') ? [dom._class('active'), 'Label: '+settings.refine.substring('label:'.length)] : 'Label',
-						attr.title('Only show messages with the selected label.'),
-						async function click(e: MouseEvent) {
-							const labels = possibleLabels()
-							const remove = popover(e.target! as HTMLElement, {},
-								dom.div(
-									style({display: 'flex', flexDirection: 'column', gap: '1ex'}),
-									labels.map(l => {
-										const selectLabel = async () => {
-											await refineToggle('label:'+l, e.target! as HTMLButtonElement)
-											remove()
-										}
-										return dom.div(
-											dom.clickbutton(styleClasses.keyword, keywordButtonStyle, l, async function click() {
-												await selectLabel()
+		dom.div(dom._class('listHeading'), mailboxHeading,
+			dom.details(dom._class('listOptions'),
+				dom.summary('Filter & sort'),
+				dom.div(
+					attr.role('region'), attr.arialabel('Filter and sorting buttons for message list'),
+					css('msgListFilterSorting', {display: 'flex', justifyContent: 'space-between', backgroundColor: styles.backgroundColorMild, borderBottom: '1px solid', borderBottomColor: styles.borderColor, padding: '.25em .5em'}),
+					dom.div(
+						dom.h1('Refine:', css('refineTitle', {fontWeight: 'normal', fontSize: 'inherit', display: 'inline', margin: 0}), attr.title('Refine message listing with quick filters. These refinement filters are in addition to any search criteria, but the refine attachment filter overrides a search attachment criteria.')),
+						' ',
+						dom.span(dom._class('btngroup'),
+							refineUnreadBtn=dom.clickbutton(settings.refine === 'unread' ? dom._class('active') : [],
+								'Unread',
+								attr.title('Only show messages marked as unread.'),
+								async function click(e: MouseEvent) {
+									await refineToggle('unread', e.target! as HTMLButtonElement)
+								},
+							),
+							refineReadBtn=dom.clickbutton(settings.refine === 'read' ? dom._class('active') : [],
+								'Read',
+								attr.title('Only show messages marked as read.'),
+								async function click(e: MouseEvent) {
+									await refineToggle('read', e.target! as HTMLButtonElement)
+								},
+							),
+							refineAttachmentsBtn=dom.clickbutton(settings.refine === 'attachments' ? dom._class('active') : [],
+								'Attachments',
+								attr.title('Only show messages with attachments.'),
+								async function click(e: MouseEvent) {
+									await refineToggle('attachments', e.target! as HTMLButtonElement)
+								},
+							),
+							refineFlaggedBtn=dom.clickbutton(settings.refine === 'flagged' ? dom._class('active') : [],
+								'Flagged',
+								attr.title('Only show flagged/starred messages.'),
+								async function click(e: MouseEvent) {
+									await refineToggle('flagged', e.target! as HTMLButtonElement)
+								},
+							),
+							refineLabelBtn=dom.clickbutton(settings.refine.startsWith('label:') ? [dom._class('active'), 'Label: '+settings.refine.substring('label:'.length)] : 'Label',
+								attr.title('Only show messages with the selected label.'),
+								async function click(e: MouseEvent) {
+									const labels = possibleLabels()
+									const remove = popover(e.target! as HTMLElement, {},
+										dom.div(
+											style({display: 'flex', flexDirection: 'column', gap: '1ex'}),
+											labels.map(l => {
+												const selectLabel = async () => {
+													await refineToggle('label:'+l, e.target! as HTMLButtonElement)
+													remove()
+												}
+												return dom.div(
+													dom.clickbutton(styleClasses.keyword, keywordButtonStyle, l, async function click() {
+														await selectLabel()
+													}),
+												)
 											}),
+											labels.length === 0 ? dom.div('No labels yet, set one on a message first.') : [],
 										)
-									}),
-									labels.length === 0 ? dom.div('No labels yet, set one on a message first.') : [],
-								)
-							)
-						},
+									)
+								},
+							),
+						),
+						' ',
+						dom.clickbutton(
+							'x',
+							style({padding: '0 .25em'}),
+							attr.arialabel('Clear refinement filters.'),
+							attr.title('Clear refinement filters.'),
+							async function click(e: MouseEvent) {
+								settingsPut({...settings, refine: ''})
+								refineToggleActive(e.target! as HTMLButtonElement)
+								await withStatus('Requesting messages', requestNewView(false))
+							},
+						),
 					),
-				),
-				' ',
-				dom.clickbutton(
-					'x',
-					style({padding: '0 .25em'}),
-					attr.arialabel('Clear refinement filters.'),
-					attr.title('Clear refinement filters.'),
-					async function click(e: MouseEvent) {
-						settingsPut({...settings, refine: ''})
-						refineToggleActive(e.target! as HTMLButtonElement)
-						await withStatus('Requesting messages', requestNewView(false))
-					},
-				),
-			),
-			dom.div(
-				queryactivityElem=dom.span(),
-				' ',
-				threadMode=dom.select(
-					attr.arialabel('Thread modes.'),
-					attr.title('Off: Threading disabled, messages are shown individually.\nOn: Group messages in threads, expanded by default except when (previously) manually collapsed.\nUnread: Only expand thread with unread messages, ignoring and not saving whether they were manually collapsed.'),
-					dom.option('Threads: Off', attr.value(api.ThreadMode.ThreadOff), settings.threading === api.ThreadMode.ThreadOff ? attr.selected('') : []),
-					dom.option('Threads: On', attr.value(api.ThreadMode.ThreadOn), settings.threading === api.ThreadMode.ThreadOn ? attr.selected('') : []),
-					dom.option('Threads: Unread', attr.value(api.ThreadMode.ThreadUnread), settings.threading === api.ThreadMode.ThreadUnread ? attr.selected('') : []),
-					async function change() {
-						let reset = settings.threading === api.ThreadMode.ThreadOff
-						settingsPut({...settings, threading: threadMode.value as api.ThreadMode})
-						reset = reset || settings.threading === api.ThreadMode.ThreadOff
-						if (reset) {
-							await withStatus('Requesting messages', requestNewView(false))
-						} else {
-							msglistView.threadToggle()
-						}
-					},
-				),
-				' ',
-				dom.clickbutton('↑↓', attr.title('Toggle sorting by date received.'), settings.orderAsc ? dom._class('invert') : [], async function click(e: MouseEvent) {
-					settingsPut({...settings, orderAsc: !settings.orderAsc})
-					;(e.target! as HTMLButtonElement).classList.toggle('invert', settings.orderAsc)
-					// We don't want to include the currently selected message because it could cause a
-					// huge amount of messages to be fetched. e.g. when first message in large mailbox
-					// was selected, it would now be the last message.
-					await withStatus('Requesting messages', requestNewView(true))
-				}),
+					dom.div(
+						queryactivityElem=dom.span(),
+						' ',
+						threadMode=dom.select(
+							attr.arialabel('Thread modes.'),
+							attr.title('Off: Threading disabled, messages are shown individually.\nOn: Group messages in threads, expanded by default except when (previously) manually collapsed.\nUnread: Only expand thread with unread messages, ignoring and not saving whether they were manually collapsed.'),
+							dom.option('Threads: Off', attr.value(api.ThreadMode.ThreadOff), settings.threading === api.ThreadMode.ThreadOff ? attr.selected('') : []),
+							dom.option('Threads: On', attr.value(api.ThreadMode.ThreadOn), settings.threading === api.ThreadMode.ThreadOn ? attr.selected('') : []),
+							dom.option('Threads: Unread', attr.value(api.ThreadMode.ThreadUnread), settings.threading === api.ThreadMode.ThreadUnread ? attr.selected('') : []),
+							async function change() {
+								let reset = settings.threading === api.ThreadMode.ThreadOff
+								settingsPut({...settings, threading: threadMode.value as api.ThreadMode})
+								reset = reset || settings.threading === api.ThreadMode.ThreadOff
+								if (reset) {
+									await withStatus('Requesting messages', requestNewView(false))
+								} else {
+									msglistView.threadToggle()
+								}
+							},
+						),
+						' ',
+						dom.clickbutton('↑↓', attr.title('Toggle sorting by date received.'), settings.orderAsc ? dom._class('invert') : [], async function click(e: MouseEvent) {
+							settingsPut({...settings, orderAsc: !settings.orderAsc})
+							;(e.target! as HTMLButtonElement).classList.toggle('invert', settings.orderAsc)
+							// We don't want to include the currently selected message because it could cause a
+							// huge amount of messages to be fetched. e.g. when first message in large mailbox
+							// was selected, it would now be the last message.
+							await withStatus('Requesting messages', requestNewView(true))
+						}),
+					),
 			),
 		),
+		),
+
 		dom.div(
 			style({height: '1ex', position: 'relative'}),
 			dom.div(dom._class('msgItemFlags')),
@@ -7039,9 +7092,7 @@ const init = async () => {
 			attr.role('region'), attr.arialabel('Top bar'),
 			topcomposeboxElem=dom.div(dom._class('pad'),
 				style({width: settings.mailboxesWidth + 'px', textAlign: 'center'}),
-				composeBtn=dom.clickbutton('Compose', attr.title('Compose new email message.'), function click() {
-					shortcutCmd(cmdCompose, shortcuts)
-				}),
+				dom.span(dom._class('brandName'), 'devn'),
 			),
 			dom.div(dom._class('pad'),
 				css('searchbarBox', {paddingLeft: 0, display: 'flex', flexGrow: 1}),
@@ -7050,7 +7101,8 @@ const init = async () => {
 					dom.form(
 						style({display: 'flex', flexGrow: 1}),
 						searchbarElem=dom.input(
-							attr.placeholder('Search...'),
+							attr.placeholder('Search mail…'),
+							attr.arialabel('Search mail'),
 							style({position: 'relative', width: '100%'}),
 							attr.title('Search messages based on criteria like matching free-form text, in a mailbox, labels, addressees.'),
 							focusPlaceholder('word "with space" -notword mb:Inbox f:from@x.example t:rcpt@x.example start:2023-7-1 end:2023-7-8 s:"subject" a:images l:$Forwarded h:Reply-To:other@x.example minsize:500kb'),
@@ -7088,10 +7140,9 @@ const init = async () => {
 								searchView.updateForm()
 							},
 						),
-						dom.clickbutton('x',
+						dom.clickbutton('×', dom._class('searchClear'),
 							attr.arialabel('Cancel and clear search and open Inbox.'),
 							attr.title('Cancel and clear search and open Inbox.'),
-							style({marginLeft: '.25em', padding: '0 .3em'}),
 							async function click() {
 								searchbarElem.value = ''
 								if (!search.active) {
@@ -7117,47 +7168,64 @@ const init = async () => {
 				),
 				connectionElem=dom.div(),
 				statusElem=dom.div(css('status', {marginLeft: '.5em', flexGrow: '1'}), attr.role('status')),
-				dom.div(
-					style({paddingLeft: '1em'}),
-					layoutElem=dom.select(
-						attr.title('Layout of message list and message panes. Top/bottom has message list above message view. Left/Right has message list left, message view right. Auto selects based on window width and automatically switches on resize. Wide screens get left/right, smaller screens get top/bottom.'),
-						dom.option('Auto layout', attr.value('auto'), settings.layout === 'auto' ? attr.selected('') : []),
-						dom.option('Top/bottom', attr.value('topbottom'), settings.layout === 'topbottom' ? attr.selected('') : []),
-						dom.option('Left/right', attr.value('leftright'), settings.layout === 'leftright' ? attr.selected('') : []),
-						function change() {
-							settingsPut({...settings, layout: layoutElem.value})
-							if (layoutElem.value === 'auto') {
-								autoselectLayout()
-							} else {
-								selectLayout(layoutElem.value)
+				dom.details(dom._class('accountMenu'),
+					dom.summary(loginAddressElem=dom.span()),
+					dom.div(dom._class('accountMenuContent'),
+						dom.label(dom._class('themeSetting'), 'Theme',
+							dom.select(attr.arialabel('Theme'),
+								...['system', 'light', 'dark'].map(value => {
+									const option = dom.option(value[0].toUpperCase() + value.slice(1), attr.value(value))
+									option.selected = settings.theme === value
+									return option
+								}),
+								function change(e: Event) {
+									settingsPut({...settings, theme: (e.target as HTMLSelectElement).value})
+									applyTheme()
+								},
+							),
+						),
+						layoutElem=dom.select(
+							attr.title('Layout of message list and message panes. Top/bottom has message list above message view. Left/Right has message list left, message view right. Auto selects based on window width and automatically switches on resize. Wide screens get left/right, smaller screens get top/bottom.'),
+							dom.option('Auto layout', attr.value('auto'), settings.layout === 'auto' ? attr.selected('') : []),
+							dom.option('Top/bottom', attr.value('topbottom'), settings.layout === 'topbottom' ? attr.selected('') : []),
+							dom.option('Left/right', attr.value('leftright'), settings.layout === 'leftright' ? attr.selected('') : []),
+							function change() {
+								settingsPut({...settings, layout: layoutElem.value})
+								if (layoutElem.value === 'auto') {
+									autoselectLayout()
+								} else {
+									selectLayout(layoutElem.value)
+								}
+							},
+						),
+						' ',
+						dom.clickbutton('Help', attr.title('Show popup with basic usage information and a keyboard shortcuts.'), clickCmd(cmdHelp, shortcuts)),
+						' ',
+						settingsBtn=dom.clickbutton('Settings', attr.title('Change settings for composing messages.'), clickCmd(cmdSettings, shortcuts)),
+						' ',
+						accountElem=dom.span(),
+						' ',
+						' ',
+						dom.clickbutton('Logout', attr.title('Logout, invalidating this session.'), async function click(e: MouseEvent) {
+							await withStatus('Logging out', client.Logout(), e.target! as HTMLButtonElement)
+							localStorageRemove('webmailcsrftoken')
+							if (eventSource) {
+								eventSource.close()
+								eventSource = null
 							}
-						},
+							// Reload so all state is cleared from memory.
+							window.location.reload()
+						}),
 					),
-					' ',
-					dom.clickbutton('Help', attr.title('Show popup with basic usage information and a keyboard shortcuts.'), clickCmd(cmdHelp, shortcuts)),
-					' ',
-					settingsBtn=dom.clickbutton('Settings', attr.title('Change settings for composing messages.'), clickCmd(cmdSettings, shortcuts)),
-					' ',
-					accountElem=dom.span(),
-					' ',
-					loginAddressElem=dom.span(),
-					' ',
-					dom.clickbutton('Logout', attr.title('Logout, invalidating this session.'), async function click(e: MouseEvent) {
-						await withStatus('Logging out', client.Logout(), e.target! as HTMLButtonElement)
-						localStorageRemove('webmailcsrftoken')
-						if (eventSource) {
-							eventSource.close()
-							eventSource = null
-						}
-						// Reload so all state is cleared from memory.
-						window.location.reload()
-					}),
 				),
 			),
 		),
 		mailboxesListMsgBox=dom.div(
 			css('mailboxesListMsgBox', {flexGrow: '1', position: 'relative'}),
 			mailboxesElem=dom.div(topMailboxesStyle,
+				composeBtn=dom.clickbutton(dom._class('composePrimary'), icons.draft(), ' Compose', attr.title('Compose new email message.'), function click() {
+					shortcutCmd(cmdCompose, shortcuts)
+				}),
 				style({width: settings.mailboxesWidth + 'px'}),
 				css('mailboxesBox', {display: 'flex', flexDirection: 'column', alignContent: 'stretch', position: 'absolute', left: 0,top: 0, bottom: 0}),
 				dom.div(dom._class('pad'), yscrollAutoStyle,
@@ -7320,7 +7388,10 @@ const init = async () => {
 	}
 
 	const autoselectLayout = () => {
-		const want = window.innerWidth <= 2*2560/3 ? 'topbottom' : 'leftright'
+		let want = 'leftright'
+		if (window.innerWidth < 1000) {
+			want = 'topbottom'
+		}
 		selectLayout(want)
 	}
 

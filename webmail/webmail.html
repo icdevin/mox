@@ -16,6 +16,229 @@ fieldset { border: 0; }
 @keyframes fadeout { 0% { opacity: 1 } 100% { opacity: 0.1 } }
 .invert { filter: invert(100%); }
 
+/* Keeping theme overrides after generated styles and before administrator customizations. */
+:root {
+  --color: #282520; --colorMild: #625e58; --colorMilder: #746e66;
+  --backgroundColor: #fcfaf7; --backgroundColorMild: #f6f3ee; --backgroundColorMilder: #e2dcd3;
+  --borderColor: #e3ddd4; --mailboxesTopBackgroundColor: #f9f6f1; --msglistBackgroundColor: #fcfaf7;
+  --buttonBackground: transparent; --buttonBorderColor: #d7cfc4; --buttonHoverBackground: #eee8df;
+  --popupColor: #282520; --popupBackgroundColor: #fcfaf7; --popupBorderColor: #d7cfc4;
+  --overlayOpaqueBackgroundColor: #f6f3ee; --overlayBackgroundColor: #28252033;
+  --highlightBackground: #f8e7d6; --highlightBorderColor: #c26326; --highlightBackgroundHover: #f1d8bf;
+  --mailboxActiveBackground: #f6e8d9; --mailboxHoverBackgroundColor: #f0eae2;
+  --msgItemActiveBackground: #f8ecdf; --msgItemHoverBackgroundColor: #f2ede6;
+  --msgItemFocusBorderColor: #b94a0a; --linkColor: #a84108; --linkVisitedColor: #804824;
+  --accent: #b94706; --accentContrast: #fff; --boxShadow: 0 12px 36px #3526161a;
+}
+html { font-size: 15px; }
+* { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
+button, .button, select, input, textarea { font: inherit; }
+button, .button, select { min-height: 34px; padding: 6px 10px; border-radius: 6px; cursor: pointer; }
+input, textarea { padding: 8px 10px; border: 1px solid var(--buttonBorderColor); border-radius: 6px; }
+button:focus-visible, a:focus-visible, summary:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+button:hover, summary:hover { text-decoration: none; }
+button:disabled { cursor: default; }
+.webmailRoot { line-height: 1.45; }
+.webmailRoot > .topMailboxes { min-height: 74px; align-items: center; border-bottom: 1px solid var(--borderColor); flex-shrink: 0; }
+.brandName { font: bold 38px Georgia, 'Times New Roman', serif; letter-spacing: -1.5px; }
+.webmailRoot .searchbarBox { padding: 12px 24px; align-items: center; gap: 16px; min-width: 0; }
+.searchbarBox search { flex: 1; min-width: 100px; }
+.searchbarBox > search > form > input { background: transparent; height: 42px; border-color: var(--buttonBorderColor); padding: 10px 16px; }
+.searchbarBox .status:empty { display: none; }
+.searchbarBox .searchClear { border: 0; color: var(--colorMild); }
+.searchbarBox search > form { position: relative; min-width: 0; }
+.searchbarBox > search > form > input { padding-right: 42px; }
+.searchbarBox .searchClear { position: absolute; right: 5px; top: 5px; z-index: 4; width: 32px; height: 32px; min-height: 32px; padding: 0; border-radius: 5px; background: transparent; font-size: 22px; line-height: 1; display: grid; place-items: center; }
+.searchbarBox .searchClear:hover { background: var(--buttonHoverBackground); color: var(--color); }
+.searchbarBox .searchClear:focus-visible { outline-offset: -2px; }
+.accountMenu { position: relative; flex-shrink: 0; }
+.accountMenu summary { cursor: pointer; padding: 8px; border-radius: 5px; }
+.accountMenuContent { position: absolute; right: 0; top: 100%; width: 240px; display: flex; flex-direction: column; gap: 10px; background: var(--popupBackgroundColor); padding: 16px; border: 1px solid var(--borderColor); border-radius: 8px; box-shadow: var(--boxShadow); z-index: 3; }
+.themeSetting { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.accountMenuContent button, .accountMenuContent a { text-align: left; }
+.webmailRoot .mailboxesBox { padding: 20px 8px; gap: 22px; }
+.webmailRoot .composePrimary { min-height: 46px; margin: 0 4px; background: var(--accent); color: var(--accentContrast); border: 0; font-weight: 600; border-radius: 7px; }
+.webmailRoot .composePrimary:hover { background: #963b08; color: #fff; }
+.mailboxesBox > .yscrollAuto { padding: 0; }
+.mailboxesBox [aria-label="Mailboxes"] > div:first-child { display: flex; align-items: center; justify-content: space-between; padding: 0 8px 12px; color: var(--colorMilder); }
+.mailboxesBox .mailboxesTitle { font-size: 12px; font-weight: 500; }
+.mailboxesBox [aria-label="Mailboxes actions"] { border: 0; min-height: 26px; padding: 0 5px; }
+.webmailRoot .mailboxItem { border-radius: 6px; margin-bottom: 5px; }
+.webmailRoot .mailbox { padding: 11px 9px; gap: 10px; align-items: center; }
+.mailboxItem.active { color: var(--accent); }
+.mailboxName { font-size: 14px; }
+.webmailRoot .listMsgBox { border-top: 0; }
+.listHeading { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 20px; border-bottom: 1px solid var(--borderColor); flex-shrink: 0; }
+.mailboxHeading { font-size: 25px; font-weight: 650; letter-spacing: -.6px; margin: 0; overflow: hidden; text-overflow: ellipsis; }
+.listOptions { position: relative; flex-shrink: 0; font-size: 13px; }
+.listOptions summary { cursor: pointer; padding: 7px 0; color: var(--colorMild); }
+.webmailRoot .msgListFilterSorting { position: absolute; right: 0; top: 100%; z-index: 2; width: 300px; padding: 16px; display: flex; flex-direction: column; gap: 16px; border: 1px solid var(--borderColor); border-radius: 8px; box-shadow: var(--boxShadow); background: var(--popupBackgroundColor); }
+.msgListFilterSorting .btngroup { display: flex; flex-wrap: wrap; gap: 5px; margin: 8px 0; }
+.msgListFilterSorting .btngroup button { border: 1px solid var(--borderColor); border-radius: 5px; }
+.layoutLeft .msgList > div:nth-child(2) { display: none; }
+.layoutLeft .msgItem { position: relative; display: grid; grid-template-columns: minmax(0, 1fr) 64px; padding: 10px 16px; border: 0; border-bottom: 1px solid var(--borderColor); border-left: 3px solid transparent; border-radius: 0; min-height: 84px; }
+.layoutLeft .msgItem.active { border-left-color: var(--accent); }
+.layoutLeft .msgItem.focus { outline: 1px solid var(--accent); outline-offset: -1px; border: 0; border-bottom: 1px solid var(--borderColor); border-left: 3px solid var(--accent); }
+.layoutLeft .msgItem .msgItemCell { padding: 0; width: auto; min-width: 0; }
+.layoutLeft .msgItemFrom { grid-column: 1; grid-row: 1; font-size: 15px; font-weight: 600; }
+.layoutLeft .msgItemAge { grid-column: 2; grid-row: 1; font-size: 12px; color: var(--colorMild); white-space: nowrap; }
+.layoutLeft .msgItemSubject { grid-column: 1 / -1; grid-row: 2; font-size: 14px; font-weight: 400; }
+.layoutLeft .msgItemSubjectText { text-overflow: ellipsis; width: 100%; }
+.layoutLeft .msgItemSubjectSnippet { display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: 13px; margin-top: 1px; }
+.layoutLeft .msgItemFlags { grid-column: 1 / -1; grid-row: 3; font-size: 12px; }
+.layoutLeft .msgItemFlags:has(.msgItemFlagsSpread > div:empty):not(:has(button)) { display: none; }
+.layoutLeft .msgItemUnread .msgItemSubject { font-weight: 600; }
+.layoutLeft .msgItemThreadBar { display: none; }
+.msgItemFromSpread { align-items: center; gap: 6px; }
+.msgItemFromText { flex: 1; min-width: 0; }
+button.threadToggle { min-height: 24px; height: 24px; padding: 1px 4px; gap: 2px; flex-shrink: 0; border: 0; background: transparent; color: var(--colorMild); font-size: 12px; font-weight: 500; }
+button.threadToggle:hover { background: var(--buttonHoverBackground); color: var(--color); }
+button.threadToggle svg { width: 14px; height: 14px !important; flex-basis: 14px; }
+.threadToggle[aria-expanded="true"] svg { transform: rotate(90deg); }
+.msgItemNotRelevant { opacity: 1; color: var(--colorMild); }
+.msgItemMailbox, .msgItemMailboxCollapsed { background: var(--backgroundColorMild); color: var(--color); border: 1px solid var(--buttonBorderColor); border-radius: 4px; padding: 1px 5px; font-weight: 500; }
+.webmailRoot .msgmeta { background: var(--backgroundColor); border-bottom: 0; max-height: 55%; flex-shrink: 0; }
+.readerToolbar { padding: 14px 20px; border-bottom: 1px solid var(--borderColor); }
+.readerToolbar > .pad { padding: 0; display: flex; flex-wrap: wrap; gap: 4px; align-items: center; }
+.readerToolbar button { border: 0; font-size: 13px; padding: 6px 8px; }
+.readerSubject { font: bold clamp(26px, 2.8vw, 42px)/1.18 Georgia, 'Times New Roman', serif; letter-spacing: -.8px; padding: 28px 32px 20px; margin: 0; overflow-wrap: anywhere; }
+.msgmeta > [aria-live] { padding: 0 32px 20px; }
+.webmailRoot .msgHeaders { margin-bottom: 0; font-size: 13px; }
+.webmailRoot .msgHeaders td { padding: 3px 4px; }
+.webmailRoot .msgFromReceivedSpread { flex-direction: column; gap: 5px; }
+.msgFromReceivedSpread > div:first-child { font-size: 15px; font-weight: 600; }
+.msgFromReceivedSpread > div:last-child { color: var(--colorMild); font-size: 12px; }
+.msgViewRoot .subjectHeaderText { display: none; }
+.msgViewRoot .subjectHeaderRow > .msgHeaderField { visibility: hidden; }
+.msgViewRoot .subjectHeaderRow > td:last-child { grid-column: 2; }
+.webmailRoot .headerBodySeparator { height: 1px; margin: 0 32px; }
+.webmailRoot .msgscroll { padding: 28px 32px; }
+.msgscroll .textmulti { max-width: 66ch; font-size: 15px; line-height: 1.65; overflow-wrap: anywhere; }
+/* Fixed-width mode preserves alignment when reading patches and text tables. */
+.msgscroll .mono, .msgscroll .mono * { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
+.msgscroll.readerFixedWidth .mono, .msgscroll.readerFixedWidth .mono * { font-family: ui-monospace, 'SFMono-Regular', monospace; }
+.msgscroll .textmulti > * { padding: 0; margin: 0; }
+.readerReply { margin: 16px 32px 28px; padding: 18px; border: 1px solid var(--borderColor); border-radius: 8px; display: flex; gap: 10px; flex-shrink: 0; }
+.readerReply .replyPrimary { background: var(--accent); color: var(--accentContrast); border-color: var(--accent); }
+.webmailRoot .msgListEnd { border-top: 0; font-size: 12px; text-align: center; }
+.popupContent, .popoverContent { border-radius: 8px; }
+.popoverMenu { background: var(--popupBackgroundColor); color: var(--popupColor); border: 1px solid var(--popupBorderColor); padding: 8px; box-shadow: var(--boxShadow); }
+.popoverMenu button { width: 100%; text-align: left; border: 0; padding: 8px 12px !important; }
+.composePopup { border-radius: 10px; }
+.composePopup textarea { padding: 16px; line-height: 1.6; }
+.searchOverlay { position: fixed; }
+.searchContent { max-width: calc(100vw - 32px); max-height: calc(100dvh - 90px); overflow-y: auto; padding: 16px; border-radius: 10px; }
+.searchTable { border-collapse: separate; border-spacing: 0 8px; }
+.searchTable td { padding: 4px; vertical-align: top; }
+.searchTable td:first-child { width: 130px; padding-top: 12px; color: var(--colorMild); }
+.searchContent input:not([type=radio]):not([type=checkbox]), .searchContent select { min-height: 36px; max-width: 100%; }
+input[type=radio], input[type=checkbox] { padding: 0; accent-color: var(--accent); }
+.searchContent label:has(input[type=radio]), .searchContent label:has(input[type=checkbox]) { display: inline-flex; align-items: center; gap: 7px; margin: 4px 12px 4px 0; line-height: 1.4; }
+.searchContent input[type=radio], .searchContent input[type=checkbox] { width: 16px; height: 16px; margin: 0; flex: 0 0 16px; }
+.searchDates { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr) 32px; gap: 6px; align-items: center; }
+.searchDateSeparator { grid-column: 1 / -1; color: var(--colorMild); line-height: 1; }
+.searchContent button[type=submit] { background: var(--accent); color: var(--accentContrast); padding: 8px 20px; }
+button:has(svg) { display: inline-flex; align-items: center; justify-content: center; gap: 6px; vertical-align: middle; }
+button svg { width: 16px; height: 16px !important; flex: 0 0 16px; display: block; }
+.popoverMenu button:has(svg) { justify-content: flex-start; }
+@media (max-width: 600px) {
+  .searchContent { left: 6px !important; right: 6px; width: auto; padding: 12px; }
+  .searchTable, .searchTable tbody, .searchTable tr, .searchTable td { display: block; width: 100%; }
+  .searchTable td:first-child { width: auto; padding-top: 10px; }
+  .searchTable td { padding: 4px 0; }
+}
+
+.layoutLeft .msgItemFrom { font-size: 16px; }
+.layoutLeft .msgItemSubject { font-size: 16px; }
+.layoutLeft .msgItemSubjectSnippet { font-size: 14px; }
+.mailboxName { font-size: 15px; }
+.msgscroll .textmulti { font-size: 17px; line-height: 1.7; }
+.msgmeta > [aria-live] > div:empty, .msgmeta > [aria-live] > table:empty { display: none; }
+.readerToolbar svg { margin-right: 5px; }
+.composeFields { min-width: 0; }
+
+:root[data-theme="dark"] { --color: #eee8df; --colorMild: #c4baad; --colorMilder: #b0a697; --backgroundColor: #211e1a; --backgroundColorMild: #28241f; --backgroundColorMilder: #494238; --borderColor: #41392f; --mailboxesTopBackgroundColor: #25211c; --msglistBackgroundColor: #211e1a; --buttonBackground: transparent; --buttonBorderColor: #5f5243; --buttonHoverBackground: #383026; --popupColor: #eee8df; --popupBackgroundColor: #2b251f; --popupBorderColor: #5f5243; --overlayOpaqueBackgroundColor: #211e1a; --highlightBackground: #50351e; --highlightBorderColor: #d99150; --highlightBackgroundHover: #664324; --mailboxActiveBackground: #47301d; --mailboxHoverBackgroundColor: #342b22; --msgItemActiveBackground: #3c2c1e; --msgItemHoverBackgroundColor: #30291f; --msgItemFocusBorderColor: #e99a5d; --accent: #e99a5d; --accentContrast: #211e1a; --linkColor: #efb080; --linkVisitedColor: #d6ac90; }
+@media (max-width: 999px) {
+  .webmailRoot .mailboxesBox { width: 150px !important; }
+  .webmailRoot > .topMailboxes > div:first-child { width: 150px !important; }
+  .webmailRoot .listMsgBox { left: 151px !important; }
+  .mailboxesListGrab { display: none; }
+  .readerSubject { padding: 16px 20px; font-size: 27px; }
+  .msgmeta > [aria-live] { padding: 0 20px 12px; }
+  .webmailRoot .msgscroll { padding: 20px; }
+  .readerReply { margin: 10px 20px; padding: 10px; }
+  .readerToolbar { padding: 8px 12px; }
+  .webmailRoot .searchbarBox { padding: 10px 16px; }
+  .accountMenu summary { max-width: 160px; overflow-wrap: anywhere; }
+  .listHeading { padding: 10px 16px; }
+}
+@media (max-width: 600px) {
+  .webmailRoot .mailboxesBox { width: 94px !important; padding: 12px 4px; gap: 16px; }
+  .webmailRoot > .topMailboxes > div:first-child { width: 94px !important; }
+  .webmailRoot .listMsgBox { left: 95px !important; }
+  .brandName { font-size: 30px; }
+  .webmailRoot .mailbox { flex-wrap: wrap; gap: 4px; padding: 8px 6px; }
+  .mailboxName { font-size: 12px; }
+  .webmailRoot .composePrimary { font-size: 12px; padding: 6px 2px; margin: 0; }
+  .composePrimary svg { display: none; }
+  .mailboxesBox .mailboxesTitle { font-size: 10px; }
+  .webmailRoot .searchbarBox { gap: 6px; padding: 8px; }
+  .accountMenu summary { font-size: 11px; max-width: 90px; }
+  .searchbarBox search { margin-right: 0 !important; }
+
+  .accountMenuContent { width: 210px; }
+  .listHeading { padding: 10px; }
+  .mailboxHeading { font-size: 19px; }
+  .listOptions { font-size: 11px; }
+  .webmailRoot .msgListFilterSorting { width: 260px; }
+  .readerToolbar button { padding: 4px 6px; font-size: 12px; }
+  .readerSubject { font-size: 23px; padding: 12px; }
+  .msgmeta > [aria-live] { padding: 0 10px 10px; }
+  .webmailRoot .msgscroll { padding: 14px; }
+  .readerReply { margin: 8px 10px; }
+  .searchContent { max-width: calc(100vw - 12px); }
+  .popupSettings { min-width: 0 !important; }
+  .composePopup { min-width: 0; max-width: none; width: calc(100vw - 16px) !important; height: calc(100dvh - 16px) !important; left: 8px; right: 8px; top: 8px; bottom: 8px; padding: 12px; overflow: auto; }
+  .composeForm, .composeFields { min-height: 0; }
+  .composeFields > table { table-layout: fixed; }
+  .composeFields td:first-child { width: 50px; font-size: 12px; }
+  .composeFields td { overflow-wrap: anywhere; }
+  .composeFields input { max-width: 100%; min-width: 0; }
+  .composeFields .autosize { max-width: 100%; min-width: 0; }
+  .composeFields textarea { min-height: 180px; width: 100% !important; }
+  .composeButtonsSpread { flex-wrap: wrap; gap: 6px; }
+  .composeButtonsSpread button, .composeButtonsSpread select { font-size: 12px; padding: 4px 6px; }
+  .composeFields input[type=file] { font-size: 12px; width: 100%; }
+
+}
+
+@media (max-width: 600px) {
+.layoutTop .msgList > div:nth-child(2) { display: none; }
+.layoutTop .msgItem { position: relative; display: grid; grid-template-columns: minmax(0, 1fr) 64px; padding: 10px 16px; border: 0; border-bottom: 1px solid var(--borderColor); border-left: 3px solid transparent; border-radius: 0; min-height: 84px; }
+.layoutTop .msgItem.active { border-left-color: var(--accent); }
+.layoutTop .msgItem.focus { outline: 1px solid var(--accent); outline-offset: -1px; border: 0; border-bottom: 1px solid var(--borderColor); border-left: 3px solid var(--accent); }
+.layoutTop .msgItem .msgItemCell { padding: 0; width: auto; min-width: 0; }
+.layoutTop .msgItemFrom { grid-column: 1; grid-row: 1; font-size: 15px; font-weight: 600; }
+.layoutTop .msgItemAge { grid-column: 2; grid-row: 1; font-size: 12px; color: var(--colorMild); white-space: nowrap; }
+.layoutTop .msgItemSubject { grid-column: 1 / -1; grid-row: 2; font-size: 14px; font-weight: 400; }
+.layoutTop .msgItemSubjectText { text-overflow: ellipsis; width: 100%; }
+.layoutTop .msgItemSubjectSnippet { display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: 13px; margin-top: 1px; }
+.layoutTop .msgItemFlags { grid-column: 1 / -1; grid-row: 3; font-size: 12px; }
+.layoutTop .msgItemFlags:has(.msgItemFlagsSpread > div:empty):not(:has(button)) { display: none; }
+.layoutTop .msgItemUnread .msgItemSubject { font-weight: 600; }
+.layoutTop .msgItemThreadBar { display: none; }
+
+.webmailRoot .mailbox { display: grid; grid-template-columns: minmax(0, 1fr) auto; padding: 9px 5px; gap: 4px; }
+.mailboxIcon { display: none; }
+.mailbox .mailboxHoverOnly { position: absolute; right: 0; top: 0; }
+.webmailRoot .mailbox { position: relative; }
+.mailboxName { font-size: 12px; white-space: normal; overflow-wrap: anywhere; }
+.accountMenu summary { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.layoutTop .msgItem { min-height: 78px; padding: 8px 12px; grid-template-columns: minmax(0,1fr) 45px; }
+.layoutTop .msgItemFrom { font-size: 14px; }
+.layoutTop .msgItemSubject { font-size: 13px; }
+.layoutTop .msgItemSubjectSnippet { font-size: 12px; }
+}
 /* css placeholder */
 		</style>
 	</head>

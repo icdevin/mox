@@ -148,6 +148,8 @@
 		datalist: /* @__PURE__ */ __name((...l) => _domKids(document.createElement("datalist"), l), "datalist"),
 		h1: /* @__PURE__ */ __name((...l) => _domKids(document.createElement("h1"), l), "h1"),
 		h2: /* @__PURE__ */ __name((...l) => _domKids(document.createElement("h2"), l), "h2"),
+		details: /* @__PURE__ */ __name((...l) => _domKids(document.createElement("details"), l), "details"),
+		summary: /* @__PURE__ */ __name((...l) => _domKids(document.createElement("summary"), l), "summary"),
 		h3: /* @__PURE__ */ __name((...l) => _domKids(document.createElement("h3"), l), "h3"),
 		br: /* @__PURE__ */ __name((...l) => _domKids(document.createElement("br"), l), "br"),
 		hr: /* @__PURE__ */ __name((...l) => _domKids(document.createElement("hr"), l), "hr"),

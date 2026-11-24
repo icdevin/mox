@@ -16,6 +16,19 @@ const styleSheetDark = cssStyleDark.sheet!
 styleSheetDark.insertRule('@media (prefers-color-scheme: dark) {}')
 const darkModeRule = styleSheetDark.cssRules[0] as CSSMediaRule
 
+// Keeping generated colors and native controls consistent with an explicit theme.
+export const setDarkMode = (dark: boolean) => {
+	let theme = 'light'
+	let media = 'not all'
+	if (dark) {
+		theme = 'dark'
+		media = 'all'
+	}
+	darkModeRule.media.mediaText = media
+	document.documentElement.dataset.theme = theme
+	document.documentElement.style.colorScheme = theme
+}
+
 // We keep the default/regular styles and dark-mode styles in separate stylesheets.
 const cssStyle = dom.style(attr.type('text/css'))
 document.head.prepend(cssStyle)
@@ -484,11 +497,11 @@ export const loadMsgheaderView = (msgheaderelem: HTMLTableSectionElement, mi: ap
 			dom.td('Bcc:', msgHeaderFieldStyle),
 			dom.td(addressList(allAddrs, msgenv.BCC || [])),
 		),
-		dom.tr(
+		dom.tr(dom._class('subjectHeaderRow'),
 			dom.td('Subject:', msgHeaderFieldStyle),
 			dom.td(
 				dom.div(css('msgSubjectAttrsSpread', {display: 'flex', justifyContent: 'space-between'}),
-					dom.div(msgenv.Subject || ''),
+					dom.div(dom._class('subjectHeaderText'), msgenv.Subject || ''),
 					dom.div(
 						mi.Message.IsForward ? dom.span(msgAttrStyle, 'Forwarded', attr.title('Message came in from a forwarded address. Some message authentication policies, like DMARC, were not evaluated.')) : [],
 						mi.Message.IsMailingList ? dom.span(msgAttrStyle, 'Mailing list', attr.title('Message was received from a mailing list. Some message authentication policies, like DMARC, were not evaluated.')) : [],

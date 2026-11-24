@@ -148,6 +148,8 @@
 		datalist: /* @__PURE__ */ __name((...l) => _domKids(document.createElement("datalist"), l), "datalist"),
 		h1: /* @__PURE__ */ __name((...l) => _domKids(document.createElement("h1"), l), "h1"),
 		h2: /* @__PURE__ */ __name((...l) => _domKids(document.createElement("h2"), l), "h2"),
+		details: /* @__PURE__ */ __name((...l) => _domKids(document.createElement("details"), l), "details"),
+		summary: /* @__PURE__ */ __name((...l) => _domKids(document.createElement("summary"), l), "summary"),
 		h3: /* @__PURE__ */ __name((...l) => _domKids(document.createElement("h3"), l), "h3"),
 		br: /* @__PURE__ */ __name((...l) => _domKids(document.createElement("br"), l), "br"),
 		hr: /* @__PURE__ */ __name((...l) => _domKids(document.createElement("hr"), l), "hr"),
@@ -1037,6 +1039,17 @@
 	var styleSheetDark = cssStyleDark.sheet;
 	styleSheetDark.insertRule("@media (prefers-color-scheme: dark) {}");
 	var darkModeRule = styleSheetDark.cssRules[0];
+	var setDarkMode = /* @__PURE__ */ __name((dark) => {
+		let theme = "light";
+		let media = "not all";
+		if (dark) {
+			theme = "dark";
+			media = "all";
+		}
+		darkModeRule.media.mediaText = media;
+		document.documentElement.dataset.theme = theme;
+		document.documentElement.style.colorScheme = theme;
+	}, "setDarkMode");
 	var cssStyle = dom.style(attr.type("text/css"));
 	document.head.prepend(cssStyle);
 	var styleSheet = cssStyle.sheet;
@@ -1378,7 +1391,7 @@
 			dom.tr(dom.td("To:", msgHeaderFieldStyle), dom.td(addressList(allAddrs, msgenv.To || []))),
 			(msgenv.CC || []).length === 0 ? [] : dom.tr(dom.td("Cc:", msgHeaderFieldStyle), dom.td(addressList(allAddrs, msgenv.CC || []))),
 			(msgenv.BCC || []).length === 0 ? [] : dom.tr(dom.td("Bcc:", msgHeaderFieldStyle), dom.td(addressList(allAddrs, msgenv.BCC || []))),
-			dom.tr(dom.td("Subject:", msgHeaderFieldStyle), dom.td(dom.div(css("msgSubjectAttrsSpread", { display: "flex", justifyContent: "space-between" }), dom.div(msgenv.Subject || ""), dom.div(mi.Message.IsForward ? dom.span(msgAttrStyle, "Forwarded", attr.title("Message came in from a forwarded address. Some message authentication policies, like DMARC, were not evaluated.")) : [], mi.Message.IsMailingList ? dom.span(msgAttrStyle, "Mailing list", attr.title("Message was received from a mailing list. Some message authentication policies, like DMARC, were not evaluated.")) : [], mi.Message.ReceivedTLSVersion === 1 ? dom.span(msgAttrStyle, css("msgAttrNoTLS", { borderBottom: "1.5px solid", borderBottomColor: styles.underlineRed }), "Without TLS", attr.title("Message received (last hop) without TLS.")) : [], mi.Message.ReceivedTLSVersion > 1 && !mi.Message.ReceivedRequireTLS ? dom.span(msgAttrStyle, css("msgAttrTLS", { borderBottom: "1.5px solid", borderBottomColor: styles.underlineGreen }), "With TLS", attr.title("Message received (last hop) with TLS.")) : [], mi.Message.ReceivedRequireTLS ? dom.span(css("msgAttrRequireTLS", { padding: ".1em .3em", fontSize: ".9em", backgroundColor: styles.successBackground, border: "1px solid", borderColor: styles.borderColor, borderRadius: "3px" }), "With RequireTLS", attr.title("Transported with RequireTLS, ensuring TLS along the entire delivery path from sender to recipient, with TLS certificate verification through MTA-STS and/or DANE.")) : [], mi.IsSigned ? dom.span(msgAttrStyle, css("msgAttrSigned", { backgroundColor: styles.colorMild, color: styles.backgroundColorMild, borderRadius: ".15em" }), "Message has a signature") : [], mi.IsEncrypted ? dom.span(msgAttrStyle, css("msgAttrEncrypted", { backgroundColor: styles.colorMild, color: styles.backgroundColorMild, borderRadius: ".15em" }), "Message is encrypted") : [], refineKeyword ? (mi.Message.Keywords || []).map((kw) => dom.clickbutton(styleClasses.keyword, dom._class("keywordButton"), kw, /* @__PURE__ */ __name(async function click() {
+			dom.tr(dom._class("subjectHeaderRow"), dom.td("Subject:", msgHeaderFieldStyle), dom.td(dom.div(css("msgSubjectAttrsSpread", { display: "flex", justifyContent: "space-between" }), dom.div(dom._class("subjectHeaderText"), msgenv.Subject || ""), dom.div(mi.Message.IsForward ? dom.span(msgAttrStyle, "Forwarded", attr.title("Message came in from a forwarded address. Some message authentication policies, like DMARC, were not evaluated.")) : [], mi.Message.IsMailingList ? dom.span(msgAttrStyle, "Mailing list", attr.title("Message was received from a mailing list. Some message authentication policies, like DMARC, were not evaluated.")) : [], mi.Message.ReceivedTLSVersion === 1 ? dom.span(msgAttrStyle, css("msgAttrNoTLS", { borderBottom: "1.5px solid", borderBottomColor: styles.underlineRed }), "Without TLS", attr.title("Message received (last hop) without TLS.")) : [], mi.Message.ReceivedTLSVersion > 1 && !mi.Message.ReceivedRequireTLS ? dom.span(msgAttrStyle, css("msgAttrTLS", { borderBottom: "1.5px solid", borderBottomColor: styles.underlineGreen }), "With TLS", attr.title("Message received (last hop) with TLS.")) : [], mi.Message.ReceivedRequireTLS ? dom.span(css("msgAttrRequireTLS", { padding: ".1em .3em", fontSize: ".9em", backgroundColor: styles.successBackground, border: "1px solid", borderColor: styles.borderColor, borderRadius: "3px" }), "With RequireTLS", attr.title("Transported with RequireTLS, ensuring TLS along the entire delivery path from sender to recipient, with TLS certificate verification through MTA-STS and/or DANE.")) : [], mi.IsSigned ? dom.span(msgAttrStyle, css("msgAttrSigned", { backgroundColor: styles.colorMild, color: styles.backgroundColorMild, borderRadius: ".15em" }), "Message has a signature") : [], mi.IsEncrypted ? dom.span(msgAttrStyle, css("msgAttrEncrypted", { backgroundColor: styles.colorMild, color: styles.backgroundColorMild, borderRadius: ".15em" }), "Message is encrypted") : [], refineKeyword ? (mi.Message.Keywords || []).map((kw) => dom.clickbutton(styleClasses.keyword, dom._class("keywordButton"), kw, /* @__PURE__ */ __name(async function click() {
 				await refineKeyword(kw);
 			}, "click"))) : [])))),
 			(mi.MoreHeaders || []).map((t) => dom.tr(dom.td(t[0] + ":", msgHeaderFieldStyle), dom.td(t[1]))),
@@ -1415,6 +1428,7 @@
 	var rejects = /* @__PURE__ */ __name(() => svgIcon(24, 24, "M12 2c-4.96 0-9 4.04-9 9v8h.05c.25 1.69 1.69 3 3.45 3c1.17 0 2.07-.42 2.67-1.17c.72.72 1.72 1.17 2.83 1.17s2.11-.46 2.84-1.19c.6.76 1.5 1.19 2.66 1.19c1.93 0 3.5-1.57 3.5-3.5V11c0-4.96-4.04-9-9-9m7 16.5c0 .83-.67 1.5-1.5 1.5c-.45 0-1.5 0-1.5-2v-1h-2v1c0 1.1-.9 2-2 2s-2-.9-2-2v-1H8v1c0 1.85-.77 2-1.5 2c-.83 0-1.5-.67-1.5-1.5V11c0-3.86 3.14-7 7-7s7 3.14 7 7z", "M15.5 9a1.5 1.5 0 1 0 0 3a1.5 1.5 0 1 0 0-3m-7 0a1.5 1.5 0 1 0 0 3a1.5 1.5 0 1 0 0-3"), "rejects");
 	var introbox = /* @__PURE__ */ __name(() => svgIcon(24, 24, "M11 14h2v2h-2zM9.53 7.03C8.87 7.69 8.5 8.57 8.5 9.5h2c0-.4.16-.78.44-1.06c.57-.57 1.55-.57 2.12 0A1.499 1.499 0 0 1 12 11c-.55 0-1 .45-1 1v1h2v-.14c.55-.16 1.06-.46 1.47-.88c.66-.66 1.03-1.54 1.03-2.47s-.36-1.81-1.03-2.47c-1.32-1.32-3.63-1.32-4.95 0Z", "M12 3C6.49 3 2 6.59 2 11c0 2.91 1.9 5.51 5 6.93V21c0 .38.21.72.55.89c.14.07.29.11.45.11c.21 0 .42-.07.6-.2l3.74-2.8c5.36-.14 9.66-3.67 9.66-8s-4.49-8-10-8m0 14c-.22 0-.43.07-.6.2L9 19v-1.73c0-.41-.25-.78-.64-.93C5.67 15.3 4 13.26 4 11c0-3.31 3.59-6 8-6s8 2.69 8 6s-3.59 6-8 6"), "introbox");
 	var attachment = /* @__PURE__ */ __name(() => svgIcon(16, 16, "M4.5 3a2.5 2.5 0 0 1 5 0v9a1.5 1.5 0 0 1-3 0V5a.5.5 0 0 1 1 0v7a.5.5 0 0 0 1 0V3a1.5 1.5 0 1 0-3 0v9a2.5 2.5 0 0 0 5 0V5a.5.5 0 0 1 1 0v7a3.5 3.5 0 1 1-7 0z"), "attachment");
+	var chevronRight = /* @__PURE__ */ __name(() => svgIcon(24, 24, "M9 5l7 7-7 7-1.4-1.4L13.2 12 7.6 6.4Z"), "chevronRight");
 
 	// .js/webmail/webmail.js
 	var reloadURL = URL.parse(window.location.href);
@@ -1472,10 +1486,11 @@
 	var accountSettings;
 	var introboxMailbox = "";
 	var defaultSettings = {
-		mailboxesWidth: 240,
+		theme: "system",
+		mailboxesWidth: 160,
 		layout: "auto",
 		// Automatic switching between left/right and top/bottom layout, based on screen width.
-		leftWidthPct: 50,
+		leftWidthPct: 33,
 		// Split in percentage of remaining width for left/right layout.
 		topHeightPct: 40,
 		// Split in percentage of remaining height for top/bottom layout.
@@ -1531,6 +1546,7 @@
 				mailboxCollapsed = def.mailboxCollapsed;
 			}
 			return {
+				theme: getString("theme", "system", "light", "dark"),
 				refine: getString("refine"),
 				orderAsc: getBool("orderAsc"),
 				mailboxesWidth: getInt("mailboxesWidth"),
@@ -1564,6 +1580,16 @@
 		}
 	}, "settingsPut");
 	var settings = parseSettings();
+	var systemTheme = window.matchMedia("(prefers-color-scheme: dark)");
+	var applyTheme = /* @__PURE__ */ __name(() => {
+		let dark = settings.theme === "dark";
+		if (settings.theme === "system") {
+			dark = systemTheme.matches;
+		}
+		setDarkMode(dark);
+	}, "applyTheme");
+	systemTheme.addEventListener("change", applyTheme);
+	applyTheme();
 	var accountAddresses = [];
 	var loginAddress = null;
 	var domainAddressConfigs = {};
@@ -2202,6 +2228,9 @@
 				e.stopPropagation();
 			}, "click")
 		], ...kids));
+		if (opts.transparent && !opts.fullscreen) {
+			content.classList.add("popoverMenu");
+		}
 		document.body.appendChild(root);
 		const first = root.querySelector("input, select, textarea, button");
 		if (first && first instanceof HTMLElement) {
@@ -3319,6 +3348,28 @@
 			ensureCSS(".msgItem.active", { background: styles.msgItemActiveBackground });
 			const active = msgitemView.root && msgitemView.root.classList.contains("active");
 			const focus = msgitemView.root && msgitemView.root.classList.contains("focus");
+			let threadToggle;
+			if (!msgitemView.parent && msgitemView.kids.length > 0) {
+				let label = "Collapse thread.";
+				if (msgitemView.collapsed) {
+					label = "Expand thread.";
+				}
+				threadToggle = dom.clickbutton(dom._class("threadToggle"), chevronRight(), dom.span("" + (1 + msgitemView.descendants().length)), attr.title(label), attr.arialabel(label), /* @__PURE__ */ __name(function dblclick(e) {
+					e.stopPropagation();
+				}, "dblclick"), /* @__PURE__ */ __name(function click(e) {
+					e.stopPropagation();
+					if (settings.threading === ThreadMode.ThreadOn) {
+						withStatus("Saving thread expand/collapse", client.ThreadCollapse([msgitemView.messageitem.Message.ID], !msgitemView.collapsed));
+					}
+					if (msgitemView.collapsed) {
+						msglistView.threadExpand(msgitemView);
+					} else {
+						msglistView.threadCollapse(msgitemView);
+						msglistView.viewportEnsureMessages();
+					}
+				}, "click"));
+				threadToggle.setAttribute("aria-expanded", String(!msgitemView.collapsed));
+			}
 			const elem = dom.div(
 				msgItemStyle,
 				active ? dom._class("active") : [],
@@ -3348,24 +3399,11 @@
 				isUnread() ? css("msgItemUnread", { fontWeight: "bold" }) : [],
 				// Relevant means not muted and matching the query.
 				isRelevant() ? [] : css("msgItemNotRelevant", { opacity: ".4" }),
-				dom.div(msgItemCellStyle, dom._class("msgItemFlags"), dom.div(css("msgItemFlagsSpread", { display: "flex", justifyContent: "space-between" }), dom.div(flagList(msgitemView)), !msgitemView.parent && msgitemView.kids.length > 0 && msgitemView.collapsed ? dom.clickbutton("" + (1 + msgitemView.descendants().length), attr.tabindex("-1"), attr.title("Expand thread."), attr.arialabel("Expand thread."), /* @__PURE__ */ __name(function click(e) {
-					e.stopPropagation();
-					if (settings.threading === ThreadMode.ThreadOn) {
-						withStatus("Saving thread expanded", client.ThreadCollapse([msgitemView.messageitem.Message.ID], false));
-					}
-					msglistView.threadExpand(msgitemView);
-				}, "click")) : [], !msgitemView.parent && msgitemView.kids.length > 0 && !msgitemView.collapsed ? dom.clickbutton("-", style({ width: "1em" }), attr.tabindex("-1"), attr.title("Collapse thread."), attr.arialabel("Collapse thread."), /* @__PURE__ */ __name(function click(e) {
-					e.stopPropagation();
-					if (settings.threading === ThreadMode.ThreadOn) {
-						withStatus("Saving thread expanded", client.ThreadCollapse([msgitemView.messageitem.Message.ID], true));
-					}
-					msglistView.threadCollapse(msgitemView);
-					msglistView.viewportEnsureMessages();
-				}, "click")) : [])),
+				dom.div(msgItemCellStyle, dom._class("msgItemFlags"), dom.div(css("msgItemFlagsSpread", { display: "flex", justifyContent: "space-between" }), dom.div(flagList(msgitemView)))),
 				dom.div(
 					msgItemCellStyle,
 					dom._class("msgItemFrom"),
-					dom.div(css("msgItemFromSpread", { display: "flex", justifyContent: "space-between" }), dom.div(dom._class("silenttitle"), css("msgItemFromText", { whiteSpace: "nowrap", overflow: "hidden" }), correspondents()), identityHeader),
+					dom.div(css("msgItemFromSpread", { display: "flex", justifyContent: "space-between" }), threadToggle || [], dom.div(dom._class("silenttitle"), css("msgItemFromText", { whiteSpace: "nowrap", overflow: "hidden" }), correspondents()), identityHeader),
 					// Thread messages are connected by a vertical bar. The first and last message are
 					// only half the height of the item, to indicate start/end, and so it stands out
 					// from any thread above/below.
@@ -3727,7 +3765,8 @@
 			css("msgmeta", { backgroundColor: styles.backgroundColorMild, borderBottom: "5px solid", borderBottomColor: ["white", "black"], maxHeight: "90%", overflowY: "auto" }),
 			attr.role("region"),
 			attr.arialabel("Buttons and headers for message"),
-			msgbuttonElem = dom.div(),
+			msgbuttonElem = dom.div(dom._class("readerToolbar")),
+			dom.h1(dom._class("readerSubject"), mi.Envelope.Subject || "(no subject)"),
 			dom.div(attr.arialive("assertive"), dom.table(styleClasses.msgHeaders, msgheaderElem = dom.tbody()), msgheaderFullElem = dom.table(), msgattachmentElem = dom.div(), msgmodeElem = dom.div()),
 			// Explicit separator that separates headers from body, to
 			// prevent HTML messages from faking UI elements.
@@ -3738,12 +3777,18 @@
 		const trashMailboxID = listMailboxes().find((mb) => mb.Trash)?.ID;
 		const draftMailboxID = listMailboxes().find((mb) => mb.Draft)?.ID;
 		const loadButtons = /* @__PURE__ */ __name((pm) => {
-			dom._kids(msgbuttonElem, dom.div(dom._class("pad"), m.MailboxID === draftMailboxID ? dom.clickbutton("Edit", attr.title("Continue editing this draft message."), clickCmd(cmdComposeDraft, shortcuts)) : [], " ", !pm || !pm.ListReplyAddress ? [] : dom.clickbutton("Reply to list", attr.title("Compose a reply to this mailing list."), clickCmd(cmdReplyList, shortcuts)), " ", pm && pm.ListReplyAddress && formatEmail(pm.ListReplyAddress) === fromAddress ? [] : dom.clickbutton("Reply", attr.title("Compose a reply to the sender of this message."), clickCmd(cmdReply, shortcuts)), " ", (mi.Envelope.To || []).length <= 1 && (mi.Envelope.CC || []).length === 0 && (mi.Envelope.BCC || []).length === 0 ? [] : dom.clickbutton("Reply all", attr.title("Compose a reply to all participants of this message."), clickCmd(cmdReplyAll, shortcuts)), " ", dom.clickbutton("Forward", attr.title("Compose a forwarding message, optionally including attachments."), clickCmd(cmdForward, shortcuts)), " ", dom.clickbutton("Archive", attr.title("Move to the Archive mailbox."), clickCmd(msglistView.cmdArchive, shortcuts)), " ", m.MailboxID === trashMailboxID ? dom.clickbutton("Delete", attr.title("Permanently delete message."), clickCmd(msglistView.cmdDelete, shortcuts)) : dom.clickbutton("Trash", attr.title("Move to the Trash mailbox."), clickCmd(msglistView.cmdTrash, shortcuts)), " ", dom.clickbutton("Junk", attr.title("Move to Junk mailbox, marking as junk and causing this message to be used in spam classification of new incoming messages."), clickCmd(msglistView.cmdJunk, shortcuts)), " ", dom.clickbutton("Move to...", /* @__PURE__ */ __name(function click(e) {
-				movePopover(e, listMailboxes(), [m]);
-			}, "click")), " ", dom.clickbutton("Labels...", attr.title("Add/remove labels."), /* @__PURE__ */ __name(function click(e) {
-				labelsPopover(e, [m], possibleLabels);
-			}, "click")), " ", dom.clickbutton("More...", attr.title("Show more actions."), /* @__PURE__ */ __name(function click(e) {
+			dom._kids(msgbuttonElem, dom.div(dom._class("pad"), m.MailboxID === draftMailboxID ? dom.clickbutton("Edit", attr.title("Continue editing this draft message."), clickCmd(cmdComposeDraft, shortcuts)) : [], " ", !pm || !pm.ListReplyAddress ? [] : dom.clickbutton("Reply to list", attr.title("Compose a reply to this mailing list."), clickCmd(cmdReplyList, shortcuts)), " ", pm && pm.ListReplyAddress && formatEmail(pm.ListReplyAddress) === fromAddress ? [] : dom.clickbutton(reply(), " Reply", attr.title("Compose a reply to the sender of this message."), clickCmd(cmdReply, shortcuts)), " ", (mi.Envelope.To || []).length <= 1 && (mi.Envelope.CC || []).length === 0 && (mi.Envelope.BCC || []).length === 0 ? [] : dom.clickbutton("Reply all", attr.title("Compose a reply to all participants of this message."), clickCmd(cmdReplyAll, shortcuts)), " ", dom.clickbutton(forward(), " Forward", attr.title("Compose a forwarding message, optionally including attachments."), clickCmd(cmdForward, shortcuts)), " ", dom.clickbutton(archive(), " Archive", attr.title("Move to the Archive mailbox."), clickCmd(msglistView.cmdArchive, shortcuts)), " ", m.MailboxID === trashMailboxID ? dom.clickbutton("Delete", attr.title("Permanently delete message."), clickCmd(msglistView.cmdDelete, shortcuts)) : dom.clickbutton(trash(), " Trash", attr.title("Move to the Trash mailbox."), clickCmd(msglistView.cmdTrash, shortcuts)), " ", dom.clickbutton("More...", attr.title("Show more actions."), /* @__PURE__ */ __name(function click(e) {
 				popover(e.target, { transparent: true }, dom.div(css("popupMore", { display: "flex", flexDirection: "column", gap: ".5ex", textAlign: "right" }), [
+					dom.clickbutton("Junk", attr.title("Move to Junk mailbox, marking as junk and causing this message to be used in spam classification of new incoming messages."), clickCmd(msglistView.cmdJunk, shortcuts)),
+					dom.clickbutton("Move to...", /* @__PURE__ */ __name(function click2(e2) {
+						movePopover(e2, listMailboxes(), [m]);
+					}, "click")),
+					dom.clickbutton("Labels...", attr.title("Add/remove labels."), /* @__PURE__ */ __name(function click2(e2) {
+						labelsPopover(e2, [m], possibleLabels);
+					}, "click")),
+					dom.clickbutton("Toggle fixed-width text", attr.title("Switch plain text between proportional and monospace fonts for patches or aligned tables."), /* @__PURE__ */ __name(function click2() {
+						msgscrollElem.classList.toggle("readerFixedWidth");
+					}, "click")),
 					dom.clickbutton("Print", attr.title("Print message, opens in new tab and opens print dialog."), clickCmd(cmdPrint, shortcuts)),
 					dom.clickbutton("Mark Not Junk", attr.title("Mark as not junk, causing this message to be used in spam classification of new incoming messages."), clickCmd(msglistView.cmdMarkNotJunk, shortcuts)),
 					dom.clickbutton("Mark Read", clickCmd(msglistView.cmdMarkRead, shortcuts)),
@@ -3861,7 +3906,7 @@
 		}, "renderAttachments");
 		renderAttachments();
 		const root = dom.div(css("msgViewRoot", { position: "absolute", top: 0, right: 0, bottom: 0, left: 0, display: "flex", flexDirection: "column" }));
-		dom._kids(root, msgmetaElem, msgcontentElem);
+		dom._kids(root, msgmetaElem, msgcontentElem, dom.div(dom._class("readerReply"), dom.clickbutton(dom._class("replyPrimary"), reply(), " Reply", clickCmd(cmdReply, shortcuts)), dom.clickbutton(forward(), " Forward", clickCmd(cmdForward, shortcuts))));
 		const loadText = /* @__PURE__ */ __name((pm) => {
 			urlType = "text";
 			const elem = dom.div(dom._class("mono", "textmulti"), style({ whiteSpace: "pre-wrap" }), (pm.Texts || []).map((t) => renderText(t.replace(/\r\n/g, "\n"))), (mi.Attachments || []).filter((f) => isImage(f)).map((f) => {
@@ -5907,11 +5952,11 @@
 			}, "click"),
 			// This is a separate form, inside the form with the overall search field because
 			// when updating the form based on the parsed searchbar, we first need to reset it.
-			form = dom.form(dom.table(searchTableStyle, dom.tr(dom.td(dom.label("Mailbox", attr.for("searchMailbox")), attr.title("Filter by mailbox, including children of the mailbox.")), dom.td(mailbox = dom.select(attr.id("searchMailbox"), style({ width: "100%" }), dom.option("All mailboxes except Trash/Junk/Rejects", attr.value("-1")), dom.option("All mailboxes", attr.value("0")), changeHandlers), dom.div(style({ paddingTop: ".5ex" }), dom.label(mailboxkids = dom.input(attr.type("checkbox"), changeHandlers), " Also search in mailboxes below the selected mailbox.")))), dom.tr(dom.td(dom.label("Text", attr.for("searchWords"))), dom.td(words = dom.input(attr.id("searchWords"), attr.title("Filter by text, case-insensitive, substring match, not necessarily whole words."), focusPlaceholder('word "exact match" -notword'), style({ width: "100%" }), changeHandlers))), dom.tr(dom.td(dom.label("From", attr.for("searchFrom"))), dom.td(from = dom.input(attr.id("searchFrom"), style({ width: "100%" }), focusPlaceholder("Address or name"), newAddressComplete(), changeHandlers))), dom.tr(dom.td(dom.label("To", attr.for("searchTo")), attr.title("Search on addressee, including Cc and Bcc headers.")), dom.td(to = dom.input(attr.id("searchTo"), focusPlaceholder("Address or name, also matches Cc and Bcc addresses"), style({ width: "100%" }), newAddressComplete(), changeHandlers))), dom.tr(dom.td(dom.label("Subject", attr.for("searchSubject"))), dom.td(subject = dom.input(attr.id("searchSubject"), style({ width: "100%" }), focusPlaceholder('"exact match"'), changeHandlers))), dom.tr(dom.td("Received between", style({ whiteSpace: "nowrap" })), dom.td(style({ lineHeight: 2 }), dom.div(oldestDate = dom.input(attr.type("date"), focusPlaceholder("2023-07-20"), changeHandlers), oldestTime = dom.input(attr.type("time"), focusPlaceholder("23:10"), changeHandlers), " ", dom.clickbutton("x", style({ padding: "0 .3em" }), attr.arialabel("Clear start date."), attr.title("Clear start date."), /* @__PURE__ */ __name(function click() {
+			form = dom.form(dom.table(searchTableStyle, dom.tr(dom.td(dom.label("Mailbox", attr.for("searchMailbox")), attr.title("Filter by mailbox, including children of the mailbox.")), dom.td(mailbox = dom.select(attr.id("searchMailbox"), style({ width: "100%" }), dom.option("All mailboxes except Trash/Junk/Rejects", attr.value("-1")), dom.option("All mailboxes", attr.value("0")), changeHandlers), dom.div(style({ paddingTop: ".5ex" }), dom.label(mailboxkids = dom.input(attr.type("checkbox"), changeHandlers), " Also search in mailboxes below the selected mailbox.")))), dom.tr(dom.td(dom.label("Text", attr.for("searchWords"))), dom.td(words = dom.input(attr.id("searchWords"), attr.title("Filter by text, case-insensitive, substring match, not necessarily whole words."), focusPlaceholder('word "exact match" -notword'), style({ width: "100%" }), changeHandlers))), dom.tr(dom.td(dom.label("From", attr.for("searchFrom"))), dom.td(from = dom.input(attr.id("searchFrom"), style({ width: "100%" }), focusPlaceholder("Address or name"), newAddressComplete(), changeHandlers))), dom.tr(dom.td(dom.label("To", attr.for("searchTo")), attr.title("Search on addressee, including Cc and Bcc headers.")), dom.td(to = dom.input(attr.id("searchTo"), focusPlaceholder("Address or name, also matches Cc and Bcc addresses"), style({ width: "100%" }), newAddressComplete(), changeHandlers))), dom.tr(dom.td(dom.label("Subject", attr.for("searchSubject"))), dom.td(subject = dom.input(attr.id("searchSubject"), style({ width: "100%" }), focusPlaceholder('"exact match"'), changeHandlers))), dom.tr(dom.td("Received between", style({ whiteSpace: "nowrap" })), dom.td(style({ lineHeight: 2 }), dom.div(dom._class("searchDates"), oldestDate = dom.input(attr.type("date"), focusPlaceholder("2023-07-20"), changeHandlers), oldestTime = dom.input(attr.type("time"), focusPlaceholder("23:10"), changeHandlers), " ", dom.clickbutton("\xD7", style({ padding: "0 .3em" }), attr.arialabel("Clear start date."), attr.title("Clear start date."), /* @__PURE__ */ __name(function click() {
 				oldestDate.value = "";
 				oldestTime.value = "";
 				updateSearchbar();
-			}, "click")), " and ", newestDate = dom.input(attr.type("date"), focusPlaceholder("2023-07-20"), changeHandlers), newestTime = dom.input(attr.type("time"), focusPlaceholder("23:10"), changeHandlers), " ", dom.clickbutton("x", style({ padding: "0 .3em" }), attr.arialabel("Clear end date."), attr.title("Clear end date."), /* @__PURE__ */ __name(function click() {
+			}, "click")), dom.span(dom._class("searchDateSeparator"), "and"), newestDate = dom.input(attr.type("date"), focusPlaceholder("2023-07-20"), changeHandlers), newestTime = dom.input(attr.type("time"), focusPlaceholder("23:10"), changeHandlers), " ", dom.clickbutton("\xD7", style({ padding: "0 .3em" }), attr.arialabel("Clear end date."), attr.title("Clear end date."), /* @__PURE__ */ __name(function click() {
 				newestDate.value = "";
 				newestTime.value = "";
 				updateSearchbar();
@@ -6024,8 +6069,17 @@
 		let requestNotFilter = newNotFilter();
 		let requestMsgID = 0;
 		[moxversion, moxgoos, moxgoarch] = await client.Version();
+		const mailboxHeading = dom.h1(dom._class("mailboxHeading"), "Inbox");
 		const updatePageTitle = /* @__PURE__ */ __name(() => {
 			const mb = mailboxlistView && mailboxlistView.activeMailbox();
+			let heading = "All mail";
+			if (mb) {
+				heading = mb.Name;
+			}
+			if (search.active) {
+				heading = "Search results";
+			}
+			dom._kids(mailboxHeading, heading);
 			const addr = loginAddress ? loginAddress.User + "@" + formatDomain(loginAddress.Domain) : "";
 			if (!mb) {
 				document.title = [addr, "Mox Webmail"].join(" - ");
@@ -6242,7 +6296,7 @@
 		}, "refineToggle");
 		let threadMode;
 		const msgColumnDraggerStyle = css("msgColumnDragger", { position: "absolute", top: 0, bottom: 0, width: "1px", backgroundColor: styles.popupBorderColor, left: "2.5px" });
-		let msglistElem = dom.div(css("msgList", { backgroundColor: styles.msglistBackgroundColor, position: "absolute", left: "0", right: 0, top: 0, bottom: 0, display: "flex", flexDirection: "column" }), dom.div(attr.role("region"), attr.arialabel("Filter and sorting buttons for message list"), css("msgListFilterSorting", { display: "flex", justifyContent: "space-between", backgroundColor: styles.backgroundColorMild, borderBottom: "1px solid", borderBottomColor: styles.borderColor, padding: ".25em .5em" }), dom.div(dom.h1("Refine:", css("refineTitle", { fontWeight: "normal", fontSize: "inherit", display: "inline", margin: 0 }), attr.title("Refine message listing with quick filters. These refinement filters are in addition to any search criteria, but the refine attachment filter overrides a search attachment criteria.")), " ", dom.span(dom._class("btngroup"), refineUnreadBtn = dom.clickbutton(settings.refine === "unread" ? dom._class("active") : [], "Unread", attr.title("Only show messages marked as unread."), /* @__PURE__ */ __name(async function click(e) {
+		let msglistElem = dom.div(css("msgList", { backgroundColor: styles.msglistBackgroundColor, position: "absolute", left: "0", right: 0, top: 0, bottom: 0, display: "flex", flexDirection: "column" }), dom.div(dom._class("listHeading"), mailboxHeading, dom.details(dom._class("listOptions"), dom.summary("Filter & sort"), dom.div(attr.role("region"), attr.arialabel("Filter and sorting buttons for message list"), css("msgListFilterSorting", { display: "flex", justifyContent: "space-between", backgroundColor: styles.backgroundColorMild, borderBottom: "1px solid", borderBottomColor: styles.borderColor, padding: ".25em .5em" }), dom.div(dom.h1("Refine:", css("refineTitle", { fontWeight: "normal", fontSize: "inherit", display: "inline", margin: 0 }), attr.title("Refine message listing with quick filters. These refinement filters are in addition to any search criteria, but the refine attachment filter overrides a search attachment criteria.")), " ", dom.span(dom._class("btngroup"), refineUnreadBtn = dom.clickbutton(settings.refine === "unread" ? dom._class("active") : [], "Unread", attr.title("Only show messages marked as unread."), /* @__PURE__ */ __name(async function click(e) {
 			await refineToggle("unread", e.target);
 		}, "click")), refineReadBtn = dom.clickbutton(settings.refine === "read" ? dom._class("active") : [], "Read", attr.title("Only show messages marked as read."), /* @__PURE__ */ __name(async function click(e) {
 			await refineToggle("read", e.target);
@@ -6278,7 +6332,7 @@
 			settingsPut({ ...settings, orderAsc: !settings.orderAsc });
 			e.target.classList.toggle("invert", settings.orderAsc);
 			await withStatus("Requesting messages", requestNewView(true));
-		}, "click")))), dom.div(style({ height: "1ex", position: "relative" }), dom.div(dom._class("msgItemFlags")), dom.div(dom._class("msgItemFlagsOffset"), css("msgItemFlagsGrab", { position: "absolute", width: "6px", top: 0, bottom: 0, marginLeft: "-3px", cursor: "ew-resize" }), dom.div(msgColumnDraggerStyle), /* @__PURE__ */ __name(function mousedown(e) {
+		}, "click")))))), dom.div(style({ height: "1ex", position: "relative" }), dom.div(dom._class("msgItemFlags")), dom.div(dom._class("msgItemFlagsOffset"), css("msgItemFlagsGrab", { position: "absolute", width: "6px", top: 0, bottom: 0, marginLeft: "-3px", cursor: "ew-resize" }), dom.div(msgColumnDraggerStyle), /* @__PURE__ */ __name(function mousedown(e) {
 			startDrag(e, (e2) => {
 				const bounds = msglistscrollElem.getBoundingClientRect();
 				const width = Math.round(e2.clientX - bounds.x);
@@ -6398,9 +6452,7 @@
 		};
 		const topMailboxesStyle = css("topMailboxes", { backgroundColor: styles.mailboxesTopBackgroundColor });
 		css("searchbarActive", { background: styles.mailboxActiveBackground });
-		const webmailroot = dom.div(css("webmailRoot", { display: "flex", flexDirection: "column", alignContent: "stretch", height: "100dvh" }), dom.div(topMailboxesStyle, style({ display: "flex" }), attr.role("region"), attr.arialabel("Top bar"), topcomposeboxElem = dom.div(dom._class("pad"), style({ width: settings.mailboxesWidth + "px", textAlign: "center" }), composeBtn = dom.clickbutton("Compose", attr.title("Compose new email message."), /* @__PURE__ */ __name(function click() {
-			shortcutCmd(cmdCompose, shortcuts);
-		}, "click"))), dom.div(dom._class("pad"), css("searchbarBox", { paddingLeft: 0, display: "flex", flexGrow: 1 }), searchbarElemBox = dom.search(style({ display: "flex", marginRight: ".5em" }), dom.form(style({ display: "flex", flexGrow: 1 }), searchbarElem = dom.input(attr.placeholder("Search..."), style({ position: "relative", width: "100%" }), attr.title("Search messages based on criteria like matching free-form text, in a mailbox, labels, addressees."), focusPlaceholder('word "with space" -notword mb:Inbox f:from@x.example t:rcpt@x.example start:2023-7-1 end:2023-7-8 s:"subject" a:images l:$Forwarded h:Reply-To:other@x.example minsize:500kb'), /* @__PURE__ */ __name(function click() {
+		const webmailroot = dom.div(css("webmailRoot", { display: "flex", flexDirection: "column", alignContent: "stretch", height: "100dvh" }), dom.div(topMailboxesStyle, style({ display: "flex" }), attr.role("region"), attr.arialabel("Top bar"), topcomposeboxElem = dom.div(dom._class("pad"), style({ width: settings.mailboxesWidth + "px", textAlign: "center" }), dom.span(dom._class("brandName"), "devn")), dom.div(dom._class("pad"), css("searchbarBox", { paddingLeft: 0, display: "flex", flexGrow: 1 }), searchbarElemBox = dom.search(style({ display: "flex", marginRight: ".5em" }), dom.form(style({ display: "flex", flexGrow: 1 }), searchbarElem = dom.input(attr.placeholder("Search mail\u2026"), attr.arialabel("Search mail"), style({ position: "relative", width: "100%" }), attr.title("Search messages based on criteria like matching free-form text, in a mailbox, labels, addressees."), focusPlaceholder('word "with space" -notword mb:Inbox f:from@x.example t:rcpt@x.example start:2023-7-1 end:2023-7-8 s:"subject" a:images l:$Forwarded h:Reply-To:other@x.example minsize:500kb'), /* @__PURE__ */ __name(function click() {
 			cmdSearch();
 			showShortcut("/");
 		}, "click"), /* @__PURE__ */ __name(function focus() {
@@ -6427,7 +6479,7 @@
 				ensureSearchView();
 			}
 			searchView.updateForm();
-		}, "keyup")), dom.clickbutton("x", attr.arialabel("Cancel and clear search and open Inbox."), attr.title("Cancel and clear search and open Inbox."), style({ marginLeft: ".25em", padding: "0 .3em" }), /* @__PURE__ */ __name(async function click() {
+		}, "keyup")), dom.clickbutton("\xD7", dom._class("searchClear"), attr.arialabel("Cancel and clear search and open Inbox."), attr.title("Cancel and clear search and open Inbox."), /* @__PURE__ */ __name(async function click() {
 			searchbarElem.value = "";
 			if (!search.active) {
 				return;
@@ -6444,14 +6496,21 @@
 		}, "click")), /* @__PURE__ */ __name(async function submit(e) {
 			e.preventDefault();
 			await searchView.submit();
-		}, "submit"))), connectionElem = dom.div(), statusElem = dom.div(css("status", { marginLeft: ".5em", flexGrow: "1" }), attr.role("status")), dom.div(style({ paddingLeft: "1em" }), layoutElem = dom.select(attr.title("Layout of message list and message panes. Top/bottom has message list above message view. Left/Right has message list left, message view right. Auto selects based on window width and automatically switches on resize. Wide screens get left/right, smaller screens get top/bottom."), dom.option("Auto layout", attr.value("auto"), settings.layout === "auto" ? attr.selected("") : []), dom.option("Top/bottom", attr.value("topbottom"), settings.layout === "topbottom" ? attr.selected("") : []), dom.option("Left/right", attr.value("leftright"), settings.layout === "leftright" ? attr.selected("") : []), /* @__PURE__ */ __name(function change() {
+		}, "submit"))), connectionElem = dom.div(), statusElem = dom.div(css("status", { marginLeft: ".5em", flexGrow: "1" }), attr.role("status")), dom.details(dom._class("accountMenu"), dom.summary(loginAddressElem = dom.span()), dom.div(dom._class("accountMenuContent"), dom.label(dom._class("themeSetting"), "Theme", dom.select(attr.arialabel("Theme"), ...["system", "light", "dark"].map((value) => {
+			const option = dom.option(value[0].toUpperCase() + value.slice(1), attr.value(value));
+			option.selected = settings.theme === value;
+			return option;
+		}), /* @__PURE__ */ __name(function change(e) {
+			settingsPut({ ...settings, theme: e.target.value });
+			applyTheme();
+		}, "change"))), layoutElem = dom.select(attr.title("Layout of message list and message panes. Top/bottom has message list above message view. Left/Right has message list left, message view right. Auto selects based on window width and automatically switches on resize. Wide screens get left/right, smaller screens get top/bottom."), dom.option("Auto layout", attr.value("auto"), settings.layout === "auto" ? attr.selected("") : []), dom.option("Top/bottom", attr.value("topbottom"), settings.layout === "topbottom" ? attr.selected("") : []), dom.option("Left/right", attr.value("leftright"), settings.layout === "leftright" ? attr.selected("") : []), /* @__PURE__ */ __name(function change() {
 			settingsPut({ ...settings, layout: layoutElem.value });
 			if (layoutElem.value === "auto") {
 				autoselectLayout();
 			} else {
 				selectLayout(layoutElem.value);
 			}
-		}, "change")), " ", dom.clickbutton("Help", attr.title("Show popup with basic usage information and a keyboard shortcuts."), clickCmd(cmdHelp, shortcuts)), " ", settingsBtn = dom.clickbutton("Settings", attr.title("Change settings for composing messages."), clickCmd(cmdSettings, shortcuts)), " ", accountElem = dom.span(), " ", loginAddressElem = dom.span(), " ", dom.clickbutton("Logout", attr.title("Logout, invalidating this session."), /* @__PURE__ */ __name(async function click(e) {
+		}, "change")), " ", dom.clickbutton("Help", attr.title("Show popup with basic usage information and a keyboard shortcuts."), clickCmd(cmdHelp, shortcuts)), " ", settingsBtn = dom.clickbutton("Settings", attr.title("Change settings for composing messages."), clickCmd(cmdSettings, shortcuts)), " ", accountElem = dom.span(), " ", " ", dom.clickbutton("Logout", attr.title("Logout, invalidating this session."), /* @__PURE__ */ __name(async function click(e) {
 			await withStatus("Logging out", client.Logout(), e.target);
 			localStorageRemove("webmailcsrftoken");
 			if (eventSource) {
@@ -6459,7 +6518,9 @@
 				eventSource = null;
 			}
 			window.location.reload();
-		}, "click"))))), mailboxesListMsgBox = dom.div(css("mailboxesListMsgBox", { flexGrow: "1", position: "relative" }), mailboxesElem = dom.div(topMailboxesStyle, style({ width: settings.mailboxesWidth + "px" }), css("mailboxesBox", { display: "flex", flexDirection: "column", alignContent: "stretch", position: "absolute", left: 0, top: 0, bottom: 0 }), dom.div(dom._class("pad"), yscrollAutoStyle, style({ flexGrow: "1", position: "relative" }), mailboxlistView.root)), mailboxessplitElem = dom.div(css("mailboxesListGrab", { position: "absolute", width: "5px", top: 0, bottom: 0, cursor: "ew-resize", zIndex: zindexes.splitter }), style({ left: "calc(" + settings.mailboxesWidth + "px - 2px)" }), dom.div(css("mailboxesListLine", { position: "absolute", width: "1px", top: 0, bottom: 0, left: "2px", right: "2px", backgroundColor: styles.popupBorderColor })), /* @__PURE__ */ __name(function mousedown(e) {
+		}, "click")))))), mailboxesListMsgBox = dom.div(css("mailboxesListMsgBox", { flexGrow: "1", position: "relative" }), mailboxesElem = dom.div(topMailboxesStyle, composeBtn = dom.clickbutton(dom._class("composePrimary"), draft(), " Compose", attr.title("Compose new email message."), /* @__PURE__ */ __name(function click() {
+			shortcutCmd(cmdCompose, shortcuts);
+		}, "click")), style({ width: settings.mailboxesWidth + "px" }), css("mailboxesBox", { display: "flex", flexDirection: "column", alignContent: "stretch", position: "absolute", left: 0, top: 0, bottom: 0 }), dom.div(dom._class("pad"), yscrollAutoStyle, style({ flexGrow: "1", position: "relative" }), mailboxlistView.root)), mailboxessplitElem = dom.div(css("mailboxesListGrab", { position: "absolute", width: "5px", top: 0, bottom: 0, cursor: "ew-resize", zIndex: zindexes.splitter }), style({ left: "calc(" + settings.mailboxesWidth + "px - 2px)" }), dom.div(css("mailboxesListLine", { position: "absolute", width: "1px", top: 0, bottom: 0, left: "2px", right: "2px", backgroundColor: styles.popupBorderColor })), /* @__PURE__ */ __name(function mousedown(e) {
 			startDrag(e, (e2) => {
 				mailboxesElem.style.width = Math.round(e2.clientX) + "px";
 				topcomposeboxElem.style.width = Math.round(e2.clientX) + "px";
@@ -6552,7 +6613,10 @@
 			checkMsglistWidth();
 		}, "selectLayout");
 		const autoselectLayout = /* @__PURE__ */ __name(() => {
-			const want = window.innerWidth <= 2 * 2560 / 3 ? "topbottom" : "leftright";
+			let want = "leftright";
+			if (window.innerWidth < 1e3) {
+				want = "topbottom";
+			}
 			selectLayout(want);
 		}, "autoselectLayout");
 		const styleElem = dom.style(attr.type("text/css"));
