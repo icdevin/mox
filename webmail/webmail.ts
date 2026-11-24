@@ -6561,7 +6561,7 @@ const init = async () => {
 	}
 
 	const faviconLink = document.head.querySelector('link[rel="icon"]') as HTMLLinkElement
-	const faviconImg = dom.img(attr.src('/favicon.ico'))
+	const faviconImg = dom.img(attr.src(faviconLink.href))
 	const faviconProm = new Promise<void>((resolve, reject) => {
 		faviconImg.addEventListener('load', () => resolve())
 		faviconImg.addEventListener('error', () => reject())

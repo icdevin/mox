@@ -6088,7 +6088,7 @@
 			}
 		}, "updatePageTitle");
 		const faviconLink = document.head.querySelector('link[rel="icon"]');
-		const faviconImg = dom.img(attr.src("/favicon.ico"));
+		const faviconImg = dom.img(attr.src(faviconLink.href));
 		const faviconProm = new Promise((resolve, reject) => {
 			faviconImg.addEventListener("load", () => resolve());
 			faviconImg.addEventListener("error", () => reject());
