@@ -142,7 +142,6 @@ ensureCSS(':root', {
 	'--quoted2Color': ['#c7445c', '#ec4c4c'], // green
 	'--quoted3Color': ['#417c10', '#73e614'], // blue
 
-	'--scriptSwitchUnderlineColor': ['#dca053', '#e88f1e'],
 
 	'--linkColor': ['#096bc2', '#63b6ff'],
 	'--linkVisitedColor': ['#0704c1', '#c763ff'],
@@ -201,7 +200,6 @@ export const styles = {
 	quoted2Color: 'var(--quoted2Color)',
 	quoted3Color: 'var(--quoted3Color)',
 
-	scriptSwitchUnderlineColor: 'var(--scriptSwitchUnderlineColor)',
 
 	linkColor: 'var(--linkColor)',
 	linkVisitedColor: 'var(--linkVisitedColor)',
@@ -213,8 +211,6 @@ export const styleClasses = {
 		css('quoted2', {color: styles.quoted2Color}),
 		css('quoted3', {color: styles.quoted3Color}),
 	],
-	// When text switches between unicode scripts.
-	scriptswitch: css('scriptswitch', {textDecoration: 'underline 2px', textDecorationColor: styles.scriptSwitchUnderlineColor}),
 	textMild: css('textMild', {color: styles.colorMild}),
 	// For keywords (also known as flags/labels/tags) on messages.
 	keyword: css('keyword', {padding: '0 .15em', borderRadius: '.15em', fontWeight: 'normal', fontSize: '.9em', margin: '0 .15em', whiteSpace: 'nowrap', background: styles.highlightBackground, color: styles.color, border: '1px solid', borderColor: styles.highlightBorderColor}),

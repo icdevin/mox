@@ -8,8 +8,7 @@ JS/TS tools/frameworks etc, they often complicate/obscure how things work. The
 DOM and styles are directly manipulated, so to develop on this code you need to
 know about DOM functions. With a few helper functions in the dom object,
 interaction with the DOM is still relatively high-level, but also allows for
-more low-level techniques like rendering of text in a way that highlights text
-that switches unicode blocks/scripts. We use typescript in strict mode, see
+more low-level techniques. We use typescript in strict mode, see
 top-level tsc.sh. We often specify types for function parameters, but not
 return types, since typescript is good at deriving return types.
 
@@ -40,9 +39,8 @@ headers that prevent executing scripts or loading potentially unwanted remote
 resources. We cannot load the HTML in an inline iframe, because the iframe "csp"
 attribute to set a Content-Security-Policy is not supported by all modern
 browsers (safari and firefox don't support it at the time of writing). Text
-messages are rendered inside the webmail client, making URLs clickable,
-highlighting unicode script/block changes and rendering quoted text in a
-different color.
+messages are rendered inside the webmail client, making URLs clickable and
+rendering quoted text in a different color.
 
 Browsers to test with: Firefox, Chromium, Safari, Edge.
 
@@ -65,7 +63,6 @@ Enable consistency checking in UI updates:
 - todo: make alt up/down keys work on html iframe too. requires loading it from sameorigin, to get access to its inner document.
 - todo: reconnect with last known modseq and don't clear the message list, only update it
 - todo: for embedded messages (message/rfc822 or message/global), allow viewing it as message, perhaps in a popup?
-- todo: only show orange underline where it could be a problem? in addresses and anchor texts. we may be lighting up a christmas tree now, desensitizing users.
 - todo: saved searches that are displayed below list of mailboxes, for quick access to preset view
 - todo: when search on free-form text is active, highlight the searched text in the message view.
 - todo: forwarding of html parts, including inline attachments, so the html version can be rendered like the original by the receiver.
@@ -1412,7 +1409,6 @@ const cmdHelp = async () => {
 				),
 				dom.div(style({marginTop: '2ex', marginBottom: '1ex'}), dom.span('Underdotted text', attr.title('Underdotted text shows additional information on hover.')), ' show an explanation or additional information when hovered.'),
 				dom.div(style({marginBottom: '1ex'}), 'Multiple messages can be selected by clicking messages while holding the control and/or shift keys. Dragging messages and dropping them on a mailbox moves the messages to that mailbox.'),
-				dom.div(style({marginBottom: '1ex'}), 'Text that changes ', dom.span(attr.title('Unicode blocks, e.g. from basic latin to cyrillic, or to emoticons.'), '"character groups"'), ' without whitespace has an ', dom.span(dom._class('scriptswitch'), 'orange underline'), ', which can be a sign of an intent to mislead (e.g. phishing).'),
 
 				dom.div(style({marginTop: '2ex'}), 'Mox is open source email server software, this is version ', moxversion, ', see ', dom.a(attr.href('licenses.txt'), 'licenses'), '.', dom.br(), 'Feedback, including bug reports, is appreciated! ', link('https://github.com/mjl-/mox/issues/new')),
 			),
@@ -2151,9 +2147,7 @@ const compose = (opts: ComposeOptions, listMailboxes: listMailboxes, setLocation
 						width: '100%',
 					}),
 					initHeight === 0 ? attr.rows('15') : [], // Drives default size, removed on compose window resize.
-					// Explicit string object so it doesn't get the highlight-unicode-block-changes
-					// treatment, which would cause characters to disappear.
-					new String(opts.body || ''),
+					opts.body || '',
 					prop({selectionStart: opts.editOffset || 0, selectionEnd: opts.editOffset || 0}),
 					function keyup(e: KeyboardEvent) {
 						if (e.key === 'Enter') {
