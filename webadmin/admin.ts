@@ -652,7 +652,7 @@ const accounts = async () => {
 		dom.h2('Recent login attempts', attr.title('Login attempts are stored for 30 days. At most 10000 failed login attempts are stored per account to prevent unlimited growth of the database.')),
 		renderLoginAttempts(true, loginAttempts || []),
 		dom.br(),
-		loginAttempts && loginAttempts.length >= 10 ? dom.p('See ', dom.a(attr.href('#accounts/loginattempts'), 'all login attempts'), '.') : [],
+		loginAttempts && loginAttempts.length >= 10 ? dom.p(dom._class('loginAttemptsMore'), 'See ', dom.a(attr.href('#accounts/loginattempts'), 'all login attempts'), '.') : [],
 	)
 }
 
@@ -1168,7 +1168,7 @@ const account = async (name: string) => {
 		dom.h2('Recent login attempts', attr.title('Login attempts are stored for 30 days. At most 10000 failed login attempts are stored per account to prevent unlimited growth of the database.')),
 		renderLoginAttempts(false, loginAttempts || []),
 		dom.br(),
-		loginAttempts && loginAttempts.length >= 10 ? dom.p('See ', dom.a(attr.href('#accounts/l/'+name+'/loginattempts'), 'all login attempts'), ' for this account.') : [],
+		loginAttempts && loginAttempts.length >= 10 ? dom.p(dom._class('loginAttemptsMore'), 'See ', dom.a(attr.href('#accounts/l/'+name+'/loginattempts'), 'all login attempts'), ' for this account.') : [],
 		dom.br(),
 		dom.clickbutton('Remove account', dom._class('dangerButton', 'accountRemove'), async function click(e: MouseEvent) {
 			e.preventDefault()
@@ -2355,10 +2355,10 @@ const renderDMARCSummaries = (summaries: api.DMARCSummary[]) => {
 			dom.thead(
 				dom.tr(
 					dom.th('Domain', attr.title('Domain to which the DMARC policy applied. If example.com has a DMARC policy, and email is sent with a From-header with subdomain.example.com, and there is no DMARC record for that subdomain, but there is one for example.com, then the DMARC policy of example.com applies and reports are sent for that that domain.')),
-					dom.th('Messages', attr.title('Total number of messages that had the DMARC policy applied and reported. Actual messages sent is likely higher because not all email servers send DMARC aggregate reports, or perform DMARC checks at all.')),
-					dom.th('DMARC "quarantine"/"reject"', attr.title('Messages for which policy was to mark them as spam (quarantine) or reject them during SMTP delivery.')),
-					dom.th('DKIM "fail"', attr.title('Messages with a failing DKIM check. This can happen when sending through a mailing list where that list keeps your address in the message From-header but also strips DKIM-Signature headers in the message. DMARC evaluation passes if either DKIM passes or SPF passes.')),
-					dom.th('SPF "fail"', attr.title('Message with a failing SPF check. This can happen with email forwarding and with mailing list. Other mail servers have sent email with this domain in the message From-header. DMARC evaluation passes if at least SPF or DKIM passes.')),
+					dom.th('Messages', dom._class('alignRight'), attr.title('Total number of messages that had the DMARC policy applied and reported. Actual messages sent is likely higher because not all email servers send DMARC aggregate reports, or perform DMARC checks at all.')),
+					dom.th('DMARC "quarantine"/"reject"', dom._class('alignRight'), attr.title('Messages for which policy was to mark them as spam (quarantine) or reject them during SMTP delivery.')),
+					dom.th('DKIM "fail"', dom._class('alignRight'), attr.title('Messages with a failing DKIM check. This can happen when sending through a mailing list where that list keeps your address in the message From-header but also strips DKIM-Signature headers in the message. DMARC evaluation passes if either DKIM passes or SPF passes.')),
+					dom.th('SPF "fail"', dom._class('alignRight'), attr.title('Message with a failing SPF check. This can happen with email forwarding and with mailing list. Other mail servers have sent email with this domain in the message From-header. DMARC evaluation passes if at least SPF or DKIM passes.')),
 					dom.th('Policy overrides', attr.title('Mail servers can override the DMARC policy. E.g. a mail server may be able to detect emails coming from mailing lists that do not pass DMARC and would have to be rejected, but for which an override has been configured.')),
 				)
 			),
@@ -2366,10 +2366,10 @@ const renderDMARCSummaries = (summaries: api.DMARCSummary[]) => {
 				summaries.map(r =>
 					dom.tr(
 						dom.td(dom.a(attr.href('#domains/' + r.Domain + '/dmarc'), attr.title('See report details.'), r.Domain)),
-						dom.td(style({textAlign: 'right'}), '' + r.Total),
-						dom.td(style({textAlign: 'right'}), r.DispositionQuarantine === 0 && r.DispositionReject === 0 ? '0/0' : box(red, '' + r.DispositionQuarantine + '/' + r.DispositionReject)),
-						dom.td(style({textAlign: 'right'}), box(r.DKIMFail === 0 ? green : red, '' + r.DKIMFail)),
-						dom.td(style({textAlign: 'right'}), box(r.SPFFail === 0 ? green : red, '' + r.SPFFail)),
+						dom.td(dom._class('alignRight'), '' + r.Total),
+						dom.td(dom._class('alignRight'), r.DispositionQuarantine === 0 && r.DispositionReject === 0 ? '0/0' : box(red, '' + r.DispositionQuarantine + '/' + r.DispositionReject)),
+						dom.td(dom._class('alignRight'), box(r.DKIMFail === 0 ? green : red, '' + r.DKIMFail)),
+						dom.td(dom._class('alignRight'), box(r.SPFFail === 0 ? green : red, '' + r.SPFFail)),
 						dom.td(!r.PolicyOverrides ? [] : Object.entries(r.PolicyOverrides).map(kv => (kv[0] || '(no reason)') + ': ' + kv[1]).join('; ')),
 					)
 				),
@@ -2410,8 +2410,8 @@ const dmarcEvaluations = async () => {
 				dom.tr(
 					dom.th('Domain', attr.title('Domain in the message From header. Keep in mind these can be forged, so this does not necessarily mean someone from this domain authentically tried delivering email.')),
 					dom.th('Dispositions', attr.title('Unique dispositions occurring in report.')),
-					dom.th('Evaluations', attr.title('Total number of message delivery attempts, including retries.')),
-					dom.th('Send report', attr.title('Whether the current evaluations will cause a report to be sent.')),
+					dom.th('Evaluations', dom._class('alignRight'), attr.title('Total number of message delivery attempts, including retries.')),
+					dom.th('Send report', dom._class('alignRight'), attr.title('Whether the current evaluations will cause a report to be sent.')),
 				),
 			),
 			dom.tbody(
@@ -2419,8 +2419,8 @@ const dmarcEvaluations = async () => {
 					dom.tr(
 						dom.td(dom.a(attr.href('#dmarc/evaluations/'+domainName(t[1].Domain)), domainString(t[1].Domain))),
 						dom.td((t[1].Dispositions || []).join(' ')),
-						dom.td(style({textAlign: 'right'}), ''+t[1].Count),
-						dom.td(style({textAlign: 'right'}), t[1].SendReport ? '✓' : ''),
+						dom.td(dom._class('alignRight'), ''+t[1].Count),
+						dom.td(dom._class('alignRight'), t[1].SendReport ? '✓' : ''),
 					),
 				),
 				isEmpty(evalStats) ? dom.tr(dom.td(attr.colspan('3'), 'No evaluations.')) : [],
@@ -2869,10 +2869,10 @@ const tlsrptResults = async () => {
 					dom.th('Policy domain', attr.title('Domain for TLSRPT policy, specifying URIs to which reports should be sent.')),
 					dom.th('Host', attr.title('Whether policy domain is an (MX) host (for DANE), or a recipient domain (for MTA-STS).')),
 					dom.th('Policies', attr.title('Policies found.')),
-					dom.th('Success', attr.title('Total number of successful connections.')),
-					dom.th('Failure', attr.title('Total number of failed connection attempts.')),
-					dom.th('Failure details', attr.title('Total number of details about failures.')),
-					dom.th('Send report', attr.title('Whether the current results may cause a report to be sent. To prevent report loops, reports are not sent for TLS connections used to deliver TLS or DMARC reports. Whether a report is eventually sent depends on more factors, such as whether the policy domain has a TLSRPT policy with reporting addresses, and whether TLS connection failures were registered (depending on configuration).')),
+					dom.th('Success', dom._class('alignRight'), attr.title('Total number of successful connections.')),
+					dom.th('Failure', dom._class('alignRight'), attr.title('Total number of failed connection attempts.')),
+					dom.th('Failure details', dom._class('alignRight'), attr.title('Total number of details about failures.')),
+					dom.th('Send report', dom._class('alignRight'), attr.title('Whether the current results may cause a report to be sent. To prevent report loops, reports are not sent for TLS connections used to deliver TLS or DMARC reports. Whether a report is eventually sent depends on more factors, such as whether the policy domain has a TLSRPT policy with reporting addresses, and whether TLS connection failures were registered (depending on configuration).')),
 				),
 			),
 			dom.tbody(
@@ -2906,10 +2906,10 @@ const tlsrptResults = async () => {
 						dom.td(dom.a(attr.href('#tlsrpt/results/'+ (r.RecipientDomain === r.PolicyDomain ? 'rcptdom/' : 'host/') + r.PolicyDomain), r.PolicyDomain)),
 						dom.td(r.IsHost ? '✓' : ''),
 						dom.td(policyTypes.join(', ')),
-						dom.td(style({textAlign: 'right'}), ''+success),
-						dom.td(style({textAlign: 'right'}), ''+failed),
-						dom.td(style({textAlign: 'right'}), ''+failureDetails),
-						dom.td(style({textAlign: 'right'}), r.SendReport ? '✓' : ''),
+						dom.td(dom._class('alignRight'), ''+success),
+						dom.td(dom._class('alignRight'), ''+failed),
+						dom.td(dom._class('alignRight'), ''+failureDetails),
+						dom.td(dom._class('alignRight'), r.SendReport ? '✓' : ''),
 					)
 				}),
 				(results || []).length === 0 ? dom.tr(dom.td(attr.colspan('9'), 'No results.')) : [],
@@ -3073,8 +3073,8 @@ const renderTLSRPTSummaries = (summaries: api.TLSRPTSummary[]) => {
 			dom.thead(
 				dom.tr(
 					dom.th('Policy domain', attr.title('Policy domain the report is about. The recipient domain for MTA-STS, the TLSA base domain for DANE.')),
-					dom.th('Successes', attr.title('Number of successful SMTP STARTTLS sessions.')),
-					dom.th('Failures', attr.title('Number of failed SMTP STARTTLS sessions.')),
+					dom.th('Successes', dom._class('alignRight'), attr.title('Number of successful SMTP STARTTLS sessions.')),
+					dom.th('Failures', dom._class('alignRight'), attr.title('Number of failed SMTP STARTTLS sessions.')),
 					dom.th('Failure details', attr.title('Details about connection failures.')),
 				)
 			),
@@ -3082,8 +3082,8 @@ const renderTLSRPTSummaries = (summaries: api.TLSRPTSummary[]) => {
 				summaries.map(r =>
 					dom.tr(
 						dom.td(dom.a(attr.href('#tlsrpt/reports/' + domainName(r.PolicyDomain)), attr.title('See report details.'), domainName(r.PolicyDomain))),
-						dom.td(style({textAlign: 'right'}), '' + r.Success),
-						dom.td(style({textAlign: 'right'}), '' + r.Failure),
+						dom.td(dom._class('alignRight'), '' + r.Success),
+						dom.td(dom._class('alignRight'), '' + r.Failure),
 						dom.td(!r.ResultTypeCounts ? [] : Object.entries(r.ResultTypeCounts).map(kv => kv[0] + ': ' + kv[1]).join('; ')),
 					)
 				),
@@ -3134,15 +3134,15 @@ const domainTLSRPT = async (d: string) => {
 					dom.th('Period (UTC)', attr.title('Period this reporting period is about. Mail servers are recommended to stick to whole UTC days.')),
 
 					dom.th('Policy', attr.title('The policy applied, typically STSv1.')),
-					dom.th('Successes', attr.title('Total number of successful TLS connections for policy.')),
-					dom.th('Failures', attr.title('Total number of failed TLS connections for policy.')),
+					dom.th('Successes', dom._class('alignRight'), attr.title('Total number of successful TLS connections for policy.')),
+					dom.th('Failures', dom._class('alignRight'), attr.title('Total number of failed TLS connections for policy.')),
 
 					dom.th('Result Type', attr.title('Type of failure.')),
 					dom.th('Sending MTA', attr.title('IP of sending MTA.')),
 					dom.th('Receiving MX Host'),
 					dom.th('Receiving MX HELO'),
 					dom.th('Receiving IP'),
-					dom.th('Count', attr.title('Number of TLS connections that failed with these details.')),
+					dom.th('Count', dom._class('alignRight'), attr.title('Number of TLS connections that failed with these details.')),
 					dom.th('More', attr.title('Optional additional information about the failure.')),
 					dom.th('Code', attr.title('Optional API error code relating to the failure.')),
 				),
@@ -3154,7 +3154,7 @@ const domainTLSRPT = async (d: string) => {
 					;(r.Policies || []).forEach(pr => nrows += (pr.FailureDetails || []).length || 1)
 					const reportRowSpan = attr.rowspan(''+nrows)
 					const valignTop = style({verticalAlign: 'top'})
-					const alignRight = style({textAlign: 'right'})
+					const alignRight = dom._class('alignRight')
 					return (r.Policies || []).map((result, index) => {
 						const rows: HTMLElement[] = []
 						const details = result.FailureDetails || []
@@ -3349,6 +3349,16 @@ const dnsbl = async () => {
 	)
 }
 
+const queueInfo = (label: string, ...value: ElemArg[]) => dom.div(dom._class('queueInfo'), dom.span(dom._class('queueInfoLabel'), label), value)
+
+const queueError = (results: {Error: string}[] | null | undefined) => {
+	if (!results?.length || !results[results.length-1].Error) {
+		return []
+	}
+	const error = results[results.length-1].Error
+	return dom.div(dom._class('queueError'), attr.title(error), error)
+}
+
 const mailDetails = (m: api.Msg | api.MsgRetired) => {
 	const nowSecs = new Date().getTime()/1000
 	let results: HTMLElement = dom.p('No delivery attempts yet.')
@@ -3376,6 +3386,11 @@ const mailDetails = (m: api.Msg | api.MsgRetired) => {
 			dom._class('detailsSummary'),
 			dom.div(dom.b('Subject'), ' ', m.Subject || '(no subject)'),
 			dom.div(dom.b('Account'), ' ', m.SenderAccount || '—'),
+			queueInfo('ID / Base ID', ''+m.ID, ' / ', ''+m.BaseID),
+			queueInfo('Size', formatSize(m.Size)),
+			queueInfo('Transport', m.Transport || '(default)'),
+			queueInfo('Require TLS', String(m.RequireTLS)),
+			queueInfo('Last attempt', m.LastAttempt?.toISOString() || '—'),
 		),
 		dom.div(
 			dom._class('detailsSections'),
@@ -3461,23 +3476,14 @@ const queueList = async () => {
 
 		const ntbody = dom.tbody(
 			dom._class('loadend'),
-			msgs.length === 0 ? dom.tr(dom.td(attr.colspan('15'), 'No messages.')) : [],
+			msgs.length === 0 ? dom.tr(dom.td(attr.colspan('6'), 'No messages.')) : [],
 			msgs.map(m => {
 				return dom.tr(
 					dom.td(toggles.get(m.ID)!),
-					dom.td(''+m.ID + (m.BaseID > 0 ? '/'+m.BaseID : '')),
-					dom.td(age(new Date(m.Queued), false, nowSecs)),
-					dom.td(m.SenderAccount || '-'),
-					dom.td(prewrap(m.SenderLocalpart, "@", ipdomainString(m.SenderDomain))), // todo: escaping of localpart
-					dom.td(prewrap(m.RecipientLocalpart, "@", ipdomainString(m.RecipientDomain))), // todo: escaping of localpart
-					dom.td(formatSize(m.Size)),
-					dom.td(''+m.Attempts),
-					dom.td(m.Hold ? 'Hold' : ''),
-					dom.td(age(new Date(m.NextAttempt), true, nowSecs)),
-					dom.td(m.LastAttempt ? age(new Date(m.LastAttempt), false, nowSecs) : '-'),
-					dom.td(m.Results && m.Results.length > 0 ? m.Results[m.Results.length-1].Error : []),
-					dom.td(m.Transport || '(default)'),
-					dom.td(m.RequireTLS === true ? 'Yes' : (m.RequireTLS === false ? 'No' : '')),
+					dom.td(dom.b(m.Subject || '(no subject)'), queueInfo('Account', m.SenderAccount || '—')),
+					dom.td(queueInfo('From', prewrap(m.SenderLocalpart, '@', ipdomainString(m.SenderDomain))), queueInfo('To', prewrap(m.RecipientLocalpart, '@', ipdomainString(m.RecipientDomain)))),
+					dom.td(m.Hold ? 'On hold' : 'Queued', queueInfo('Attempts', ''+m.Attempts), queueError(m.Results)),
+					dom.td(queueInfo('Submitted', age(m.Queued, false, nowSecs)), queueInfo('Next', age(m.NextAttempt, true, nowSecs))),
 					dom.td(
 						dom.clickbutton('Details', function click() {
 							mailDetails(m)
@@ -3667,8 +3673,7 @@ const queueList = async () => {
 				}),
 			),
 		),
-		dom.table(dom._class('hover'),
-			style({width: '100%'}),
+		dom.table(dom._class('hover', 'queueTable', 'queueSelectable'),
 			dom.thead(
 				dom.tr(
 					dom.td(
@@ -3679,19 +3684,10 @@ const queueList = async () => {
 							}
 						}),
 					),
-					dom.th('ID'),
-					dom.th('Submitted'),
-					dom.th('Account'),
-					dom.th('From'),
-					dom.th('To'),
-					dom.th('Size'),
-					dom.th('Attempts'),
-					dom.th('Hold'),
-					dom.th('Next attempt'),
-					dom.th('Last attempt'),
-					dom.th('Last error'),
-					dom.th('Transport'),
-					dom.th('Require TLS'),
+					dom.th('Message'),
+					dom.th('Addresses'),
+					dom.th('Status'),
+					dom.th('Timing'),
 					dom.th('Actions'),
 				),
 			),
@@ -3699,7 +3695,7 @@ const queueList = async () => {
 			dom.tfoot(
 				dom.tr(
 					dom.td(
-						attr.colspan('15'),
+						attr.colspan('6'),
 						// todo: consider implementing infinite scroll, autoloading more pages. means the operations on selected messages should be moved from below to above the table. and probably only show them when at least one message is selected to prevent clutter.
 						dom.clickbutton('Load more', attr.title('Try to load more entries. You can still try to load more entries when at the end of the list, new entries may have been appended since the previous call.'), async function click(e: MouseEvent) {
 							if (msgs.length === 0) {
@@ -3875,22 +3871,13 @@ const retiredList = async () => {
 	const render = () => {
 		const ntbody = dom.tbody(
 			dom._class('loadend'),
-			retired.length === 0 ? dom.tr(dom.td(attr.colspan('14'), 'No retired messages.')) : [],
+			retired.length === 0 ? dom.tr(dom.td(attr.colspan('5'), 'No retired messages.')) : [],
 			retired.map(m =>
 				dom.tr(
-					dom.td(''+m.ID + (m.BaseID > 0 ? '/'+m.BaseID : '')),
-					dom.td(m.Success ? '✓' : ''),
-					dom.td(age(new Date(m.LastActivity), false, nowSecs)),
-					dom.td(age(new Date(m.Queued), false, nowSecs)),
-					dom.td(m.SenderAccount || '-'),
-					dom.td(prewrap(m.SenderLocalpart, "@", m.SenderDomainStr)), // todo: escaping of localpart
-					dom.td(prewrap(m.RecipientLocalpart, "@", m.RecipientDomainStr)), // todo: escaping of localpart
-					dom.td(formatSize(m.Size)),
-					dom.td(''+m.Attempts),
-					dom.td(m.LastAttempt ? age(new Date(m.LastAttempt), false, nowSecs) : '-'),
-					dom.td(m.Results && m.Results.length > 0 ? m.Results[m.Results.length-1].Error : []),
-					dom.td(m.Transport || ''),
-					dom.td(m.RequireTLS === true ? 'Yes' : (m.RequireTLS === false ? 'No' : '')),
+					dom.td(dom.b(m.Subject || '(no subject)'), queueInfo('Account', m.SenderAccount || '—')),
+					dom.td(queueInfo('From', prewrap(m.SenderLocalpart, '@', m.SenderDomainStr)), queueInfo('To', prewrap(m.RecipientLocalpart, '@', m.RecipientDomainStr))),
+					dom.td(m.Success ? 'Delivered' : 'Failed', queueInfo('Attempts', ''+m.Attempts), queueError(m.Results)),
+					dom.td(queueInfo('Submitted', age(m.Queued, false, nowSecs)), queueInfo('Last activity', age(m.LastActivity, false, nowSecs))),
 					dom.td(
 						dom.clickbutton('Details', function click() {
 							mailDetails(m)
@@ -3994,23 +3981,13 @@ const retiredList = async () => {
 				}),
 			),
 		),
-		dom.table(dom._class('hover'),
-			style({width: '100%'}),
+		dom.table(dom._class('hover', 'queueTable'),
 			dom.thead(
 				dom.tr(
-					dom.th('ID'),
-					dom.th('Success'),
-					dom.th('Last activity'),
-					dom.th('Submitted'),
-					dom.th('Account'),
-					dom.th('From'),
-					dom.th('To'),
-					dom.th('Size'),
-					dom.th('Attempts'),
-					dom.th('Last attempt'),
-					dom.th('Last error'),
-					dom.th('Require TLS'),
-					dom.th('Transport'),
+					dom.th('Message'),
+					dom.th('Addresses'),
+					dom.th('Status'),
+					dom.th('Timing'),
 					dom.th('Actions'),
 				),
 			),
@@ -4018,7 +3995,7 @@ const retiredList = async () => {
 			dom.tfoot(
 				dom.tr(
 					dom.td(
-						attr.colspan('14'),
+						attr.colspan('5'),
 						dom.clickbutton('Load more', attr.title('Try to load more entries. You can still try to load more entries when at the end of the list, new entries may have been appended since the previous call.'), async function click(e: MouseEvent) {
 							if (retired.length === 0) {
 								sort.LastID = 0
@@ -4060,6 +4037,11 @@ const webhookDetails = (h: api.Hook | api.HookRetired) => {
 			dom._class('detailsSummary'),
 			dom.div(dom.b('Subject'), ' ', h.Subject || '(no subject)'),
 			dom.div(dom.b('Account'), ' ', h.Account, ' · ', h.OutgoingEvent || 'incoming'),
+			queueInfo('Queue message ID', ''+h.QueueMsgID),
+			queueInfo('From ID', h.FromID),
+			queueInfo('Message ID', h.MessageID),
+			queueInfo('Extra', formatExtra(h.Extra)),
+			queueInfo('Endpoint', h.URL),
 			'SupersededByID' in h && h.SupersededByID !== 0 ? dom.div('Superseded by webhook #' + h.SupersededByID) : [],
 		),
 		dom.div(
@@ -4159,23 +4141,14 @@ const hooksList = async () => {
 
 		const ntbody = dom.tbody(
 			dom._class('loadend'),
-			hooks.length === 0 ? dom.tr(dom.td(attr.colspan('15'), 'No webhooks.')) : [],
+			hooks.length === 0 ? dom.tr(dom.td(attr.colspan('6'), 'No webhooks.')) : [],
 			hooks.map(h =>
 				dom.tr(
 					dom.td(toggles.get(h.ID)!),
-					dom.td(''+h.ID),
-					dom.td(age(new Date(h.Submitted), false, nowSecs)),
-					dom.td(''+(h.QueueMsgID || '')), // todo future: make it easy to open the corresponding (retired) message from queue (if still around).
-					dom.td(''+h.FromID),
-					dom.td(''+h.MessageID),
-					dom.td(h.Account || '-'),
-					dom.td(h.IsIncoming ? "incoming" : h.OutgoingEvent),
-					dom.td(formatExtra(h.Extra)),
-					dom.td(''+h.Attempts),
-					dom.td(age(h.NextAttempt, true, nowSecs)),
-					dom.td(h.Results && h.Results.length > 0 ? age(h.Results[h.Results.length-1].Start, false, nowSecs) : []),
-					dom.td(h.Results && h.Results.length > 0 ? h.Results[h.Results.length-1].Error : []),
+					dom.td(dom.b(h.IsIncoming ? 'incoming' : h.OutgoingEvent), queueInfo('Account', h.Account || '—'), dom.div(h.Subject || '(no subject)')),
 					dom.td(h.URL),
+					dom.td('Queued', queueInfo('Attempts', ''+h.Attempts), queueError(h.Results)),
+					dom.td(queueInfo('Submitted', age(h.Submitted, false, nowSecs)), queueInfo('Next', age(h.NextAttempt, true, nowSecs))),
 					dom.td(
 						dom.clickbutton('Details', function click() {
 							webhookDetails(h)
@@ -4246,8 +4219,7 @@ const hooksList = async () => {
 				}),
 			),
 		),
-		dom.table(dom._class('hover'),
-			style({width: '100%'}),
+		dom.table(dom._class('hover', 'queueTable', 'queueSelectable'),
 			dom.thead(
 				dom.tr(
 					dom.td(
@@ -4258,19 +4230,10 @@ const hooksList = async () => {
 							}
 						}),
 					),
-					dom.th('ID'),
-					dom.th('Submitted'),
-					dom.th('Queue Msg ID', attr.title('ID of queued message this event is about.')),
-					dom.th('FromID'),
-					dom.th('MessageID'),
-					dom.th('Account'),
 					dom.th('Event'),
-					dom.th('Extra'),
-					dom.th('Attempts'),
-					dom.th('Next'),
-					dom.th('Last'),
-					dom.th('Error'),
-					dom.th('URL'),
+					dom.th('Endpoint'),
+					dom.th('Status'),
+					dom.th('Timing'),
 					dom.th('Actions'),
 				),
 			),
@@ -4278,7 +4241,7 @@ const hooksList = async () => {
 			dom.tfoot(
 				dom.tr(
 					dom.td(
-						attr.colspan('15'),
+						attr.colspan('6'),
 						loadMore=dom.clickbutton(loadMoreLabel, attr.title('Loads the next page of matching webhooks.'), async function click(e: MouseEvent) {
 							if (hooks.length === 0) {
 								sort.LastID = 0
@@ -4444,22 +4407,13 @@ const hooksRetiredList = async () => {
 	const render = () => {
 		const ntbody = dom.tbody(
 			dom._class('loadend'),
-			hooks.length === 0 ? dom.tr(dom.td(attr.colspan('14'), 'No retired webhooks.')) : [],
+			hooks.length === 0 ? dom.tr(dom.td(attr.colspan('5'), 'No retired webhooks.')) : [],
 			hooks.map(h =>
 				dom.tr(
-					dom.td(''+h.ID),
-					dom.td(h.Success ? '✓' : ''),
-					dom.td(age(h.LastActivity, false, nowSecs)),
-					dom.td(age(new Date(h.Submitted), false, nowSecs)),
-					dom.td(''+(h.QueueMsgID || '')),
-					dom.td(''+h.FromID),
-					dom.td(''+h.MessageID),
-					dom.td(h.Account || '-'),
-					dom.td(h.IsIncoming ? "incoming" : h.OutgoingEvent),
-					dom.td(formatExtra(h.Extra)),
-					dom.td(''+h.Attempts),
-					dom.td(h.Results && h.Results.length > 0 ? h.Results[h.Results.length-1].Error : []),
+					dom.td(dom.b(h.IsIncoming ? 'incoming' : h.OutgoingEvent), queueInfo('Account', h.Account || '—'), dom.div(h.Subject || '(no subject)')),
 					dom.td(h.URL),
+					dom.td(h.Success ? 'Delivered' : 'Failed', queueInfo('Attempts', ''+h.Attempts), queueError(h.Results)),
+					dom.td(queueInfo('Submitted', age(h.Submitted, false, nowSecs)), queueInfo('Last activity', age(h.LastActivity, false, nowSecs))),
 					dom.td(
 						dom.clickbutton('Details', function click() {
 							webhookDetails(h)
@@ -4518,23 +4472,13 @@ const hooksRetiredList = async () => {
 				}),
 			),
 		),
-		dom.table(dom._class('hover'),
-			style({width: '100%'}),
+		dom.table(dom._class('hover', 'queueTable'),
 			dom.thead(
 				dom.tr(
-					dom.th('ID'),
-					dom.th('Success'),
-					dom.th('Last'),
-					dom.th('Submitted'),
-					dom.th('Queue Msg ID', attr.title('ID of queued message this event is about.')),
-					dom.th('FromID'),
-					dom.th('MessageID'),
-					dom.th('Account'),
 					dom.th('Event'),
-					dom.th('Extra'),
-					dom.th('Attempts'),
-					dom.th('Error'),
-					dom.th('URL'),
+					dom.th('Endpoint'),
+					dom.th('Status'),
+					dom.th('Timing'),
 					dom.th('Actions'),
 				),
 			),
@@ -4542,7 +4486,7 @@ const hooksRetiredList = async () => {
 			dom.tfoot(
 				dom.tr(
 					dom.td(
-						attr.colspan('14'),
+						attr.colspan('5'),
 						loadMore=dom.clickbutton(loadMoreLabel, attr.title('Loads the next page of matching webhooks.'), async function click(e: MouseEvent) {
 							if (hooks.length === 0) {
 								sort.LastID = 0
@@ -5097,11 +5041,13 @@ const webserver = async () => {
 			handlerRows.splice(nindex, 0, row)
 		}
 
-		// Row that starts starts with two tables: one for the fields all WebHandlers have
-		// (in common). And one for the details, i.e. WebStatic, WebRedirect, WebForward.
-		const root = dom.tr(
-			dom.td(
-				dom.table(
+		// Groups matching fields, handler settings and actions in one card.
+		const root = dom.div(
+			dom._class('webHandlerCard'),
+			dom.div(
+				dom._class('webHandlerFields'),
+				dom.h3('Request matching'),
+				dom.table(dom._class('webHandlerMatch'),
 					dom.tr(
 						dom.td('LogName', attr.title('Name used during logging for requests matching this handler. If empty, the index of the handler in the list is used.')),
 						dom.td('Domain', attr.title('Request must be for this domain to match this handler.')),
@@ -5128,10 +5074,12 @@ const webserver = async () => {
 					),
 				),
 				// Replaced with a call to makeType, below (and later when switching types).
+				dom.h3('Handler settings'),
 				details=dom.table(),
 			),
-			dom.td(
-				dom.td(
+			dom.div(
+				dom._class('webHandlerActions'),
+				dom.div(
 					dom.clickbutton('Remove', dom._class('dangerButton'), function click() {
 						handlerRows = handlerRows.filter(r => r !== row)
 						row.root.remove()
@@ -5225,11 +5173,10 @@ const webserver = async () => {
 		}
 	}
 
-	// Add and move buttons, both above and below the table for quick access, hence a function.
+	// Keeps list actions available above and below the handlers.
 	const handlerActions = () => {
 		return [
-			'Action ',
-			dom.clickbutton('Add', function click() {
+			dom.clickbutton('Add handler', function click() {
 				// New WebHandler added as WebForward. Good chance this is what the user wants. And
 				// it has the least fields. (;
 				const nwh: api.WebHandler = {
@@ -5250,7 +5197,7 @@ const webserver = async () => {
 				nohandler.style.display = handlerRows.length ? 'none' : ''
 			}),
 			' ',
-			dom.clickbutton('Move', function click() {
+			dom.clickbutton('Reorder handlers', function click() {
 				moveButtonsVisible = !moveButtonsVisible
 				for(const row of handlerRows) {
 					row.moveButtons.style.display = moveButtonsVisible ? '' : 'none'
@@ -5294,27 +5241,16 @@ const webserver = async () => {
 				dom.br(),
 				dom.h2('Handlers', attr.title('Corresponds with WebHandlers in domains.conf')),
 				dom.p('Each incoming request is matched against the configured handlers, in order. The first matching handler serves the request. System handlers such as for ACME validation, MTA-STS and autoconfig, come first. Then these webserver handlers. Finally the internal service handlers for admin, account, webmail and webapi configured in mox.conf. Don\'t forget to save after making a change.'),
-				dom.table(dom._class('long'),
-					dom.thead(
-						dom.tr(
-							dom.th(),
-							dom.th(handlerActions()),
-						),
-					),
-					handlersTbody=dom.tbody(
-						(conf.WebHandlers || []).map(wh => handlerRow(wh)),
-						nohandler=dom.tr(
-							style({display: handlerRows.length ? 'none' : ''}),
-							dom.td(attr.colspan('2'), 'No handlers.'),
-						),
-					),
-					dom.tfoot(
-						dom.tr(
-							dom.th(),
-							dom.th(handlerActions()),
-						),
+				dom.div(dom._class('webHandlerToolbar'), handlerActions()),
+				handlersTbody=dom.div(
+					dom._class('webHandlerList'),
+					(conf.WebHandlers || []).map(wh => handlerRow(wh)),
+					nohandler=dom.div(
+						style({display: handlerRows.length ? 'none' : ''}),
+						'No handlers.',
 					),
 				),
+				dom.div(dom._class('webHandlerToolbar'), handlerActions()),
 				dom.br(),
 				dom.submitbutton('Save', attr.title('Save config. If the configuration has changed since this page was loaded, an error will be returned. After saving, the changes take effect immediately.')),
 			),
