@@ -18,12 +18,12 @@ const login = async (reason: string) => {
 		let fieldset: HTMLFieldSetElement
 		let password: HTMLInputElement
 		const root = dom.div(
-			style({position: 'absolute', top: 0, right: 0, bottom: 0, left: 0, backgroundColor: '#eee', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: '1', animation: 'fadein .15s ease-in'}),
+			dom._class('adminOverlay', 'adminLogin'),
 			dom.div(
 				style({display: 'flex', flexDirection: 'column', alignItems: 'center'}),
 				reasonElem=reason ? dom.div(style({marginBottom: '2ex', textAlign: 'center'}), reason) : dom.div(),
 				dom.div(
-					style({backgroundColor: 'white', borderRadius: '.25em', padding: '1em', boxShadow: '0 0 20px rgba(0, 0, 0, 0.1)', border: '1px solid #ddd', maxWidth: '95vw', overflowX: 'auto', maxHeight: '95vh', overflowY: 'auto', marginBottom: '20vh'}),
+					dom._class('adminDialog'),
 					dom.form(
 						async function submit(e: SubmitEvent) {
 							e.preventDefault()
@@ -53,7 +53,8 @@ const login = async (reason: string) => {
 							}
 						},
 						fieldset=dom.fieldset(
-							dom.h1('Admin'),
+							dom.h1('devn'),
+							dom.p('Administration'),
 							dom.label(
 								style({display: 'block', marginBottom: '2ex'}),
 								dom.div('Password', style({marginBottom: '.5ex'})),
@@ -73,7 +74,7 @@ const login = async (reason: string) => {
 	})
 }
 
-// Popup shows kids in a centered div with white background on top of a
+// Popup shows kids in a centered, themed dialog on top of a
 // transparent overlay on top of the window. Clicking the overlay or hitting
 // Escape closes the popup. Scrollbars are automatically added to the div with
 // kids. Returns a function that removes the popup.
@@ -90,7 +91,7 @@ const popup = (...kids: ElemArg[]) => {
 	}
 	let content: HTMLElement
 	const root = dom.div(
-		style({position: 'fixed', top: 0, right: 0, bottom: 0, left: 0, backgroundColor: 'rgba(0, 0, 0, 0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: '1'}),
+		dom._class('adminOverlay'),
 		function keydown(e: KeyboardEvent) {
 			if (e.key === 'Escape') {
 				e.stopPropagation()
@@ -103,7 +104,7 @@ const popup = (...kids: ElemArg[]) => {
 		},
 		content=dom.div(
 			attr.tabindex('0'),
-			style({backgroundColor: 'white', borderRadius: '.25em', padding: '1em', boxShadow: '0 0 20px rgba(0, 0, 0, 0.1)', border: '1px solid #ddd', maxWidth: '95vw', overflowX: 'auto', maxHeight: '95vh', overflowY: 'auto'}),
+			dom._class('adminDialog'),
 			function click(e: MouseEvent) {
 				e.stopPropagation()
 			},
@@ -148,9 +149,9 @@ const check = async <T>(elem: {disabled: boolean}, p: Promise<T>): Promise<T> =>
 // When white-space is relevant, e.g. for email addresses (e.g. "  "@example.org).
 const prewrap = (...l: string[]) => dom.span(style({whiteSpace: 'pre-wrap'}), l)
 
-const green = '#1dea20'
-const yellow = '#ffe400'
-const red = '#ff7443'
+const green = 'var(--success)'
+const yellow = 'var(--warning)'
+const red = 'var(--error)'
 // const blue = '#8bc8ff'
 
 const link = (href: string, anchorOpt?: string) => dom.a(attr.href(href), attr.rel('noopener noreferrer'), anchorOpt || href)
@@ -163,7 +164,7 @@ const crumblink = (text: string, path: string) => {
 }
 const crumbs = (...l: ({text: string, path: string} | string)[]) => {
 	const crumbtext = (e: {text: string, path: string} | string) => typeof e === 'string' ? e : e.text
-	document.title = l.map(e => crumbtext(e)).join(' - ')
+	document.title = l.map(e => crumbtext(e)).join(' / ') + ' · devn Admin'
 
 	const crumblink = (e: {text: string, path: string} | string) =>
 		typeof e === 'string' ? prewrap(e) : dom.a(e.text, attr.href(e.path))
@@ -196,7 +197,7 @@ const errmsg = (err: unknown) => ''+((err as any).message || '(no error message)
 
 const footer = () =>
 	dom.div(
-		style({marginTop: '6ex', opacity: 0.75}),
+		dom._class('adminFooter'),
 		link('https://www.xmox.nl', 'mox'),
 		' ',
 		moxversion, ' ',
@@ -354,12 +355,14 @@ const index = async () => {
 	let cidElem: HTMLSpanElement
 
 	return dom.div(
-		crumbs('Mox Admin'),
+		dom._class('overview'),
+		crumbs('Overview'),
 		checkUpdatesEnabled ? [] : dom.p(box(yellow, 'Warning: Checking for updates has not been enabled in mox.conf (CheckUpdates: true).', dom.br(), 'Make sure you stay up to date through another mechanism!', dom.br(), 'You have a responsibility to keep the internet-connected software you run up to date and secure!', dom.br(), 'See ', link('https://updates.xmox.nl/changelog'))),
-		dom.p(
-			dom.a('Accounts', attr.href('#accounts')), dom.br(),
-			dom.a('Queue', attr.href('#queue')), ' ('+queueSize+')', dom.br(),
-			dom.a('Webhook queue', attr.href('#webhookqueue')), ' ('+hooksQueueSize+')', dom.br(),
+		dom.div(
+			dom._class('overviewStats'),
+			dom.a(attr.href('#accounts'), dom.span('Accounts'), dom.b('' + (accounts || []).length)),
+			dom.a(attr.href('#queue'), dom.span('Mail queue'), dom.b('' + queueSize)),
+			dom.a(attr.href('#webhookqueue'), dom.span('Webhook queue'), dom.b('' + hooksQueueSize)),
 		),
 		dom.h2('Domains'),
 		(domains || []).length === 0 ? box(red, 'No domains') :
@@ -454,7 +457,7 @@ const globalRoutes = async () => {
 
 	return dom.div(
 		crumbs(
-			crumblink('Mox Admin', '#'),
+			crumblink('Overview', '#'),
 			'Routes',
 		),
 		RoutesEditor('global', transports, config.Routes || [], async (routes: api.Route[]) => await client.RoutesSave(routes)),
@@ -466,7 +469,7 @@ const config = async () => {
 
 	return dom.div(
 		crumbs(
-			crumblink('Mox Admin', '#'),
+			crumblink('Overview', '#'),
 			'Config',
 		),
 		dom.h2(staticPath),
@@ -488,7 +491,7 @@ const loglevels = async () => {
 
 	return dom.div(
 		crumbs(
-			crumblink('Mox Admin', '#'),
+			crumblink('Overview', '#'),
 			'Log levels',
 		),
 		dom.p('Note: changing a log level here only changes it for the current process. When mox restarts, it sets the log levels from the configuration file. Change mox.conf to keep the changes.'),
@@ -565,7 +568,7 @@ const box = (color: string, ...l: ElemArg[]) => [
 	dom.div(
 		style({
 			display: 'inline-block',
-			padding: '.125em .25em',
+			padding: '8px 12px',
 			backgroundColor: color,
 			borderRadius: '3px',
 			margin: '.5ex 0',
@@ -600,7 +603,7 @@ const accounts = async () => {
 
 	return dom.div(
 		crumbs(
-			crumblink('Mox Admin', '#'),
+			crumblink('Overview', '#'),
 			'Accounts',
 		),
 		dom.h2('Accounts'),
@@ -629,7 +632,7 @@ const accounts = async () => {
 						}
 					}),
 				),
-				'@',
+				dom.span(dom._class('addressSeparator'), '@'),
 				dom.label(
 					style({display: 'inline-block'}),
 					dom.span('Domain', attr.title('The domain of the email address, after the "@".')),
@@ -662,7 +665,7 @@ const loginattempts = async () => {
 
 	return dom.div(
 		crumbs(
-			crumblink('Mox Admin', '#'),
+			crumblink('Overview', '#'),
 			crumblink('Accounts', '#accounts'),
 			'Login attempts',
 		),
@@ -677,7 +680,7 @@ const accountloginattempts = async (accountName: string) => {
 
 	return dom.div(
 		crumbs(
-			crumblink('Mox Admin', '#'),
+			crumblink('Overview', '#'),
 			crumblink('Accounts', '#accounts'),
 			['(admin)', '-'].includes(accountName) ? accountName : crumblink(accountName, '#accounts/l/'+accountName),
 			'Login attempts',
@@ -903,7 +906,7 @@ const account = async (name: string) => {
 
 	return dom.div(
 		crumbs(
-			crumblink('Mox Admin', '#'),
+			crumblink('Overview', '#'),
 			crumblink('Accounts', '#accounts'),
 			name,
 		),
@@ -967,7 +970,7 @@ const account = async (name: string) => {
 					dom.br(),
 					localpart=dom.input(),
 				),
-				'@',
+				dom.span(dom._class('addressSeparator'), '@'),
 				dom.label(
 					style({display: 'inline-block'}),
 					dom.span('Domain'),
@@ -1395,7 +1398,7 @@ const domain = async (d: string) => {
 
 	return dom.div(
 		crumbs(
-			crumblink('Mox Admin', '#'),
+			crumblink('Overview', '#'),
 			'Domain ' + domainString(dnsdomain),
 		),
 		domainConfig.Disabled ? dom.p(box(yellow, 'Warning: Domain is disabled. Incoming/outgoing messages involving this domain are rejected and ACME for new TLS certificates is disabled.')) : [],
@@ -2030,7 +2033,7 @@ const domainAlias = async (d: string, aliasLocalpart: string) => {
 
 	return dom.div(
 		crumbs(
-			crumblink('Mox Admin', '#'),
+			crumblink('Overview', '#'),
 			crumblink('Domain ' + domainString(domain.Domain), '#domains/'+d),
 			'Alias ' + aliasLocalpart + '@' + domainName(domain.Domain),
 		),
@@ -2137,7 +2140,7 @@ const domainDNSRecords = async (d: string) => {
 
 	return dom.div(
 		crumbs(
-			crumblink('Mox Admin', '#'),
+			crumblink('Overview', '#'),
 			crumblink('Domain ' + domainString(dnsdomain), '#domains/'+d),
 			'DNS Records',
 		),
@@ -2292,7 +2295,7 @@ const domainDNSCheck = async (d: string) => {
 
 	return dom.div(
 		crumbs(
-			crumblink('Mox Admin', '#'),
+			crumblink('Overview', '#'),
 			crumblink('Domain ' + domainString(dnsdomain), '#domains/'+d),
 			'Check DNS',
 		),
@@ -2318,7 +2321,7 @@ const domainDNSCheck = async (d: string) => {
 const dmarcIndex = async () => {
 	return dom.div(
 		crumbs(
-			crumblink('Mox Admin', '#'),
+			crumblink('Overview', '#'),
 			'DMARC',
 		),
 		dom.ul(
@@ -2339,7 +2342,7 @@ const dmarcReports = async () => {
 
 	return dom.div(
 		crumbs(
-			crumblink('Mox Admin', '#'),
+			crumblink('Overview', '#'),
 			crumblink('DMARC', '#dmarc'),
 			'Aggregate reporting summary',
 		),
@@ -2401,7 +2404,7 @@ const dmarcEvaluations = async () => {
 
 	return dom.div(
 		crumbs(
-			crumblink('Mox Admin', '#'),
+			crumblink('Overview', '#'),
 			crumblink('DMARC', '#dmarc'),
 			'Evaluations',
 		),
@@ -2541,7 +2544,7 @@ const dmarcEvaluationsDomain = async (domain: string) => {
 
 	return dom.div(
 		crumbs(
-			crumblink('Mox Admin', '#'),
+			crumblink('Overview', '#'),
 			crumblink('DMARC', '#dmarc'),
 			crumblink('Evaluations', '#dmarc/evaluations'),
 			'Domain '+domainString(d),
@@ -2647,7 +2650,7 @@ const domainDMARC = async (d: string) => {
 
 	return dom.div(
 		crumbs(
-			crumblink('Mox Admin', '#'),
+			crumblink('Overview', '#'),
 			crumblink('Domain ' + domainString(dnsdomain), '#domains/'+d),
 			'DMARC aggregate reports',
 		),
@@ -2814,7 +2817,7 @@ const domainDMARCReport = async (d: string, reportID: number) => {
 
 	return dom.div(
 		crumbs(
-			crumblink('Mox Admin', '#'),
+			crumblink('Overview', '#'),
 			crumblink('Domain ' + domainString(dnsdomain), '#domains/'+d),
 			crumblink('DMARC aggregate reports', '#domains/' + d + '/dmarc'),
 			'Report ' + reportID
@@ -2827,7 +2830,7 @@ const domainDMARCReport = async (d: string, reportID: number) => {
 const tlsrptIndex = async () => {
 	return dom.div(
 		crumbs(
-			crumblink('Mox Admin', '#'),
+			crumblink('Overview', '#'),
 			'TLSRPT',
 		),
 		dom.ul(
@@ -2857,7 +2860,7 @@ const tlsrptResults = async () => {
 
 	return dom.div(
 		crumbs(
-			crumblink('Mox Admin', '#'),
+			crumblink('Overview', '#'),
 			crumblink('TLSRPT', '#tlsrpt'),
 			'Results',
 		),
@@ -2994,7 +2997,7 @@ const tlsrptResultsPolicyDomain = async (isrcptdom: boolean, domain: string) => 
 	let recordBox: HTMLElement
 	const root = dom.div(
 		crumbs(
-			crumblink('Mox Admin', '#'),
+			crumblink('Overview', '#'),
 			crumblink('TLSRPT', '#tlsrpt'),
 			crumblink('Results', '#tlsrpt/results'),
 			(isrcptdom ? 'Recipient domain ' : 'Host ') + domainString(d),
@@ -3053,7 +3056,7 @@ const tlsrptReports = async () => {
 
 	return dom.div(
 		crumbs(
-			crumblink('Mox Admin', '#'),
+			crumblink('Overview', '#'),
 			crumblink('TLSRPT', '#tlsrpt'),
 			'Reports'
 		),
@@ -3110,7 +3113,7 @@ const domainTLSRPT = async (d: string) => {
 
 	return dom.div(
 		crumbs(
-			crumblink('Mox Admin', '#'),
+			crumblink('Overview', '#'),
 			crumblink('TLSRPT', '#tlsrpt'),
 			crumblink('Reports', '#tlsrpt/reports'),
 			'Domain '+domainString(dnsdomain),
@@ -3206,7 +3209,7 @@ const domainTLSRPTID = async (d: string, reportID: number) => {
 
 	return dom.div(
 		crumbs(
-			crumblink('Mox Admin', '#'),
+			crumblink('Overview', '#'),
 			crumblink('TLSRPT', '#tlsrpt'),
 			crumblink('Reports', '#tlsrpt/reports'),
 			crumblink('Domain '+domainString(dnsdomain), '#tlsrpt/reports/' + d + ''),
@@ -3222,7 +3225,7 @@ const mtasts = async () => {
 
 	return dom.div(
 		crumbs(
-			crumblink('Mox Admin', '#'),
+			crumblink('Overview', '#'),
 			'MTA-STS policies',
 		),
 		dom.p("MTA-STS is a mechanism allowing email domains to publish a policy for using SMTP STARTTLS and TLS verification. See ", link('https://www.rfc-editor.org/rfc/rfc8461.html', 'RFC 8461'), '.'),
@@ -3294,7 +3297,7 @@ const dnsbl = async () => {
 
 	return dom.div(
 		crumbs(
-			crumblink('Mox Admin', '#'),
+			crumblink('Overview', '#'),
 			'DNS blocklist status for IPs',
 		),
 		dom.p('Follow the external links to a third party DNSBL checker to see if the IP is on one of the many blocklist.'),
@@ -3494,7 +3497,7 @@ const queueList = async () => {
 
 	return dom.div(
 		crumbs(
-			crumblink('Mox Admin', '#'),
+			crumblink('Overview', '#'),
 			'Queue',
 		),
 
@@ -3934,7 +3937,7 @@ const retiredList = async () => {
 
 	return dom.div(
 		crumbs(
-			crumblink('Mox Admin', '#'),
+			crumblink('Overview', '#'),
 			crumblink('Queue', '#queue'),
 			'Retired messages',
 		),
@@ -4216,59 +4219,52 @@ const hooksList = async () => {
 
 	return dom.div(
 		crumbs(
-			crumblink('Mox Admin', '#'),
+			crumblink('Overview', '#'),
 			'Webhook queue',
 		),
 
 		dom.p(dom.a(attr.href('#webhookqueue/retired'), 'Retired webhooks')),
 		dom.h2('Webhooks'),
+		dom.div(
+			dom._class('queueFilters'),
+			dom.label('Submitted', filterSubmitted=dom.input(attr.form('hooksfilter'), style({width: '7em'}), attr.title('Example: "<-1h" for filtering webhooks submitted more than 1 hour ago.'))),
+			dom.label('Account', filterAccount=dom.input(attr.form('hooksfilter'), style({width: '8em'}))),
+			dom.label(
+				'Event',
+				filterEvent=dom.select(
+					attr.form('hooksfilter'),
+					function change() {
+						filterForm.requestSubmit()
+					},
+					dom.option('All events', attr.value('')),
+					// note: outgoing hook events are in ../webhook/webhook.go, ../mox-/config.go ../webadmin/admin.ts and ../webapi/gendoc.sh. keep in sync.
+					['incoming', 'delivered', 'suppressed', 'delayed', 'failed', 'relayed', 'expanded', 'canceled', 'unrecognized'].map(s => dom.option(s)),
+				),
+			),
+			dom.label('Next attempt', filterNextAttempt=dom.input(attr.form('hooksfilter'), style({width: '7em'}), attr.title('Example: ">1h" for filtering webhooks to be delivered in more than 1 hour, or "<now" for webhooks to be delivered as soon as possible.'))),
+			dom.div(
+				dom._class('filterActions'),
+				dom.label('Sort',
+				sortElem=dom.select(
+					attr.form('hooksfilter'),
+					function change() {
+						filterForm.requestSubmit()
+					},
+					dom.option('Next attempt ↑', attr.value('nextattempt-asc')),
+					dom.option('Next attempt ↓', attr.value('nextattempt-desc')),
+					dom.option('Submitted ↑', attr.value('submitted-asc')),
+					dom.option('Submitted ↓', attr.value('submitted-desc')),
+				)),
+				dom.submitbutton('Apply', attr.form('hooksfilter')), ' ',
+				dom.clickbutton('Reset', attr.form('hooksfilter'), function click() {
+					filterForm.reset()
+					filterForm.requestSubmit()
+				}),
+			),
+		),
 		dom.table(dom._class('hover'),
 			style({width: '100%'}),
 			dom.thead(
-				dom.tr(
-					dom.td(attr.colspan('2'), 'Filter'),
-					dom.td(filterSubmitted=dom.input(attr.form('hooksfilter'), style({width: '7em'}), attr.title('Example: "<-1h" for filtering webhooks submitted more than 1 hour ago.'))),
-					dom.td(),
-					dom.td(),
-					dom.td(),
-					dom.td(filterAccount=dom.input(attr.form('hooksfilter'), style({width: '8em'}))),
-					dom.td(
-						filterEvent=dom.select(
-							attr.form('hooksfilter'),
-							function change() {
-								filterForm.requestSubmit()
-							},
-							dom.option(''),
-							// note: outgoing hook events are in ../webhook/webhook.go, ../mox-/config.go ../webadmin/admin.ts and ../webapi/gendoc.sh. keep in sync.
-							['incoming', 'delivered', 'suppressed', 'delayed', 'failed', 'relayed', 'expanded', 'canceled', 'unrecognized'].map(s => dom.option(s)),
-						),
-					),
-					dom.td(),
-					dom.td(),
-					dom.td(filterNextAttempt=dom.input(attr.form('hooksfilter'), style({width: '7em'}), attr.title('Example: ">1h" for filtering webhooks to be delivered in more than 1 hour, or "<now" for webhooks to be delivered as soon as possible.'))),
-					dom.td(),
-					dom.td(),
-					dom.td(
-						attr.colspan('2'),
-						style({textAlign: 'right'}), // Less content shifting while rendering.
-						'Sort ',
-						sortElem=dom.select(
-							attr.form('hooksfilter'),
-							function change() {
-								filterForm.requestSubmit()
-							},
-							dom.option('Next attempt ↑', attr.value('nextattempt-asc')),
-							dom.option('Next attempt ↓', attr.value('nextattempt-desc')),
-							dom.option('Submitted ↑', attr.value('submitted-asc')),
-							dom.option('Submitted ↓', attr.value('submitted-desc')),
-						), ' ',
-						dom.submitbutton('Apply', attr.form('hooksfilter')), ' ',
-						dom.clickbutton('Reset', attr.form('hooksfilter'), function click() {
-							filterForm.reset()
-							filterForm.requestSubmit()
-						}),
-					),
-				),
 				dom.tr(
 					dom.td(
 						dom.input(attr.type('checkbox'), (hooks || []).length === 1 ? attr.checked('') : [], attr.form('hooksfilter'), function change(e: MouseEvent) {
@@ -4325,7 +4321,7 @@ const hooksList = async () => {
 
 		// Filtering.
 		filterForm=dom.form(
-			attr.id('hooksfilter'), // Referenced by input elements in table row.
+			attr.id('hooksfilter'), // Connects filter controls and table selection to this form.
 			async function submit(e: SubmitEvent) {
 				e.preventDefault()
 				e.stopPropagation()
@@ -4504,59 +4500,52 @@ const hooksRetiredList = async () => {
 
 	return dom.div(
 		crumbs(
-			crumblink('Mox Admin', '#'),
+			crumblink('Overview', '#'),
 			crumblink('Webhook queue', '#webhookqueue'),
 			'Retired webhooks',
 		),
 
 		dom.h2('Retired webhooks'),
+		dom.div(
+			dom._class('queueFilters'),
+			dom.label('Last activity', filterLastActivity=dom.input(attr.form('hooksfilter'), style({width: '7em'}), attr.title('Example: ">-1h" for filtering last activity for webhooks more than 1 hour ago.'))),
+			dom.label('Submitted', filterSubmitted=dom.input(attr.form('hooksfilter'), style({width: '7em'}), attr.title('Example: "<-1h" for filtering webhooks submitted more than 1 hour ago.'))),
+			dom.label('Account', filterAccount=dom.input(attr.form('hooksfilter'), style({width: '8em'}))),
+			dom.label(
+				'Event',
+				filterEvent=dom.select(
+					attr.form('hooksfilter'),
+					function change() {
+						filterForm.requestSubmit()
+					},
+					dom.option('All events', attr.value('')),
+					// note: outgoing hook events are in ../webhook/webhook.go, ../mox-/config.go ../webadmin/admin.ts and ../webapi/gendoc.sh. keep in sync.
+					['incoming', 'delivered', 'suppressed', 'delayed', 'failed', 'relayed', 'expanded', 'canceled', 'unrecognized'].map(s => dom.option(s)),
+				),
+			),
+			dom.div(
+				dom._class('filterActions'),
+				dom.label('Sort',
+				sortElem=dom.select(
+					attr.form('hooksfilter'),
+					function change() {
+						filterForm.requestSubmit()
+					},
+					dom.option('Last activity ↓', attr.value('nextattempt-desc')),
+					dom.option('Last activity ↑', attr.value('nextattempt-asc')),
+					dom.option('Submitted ↓', attr.value('submitted-desc')),
+					dom.option('Submitted ↑', attr.value('submitted-asc')),
+				)),
+				dom.submitbutton('Apply', attr.form('hooksfilter')), ' ',
+				dom.clickbutton('Reset', attr.form('hooksfilter'), function click() {
+					filterForm.reset()
+					filterForm.requestSubmit()
+				}),
+			),
+		),
 		dom.table(dom._class('hover'),
 			style({width: '100%'}),
 			dom.thead(
-				dom.tr(
-					dom.td('Filter'),
-					dom.td(),
-					dom.td(filterLastActivity=dom.input(attr.form('hooksfilter'), style({width: '7em'}), attr.title('Example: ">-1h" for filtering last activity for webhooks more than 1 hour ago.'))),
-					dom.td(filterSubmitted=dom.input(attr.form('hooksfilter'), style({width: '7em'}), attr.title('Example: "<-1h" for filtering webhooks submitted more than 1 hour ago.'))),
-					dom.td(),
-					dom.td(),
-					dom.td(),
-					dom.td(filterAccount=dom.input(attr.form('hooksfilter'), style({width: '8em'}))),
-					dom.td(
-						filterEvent=dom.select(
-							attr.form('hooksfilter'),
-							function change() {
-								filterForm.requestSubmit()
-							},
-							dom.option(''),
-							// note: outgoing hook events are in ../webhook/webhook.go, ../mox-/config.go ../webadmin/admin.ts and ../webapi/gendoc.sh. keep in sync.
-							['incoming', 'delivered', 'suppressed', 'delayed', 'failed', 'relayed', 'expanded', 'canceled', 'unrecognized'].map(s => dom.option(s)),
-						),
-					),
-					dom.td(),
-					dom.td(),
-					dom.td(),
-					dom.td(
-						attr.colspan('2'),
-						style({textAlign: 'right'}), // Less content shifting while rendering.
-						'Sort ',
-						sortElem=dom.select(
-							attr.form('hooksfilter'),
-							function change() {
-								filterForm.requestSubmit()
-							},
-							dom.option('Last activity ↓', attr.value('nextattempt-desc')),
-							dom.option('Last activity ↑', attr.value('nextattempt-asc')),
-							dom.option('Submitted ↓', attr.value('submitted-desc')),
-							dom.option('Submitted ↑', attr.value('submitted-asc')),
-						), ' ',
-						dom.submitbutton('Apply', attr.form('hooksfilter')), ' ',
-						dom.clickbutton('Reset', attr.form('hooksfilter'), function click() {
-							filterForm.reset()
-							filterForm.requestSubmit()
-						}),
-					),
-				),
 				dom.tr(
 					dom.th('ID'),
 					dom.th('Success'),
@@ -4603,7 +4592,7 @@ const hooksRetiredList = async () => {
 		),
 		// Filtering.
 		filterForm=dom.form(
-			attr.id('hooksfilter'), // Referenced by input elements in table row.
+			attr.id('hooksfilter'), // Connects filter controls and table selection to this form.
 			async function submit(e: SubmitEvent) {
 				e.preventDefault()
 				e.stopPropagation()
@@ -5279,7 +5268,7 @@ const webserver = async () => {
 
 	return dom.div(
 		crumbs(
-			crumblink('Mox Admin', '#'),
+			crumblink('Overview', '#'),
 			'Webserver config',
 		),
 		dom.form(
@@ -5346,6 +5335,33 @@ const webserver = async () => {
 }
 
 const init = async () => {
+	const themeSelect = document.getElementById('adminTheme') as HTMLSelectElement
+	const systemTheme = window.matchMedia('(prefers-color-scheme: dark)')
+	const savedTheme = localStorageGet('webadmintheme')
+	if (savedTheme && ['system', 'light', 'dark'].includes(savedTheme)) {
+		themeSelect.value = savedTheme
+	}
+	const applyTheme = () => {
+		let dark = themeSelect.value === 'dark'
+		if (themeSelect.value === 'system') {
+			dark = systemTheme.matches
+		}
+		document.documentElement.dataset.theme = 'light'
+		if (dark) {
+			document.documentElement.dataset.theme = 'dark'
+		}
+	}
+	themeSelect.addEventListener('change', () => {
+		applyTheme()
+		try {
+			window.localStorage.setItem('webadmintheme', themeSelect.value)
+		} catch (err) {
+			console.log('saving admin theme', err)
+		}
+	})
+	systemTheme.addEventListener('change', applyTheme)
+	applyTheme()
+
 	let curhash: string | undefined
 
 	[moxversion, moxgoos, moxgoarch] = await client.Version()
@@ -5431,6 +5447,13 @@ const init = async () => {
 				moxBeforeDisplay(root)
 			}
 			dom._kids(page, root)
+			for (const item of document.querySelectorAll<HTMLAnchorElement>('.adminNav a')) {
+				const target = item.hash.substring(1)
+				item.removeAttribute('aria-current')
+				if (h === target || (target && h.startsWith(target + '/'))) {
+					item.setAttribute('aria-current', 'page')
+				}
+			}
 		} catch (err) {
 			console.log('error', err)
 			window.alert('Error: ' + errmsg(err))
