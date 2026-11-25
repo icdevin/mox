@@ -7165,7 +7165,7 @@ const init = async () => {
 						},
 					),
 				),
-				connectionElem=dom.div(),
+				connectionElem=dom.div(dom._class('connectionControls')),
 				statusElem=dom.div(css('status', {marginLeft: '.5em', flexGrow: '1'}), attr.role('status')),
 				dom.details(dom._class('accountMenu'),
 					dom.summary(loginAddressElem=dom.span()),
@@ -7574,7 +7574,7 @@ const init = async () => {
 	const showNotConnected = () => {
 		dom._kids(connectionElem,
 			attr.role('status'),
-			dom.span(css('connectionStatus', {backgroundColor: styles.warningBackgroundColor, padding: '0 .15em', borderRadius: '.15em'}), 'Not connected', attr.title('Not receiving real-time updates, including of new deliveries.')),
+			dom.span(dom._class('connectionStatus'), 'Disconnected', attr.title('Not receiving real-time updates, including of new deliveries.')),
 			' ',
 			dom.clickbutton('Reconnect', function click() {
 				if (!eventSource && !connecting) {

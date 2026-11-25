@@ -6496,7 +6496,7 @@
 		}, "click")), /* @__PURE__ */ __name(async function submit(e) {
 			e.preventDefault();
 			await searchView.submit();
-		}, "submit"))), connectionElem = dom.div(), statusElem = dom.div(css("status", { marginLeft: ".5em", flexGrow: "1" }), attr.role("status")), dom.details(dom._class("accountMenu"), dom.summary(loginAddressElem = dom.span()), dom.div(dom._class("accountMenuContent"), dom.label(dom._class("themeSetting"), "Theme", dom.select(attr.arialabel("Theme"), ...["system", "light", "dark"].map((value) => {
+		}, "submit"))), connectionElem = dom.div(dom._class("connectionControls")), statusElem = dom.div(css("status", { marginLeft: ".5em", flexGrow: "1" }), attr.role("status")), dom.details(dom._class("accountMenu"), dom.summary(loginAddressElem = dom.span()), dom.div(dom._class("accountMenuContent"), dom.label(dom._class("themeSetting"), "Theme", dom.select(attr.arialabel("Theme"), ...["system", "light", "dark"].map((value) => {
 			const option = dom.option(value[0].toUpperCase() + value.slice(1), attr.value(value));
 			option.selected = settings.theme === value;
 			return option;
@@ -6764,7 +6764,7 @@
 			}
 		});
 		const showNotConnected = /* @__PURE__ */ __name(() => {
-			dom._kids(connectionElem, attr.role("status"), dom.span(css("connectionStatus", { backgroundColor: styles.warningBackgroundColor, padding: "0 .15em", borderRadius: ".15em" }), "Not connected", attr.title("Not receiving real-time updates, including of new deliveries.")), " ", dom.clickbutton("Reconnect", /* @__PURE__ */ __name(function click() {
+			dom._kids(connectionElem, attr.role("status"), dom.span(dom._class("connectionStatus"), "Disconnected", attr.title("Not receiving real-time updates, including of new deliveries.")), " ", dom.clickbutton("Reconnect", /* @__PURE__ */ __name(function click() {
 				if (!eventSource && !connecting) {
 					autoReconnect = 1;
 					connect(true);

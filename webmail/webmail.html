@@ -45,6 +45,10 @@ button:disabled { cursor: default; }
 .searchbarBox search { flex: 1; min-width: 100px; }
 .searchbarBox > search > form > input { background: transparent; height: 42px; border-color: var(--buttonBorderColor); padding: 10px 16px; }
 .searchbarBox .status:empty { display: none; }
+.connectionControls:not(:empty) { display: inline-flex; align-items: center; gap: 8px; flex-shrink: 0; }
+.connectionStatus { display: inline-flex; align-items: center; gap: 6px; color: var(--colorMild); background: var(--backgroundColorMild); border: 1px solid var(--borderColor); border-radius: 20px; padding: 4px 9px; font-size: 12px; white-space: nowrap; }
+.connectionStatus::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: var(--accent); }
+.connectionControls button { min-height: 28px; padding: 4px 7px; font-size: 12px; border: 0; color: var(--linkColor); background: transparent; }
 .searchbarBox .searchClear { border: 0; color: var(--colorMild); }
 .searchbarBox search > form { position: relative; min-width: 0; }
 .searchbarBox > search > form > input { padding-right: 42px; }
