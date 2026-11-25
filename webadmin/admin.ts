@@ -702,40 +702,42 @@ const renderLoginAttempts = (accountLinks: boolean, loginAttempts: api.LoginAtte
 
 	const nowSecs = new Date().getTime()/1000
 	return dom.table(
+		dom._class('loginAttemptsTable'),
 		dom.thead(
 			dom.tr(
 				dom.th('Time'),
 				dom.th('Result'),
-				dom.th('Count'),
+				dom.th(dom._class('alignRight', 'loginAttemptsCount'), 'Count'),
 				dom.th('Account'),
-				dom.th('Address'),
-				dom.th('Protocol'),
-				dom.th('Mechanism'),
-				dom.th('User Agent'),
-				dom.th('Remote IP'),
-				dom.th('Local IP'),
-				dom.th('TLS'),
-				dom.th('TLS pubkey fingerprint'),
-				dom.th('First seen'),
+				dom.th('Client'),
+				dom.th('Connection'),
 			),
 		),
 		dom.tbody(
-			loginAttempts.length ? [] : dom.tr(dom.td(attr.colspan('13'), 'No login attempts in past 30 days.')),
+			loginAttempts.length ? [] : dom.tr(dom.td(attr.colspan('6'), 'No login attempts in past 30 days.')),
 			loginAttempts.map(la =>
 				dom.tr(
-					dom.td(age(la.Last, false, nowSecs)),
-					dom.td(la.Result === 'ok' ? la.Result : box(red, la.Result)),
-					dom.td(''+la.Count),
-					dom.td(accountLinks ? dom.a(attr.href('#accounts/l/'+la.AccountName+'/loginattempts'), la.AccountName) : la.AccountName),
-					dom.td(la.LoginAddress),
-					dom.td(la.Protocol),
-					dom.td(la.AuthMech),
-					dom.td(la.UserAgent),
-					dom.td(la.RemoteIP),
-					dom.td(la.LocalIP),
-					dom.td(la.TLS),
-					dom.td(la.TLSPubKeyFingerprint),
-					dom.td(age(la.First, false, nowSecs)),
+					dom.td(
+						queueInfo('Last', age(la.Last, false, nowSecs)),
+						queueInfo('First', age(la.First, false, nowSecs)),
+					),
+					dom.td(la.Result === 'ok' ? la.Result : inlineBox(red, la.Result)),
+					dom.td(dom._class('alignRight'), ''+la.Count),
+					dom.td(
+						accountLinks ? dom.a(attr.href('#accounts/l/'+la.AccountName+'/loginattempts'), la.AccountName) : la.AccountName,
+						queueInfo('Address', la.LoginAddress),
+					),
+					dom.td(
+						queueInfo('Protocol', la.Protocol),
+						queueInfo('Mechanism', la.AuthMech),
+						queueInfo('User agent', la.UserAgent),
+					),
+					dom.td(
+						queueInfo('Remote IP', la.RemoteIP),
+						queueInfo('Local IP', la.LocalIP),
+						queueInfo('TLS', la.TLS),
+						queueInfo('TLS pubkey fingerprint', la.TLSPubKeyFingerprint),
+					),
 				),
 			),
 		),

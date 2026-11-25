@@ -123,6 +123,11 @@ thead { position: sticky; top: 0; z-index: 1; background: var(--panel); }
 .tlsResultDetail { margin-top: 24px; display: grid; gap: 12px; }
 .tlsResultDetail h2, .tlsResultDetail p { margin: 0; }
 .loginAttemptsMore { margin-top: 16px; }
+.loginAttemptsTable { table-layout: fixed; overflow-wrap: anywhere; }
+.loginAttemptsTable td { vertical-align: top; }
+.loginAttemptsTable .loginAttemptsCount { width: 64px; }
+.loginAttemptsTable .queueInfo:first-child { margin-top: 0; }
+@media (max-width: 760px) { .loginAttemptsTable th, .loginAttemptsTable td { padding: 6px 4px; } }
 .queueTable { table-layout: fixed; width: 100%; }
 .queueTable th, .queueTable td { vertical-align: top; overflow-wrap: anywhere; padding: 10px; }
 .queueTable th:last-child { width: 85px; }
