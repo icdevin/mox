@@ -1,7 +1,11 @@
+import {loginAttemptsTable} from '../ui-loginattempts'
+import {installUI, dialog, callout, themeControl, detailLine, sessionNotice} from '../ui'
 /* Javascript is generated from typescript, do not modify generated javascript because changes will be overwritten. */
 import {dom, style, attr, prop, ElemArg} from '../lib'
 import * as api from './api'
 import {queuePage, queueCursor} from './pagination'
+
+installUI(true)
 
 // From HTML.
 declare let page: HTMLElement
@@ -13,21 +17,17 @@ let moxgoos: string
 let moxgoarch: string
 
 const login = async (reason: string) => {
-	let notice = reason
-	if (reason.startsWith('unknown session')) {
-		notice = 'Your session has ended. Enter your password to continue.'
-	}
 	return new Promise<string>((resolve: (v: string) => void, _) => {
 		const origFocus = document.activeElement
 		let reasonElem: HTMLElement
 		let fieldset: HTMLFieldSetElement
 		let password: HTMLInputElement
 		const root = dom.div(
-			dom._class('adminOverlay', 'adminLogin'),
+			dom._class('uiOverlay', 'uiLogin'),
 			dom.div(
 				style({display: 'flex', flexDirection: 'column', alignItems: 'center'}),
 				dom.div(
-					dom._class('adminDialog'),
+					dom._class('uiDialog'),
 					dom.form(
 						async function submit(e: SubmitEvent) {
 							e.preventDefault()
@@ -59,13 +59,7 @@ const login = async (reason: string) => {
 						fieldset=dom.fieldset(
 							dom.h1('devn'),
 							dom.p('Administration'),
-							reasonElem=dom.div(
-								dom._class('loginNotice'),
-								dom._attrs({role: 'status'}),
-								prop({hidden: !reason}),
-								dom.div(dom._class('loginNoticeTitle'), 'Please sign in again'),
-								dom.div(notice),
-							),
+							reasonElem=sessionNotice(reason),
 							dom.label(
 								style({display: 'block', marginBottom: '2ex'}),
 								dom.div('Password', style({marginBottom: '.5ex'})),
@@ -85,47 +79,7 @@ const login = async (reason: string) => {
 	})
 }
 
-// Popup shows kids in a centered, themed dialog on top of a
-// transparent overlay on top of the window. Clicking the overlay or hitting
-// Escape closes the popup. Scrollbars are automatically added to the div with
-// kids. Returns a function that removes the popup.
-const popup = (...kids: ElemArg[]) => {
-	const origFocus = document.activeElement
-	const close = () => {
-		if (!root.parentNode) {
-			return
-		}
-		root.remove()
-		if (origFocus && origFocus instanceof HTMLElement && origFocus.parentNode) {
-			origFocus.focus()
-		}
-	}
-	let content: HTMLElement
-	const root = dom.div(
-		dom._class('adminOverlay'),
-		function keydown(e: KeyboardEvent) {
-			if (e.key === 'Escape') {
-				e.stopPropagation()
-				close()
-			}
-		},
-		function click(e: MouseEvent) {
-			e.stopPropagation()
-			close()
-		},
-		content=dom.div(
-			attr.tabindex('0'),
-			dom._class('adminDialog'),
-			function click(e: MouseEvent) {
-				e.stopPropagation()
-			},
-			kids,
-		)
-	)
-	document.body.appendChild(root)
-	content.focus()
-	return close
-}
+const popup = (...kids: ElemArg[]) => dialog(() => {}, ...kids)
 
 const detailsDialog = (title: string, size: 'mail' | 'webhook', ...kids: ElemArg[]) => {
 	const close = popup(
@@ -203,7 +157,7 @@ const errmsg = (err: unknown) => ''+((err as any).message || '(no error message)
 
 const footer = () =>
 	dom.div(
-		dom._class('adminFooter'),
+		dom._class('uiFooter'),
 		link('https://www.xmox.nl', 'mox'),
 		' ',
 		moxversion, ' ',
@@ -570,19 +524,7 @@ const loglevels = async () => {
 	)
 }
 
-const box = (color: string, ...l: ElemArg[]) => [
-	dom.div(
-		style({
-			display: 'inline-block',
-			padding: '8px 12px',
-			backgroundColor: color,
-			borderRadius: '3px',
-			margin: '.5ex 0',
-		}),
-		l,
-	),
-	dom.br(),
-]
+const box = (color: string, ...kids: ElemArg[]) => [callout(color, ...kids)]
 const inlineBox = (color: string, ...l: ElemArg[]) =>
 	dom.span(
 		style({
@@ -726,52 +668,7 @@ const pagedLoginAttempts = async (accountName: string, accountLinks: boolean) =>
 	return dom.div(table, dom.div(dom._class('loginAttemptsMore'), style({display: 'flex', alignItems: 'center', gap: '12px'}), loadMore, status))
 }
 
-const renderLoginAttempts = (accountLinks: boolean, loginAttempts: api.LoginAttempt[]) => {
-	// todo: search
-
-	const nowSecs = new Date().getTime()/1000
-	return dom.table(
-		dom._class('loginAttemptsTable'),
-		dom.thead(
-			dom.tr(
-				dom.th('Time'),
-				dom.th('Result'),
-				dom.th(dom._class('alignRight', 'loginAttemptsCount'), 'Count'),
-				dom.th('Account'),
-				dom.th('Client'),
-				dom.th('Connection'),
-			),
-		),
-		dom.tbody(
-			loginAttempts.length ? [] : dom.tr(dom.td(attr.colspan('6'), 'No login attempts in past 30 days.')),
-			loginAttempts.map(la =>
-				dom.tr(
-					dom.td(
-						queueInfo('Last', age(la.Last, false, nowSecs)),
-						queueInfo('First', age(la.First, false, nowSecs)),
-					),
-					dom.td(la.Result === 'ok' ? la.Result : inlineBox(red, la.Result)),
-					dom.td(dom._class('alignRight'), ''+la.Count),
-					dom.td(
-						accountLinks ? dom.a(attr.href('#accounts/l/'+la.AccountName+'/loginattempts'), la.AccountName) : la.AccountName,
-						queueInfo('Address', la.LoginAddress),
-					),
-					dom.td(
-						queueInfo('Protocol', la.Protocol),
-						queueInfo('Mechanism', la.AuthMech),
-						queueInfo('User agent', la.UserAgent),
-					),
-					dom.td(
-						queueInfo('Remote IP', la.RemoteIP),
-						queueInfo('Local IP', la.LocalIP),
-						queueInfo('TLS', la.TLS),
-						queueInfo('TLS pubkey fingerprint', la.TLSPubKeyFingerprint),
-					),
-				),
-			),
-		),
-	)
-}
+const renderLoginAttempts = (accountLinks: boolean, rows: api.LoginAttempt[]) => loginAttemptsTable(accountLinks, rows, date => age(date, false, Date.now()/1000))
 
 const formatQuotaSize = (v: number) => {
 	if (v === 0) {
@@ -3390,7 +3287,7 @@ const dnsbl = async () => {
 	)
 }
 
-const queueInfo = (label: string, ...value: ElemArg[]) => dom.div(dom._class('queueInfo'), dom.span(dom._class('queueInfoLabel'), label), value)
+const queueInfo = detailLine
 
 const queueError = (results: {Error: string}[] | null | undefined) => {
 	if (!results?.length || !results[results.length-1].Error) {
@@ -5398,31 +5295,7 @@ const webserver = async () => {
 
 const init = async () => {
 	const themeSelect = document.getElementById('adminTheme') as HTMLSelectElement
-	const systemTheme = window.matchMedia('(prefers-color-scheme: dark)')
-	const savedTheme = localStorageGet('webadmintheme')
-	if (savedTheme && ['system', 'light', 'dark'].includes(savedTheme)) {
-		themeSelect.value = savedTheme
-	}
-	const applyTheme = () => {
-		let dark = themeSelect.value === 'dark'
-		if (themeSelect.value === 'system') {
-			dark = systemTheme.matches
-		}
-		document.documentElement.dataset.theme = 'light'
-		if (dark) {
-			document.documentElement.dataset.theme = 'dark'
-		}
-	}
-	themeSelect.addEventListener('change', () => {
-		applyTheme()
-		try {
-			window.localStorage.setItem('webadmintheme', themeSelect.value)
-		} catch (err) {
-			console.log('saving admin theme', err)
-		}
-	})
-	systemTheme.addEventListener('change', applyTheme)
-	applyTheme()
+	themeControl(themeSelect, 'webadmintheme')
 
 	let curhash: string | undefined
 
@@ -5528,7 +5401,7 @@ const init = async () => {
 				moxBeforeDisplay(root)
 			}
 			dom._kids(page, root)
-			for (const item of document.querySelectorAll<HTMLAnchorElement>('.adminNav a')) {
+			for (const item of document.querySelectorAll<HTMLAnchorElement>('.uiNav a')) {
 				const target = item.hash.substring(1)
 				item.removeAttribute('aria-current')
 				if (h === target || (target && h.startsWith(target + '/'))) {

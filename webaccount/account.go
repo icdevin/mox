@@ -865,3 +865,11 @@ func (Account) IMAPSave(ctx context.Context, capabilitiesDisabled []string) {
 	})
 	xcheckf(ctx, err, "saving disabled imap capabilities")
 }
+
+// LoginAttemptsPage limits history reads to the authenticated account.
+func (Account) LoginAttemptsPage(ctx context.Context, limit int, cursor string) store.LoginAttemptPage {
+	reqInfo := ctx.Value(requestInfoCtxKey).(requestInfo)
+	page, err := store.LoginAttemptListPage(ctx, reqInfo.AccountName, limit, cursor)
+	xcheckf(ctx, err, "listing login attempts page")
+	return page
+}

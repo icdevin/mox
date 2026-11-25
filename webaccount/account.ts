@@ -1,6 +1,10 @@
+import {loginAttemptsTable} from '../ui-loginattempts'
+import {installUI, dialog, callout, themeControl, section, sessionNotice} from '../ui'
 /* Javascript is generated from typescript, do not modify generated javascript because changes will be overwritten. */
 import { dom, style, attr, ElemArg } from "../lib"
 import * as api from './api'
+
+installUI(true)
 
 // From HTML.
 declare let page: HTMLElement
@@ -21,12 +25,11 @@ const login = async (reason: string) => {
 		let password: HTMLInputElement
 
 		const root = dom.div(
-			style({position: 'absolute', top: 0, right: 0, bottom: 0, left: 0, backgroundColor: '#eee', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: '1', animation: 'fadein .15s ease-in'}),
+			dom._class('uiOverlay', 'uiLogin'),
 			dom.div(
 				style({display: 'flex', flexDirection: 'column', alignItems: 'center'}),
-				reasonElem=reason ? dom.div(style({marginBottom: '2ex', textAlign: 'center'}), reason) : dom.div(),
 				dom.div(
-					style({backgroundColor: 'white', borderRadius: '.25em', padding: '1em', boxShadow: '0 0 20px rgba(0, 0, 0, 0.1)', border: '1px solid #ddd', maxWidth: '95vw', overflowX: 'auto', maxHeight: '95vh', overflowY: 'auto', marginBottom: '20vh'}),
+					dom._class('uiDialog'),
 					dom.form(
 						async function submit(e: SubmitEvent) {
 							e.preventDefault()
@@ -57,7 +60,10 @@ const login = async (reason: string) => {
 							}
 						},
 						fieldset=dom.fieldset(
-							dom.h1('Account'),
+							dom.h1('devn'),
+							dom.p('Account settings'),
+							reasonElem=sessionNotice(reason),
+
 							dom.label(
 								style({display: 'block', marginBottom: '2ex'}),
 								dom.div('Email address', style({marginBottom: '.5ex'})),
@@ -90,47 +96,7 @@ const login = async (reason: string) => {
 	})
 }
 
-// Popup shows kids in a centered div with white background on top of a
-// transparent overlay on top of the window. Clicking the overlay or hitting
-// Escape closes the popup. Scrollbars are automatically added to the div with
-// kids. Returns a function that removes the popup.
-const popup = (...kids: ElemArg[]) => {
-	const origFocus = document.activeElement
-	const close = () => {
-		if (!root.parentNode) {
-			return
-		}
-		root.remove()
-		if (origFocus && origFocus instanceof HTMLElement && origFocus.parentNode) {
-			origFocus.focus()
-		}
-	}
-	let content: HTMLElement
-	const root = dom.div(
-		style({position: 'fixed', top: 0, right: 0, bottom: 0, left: 0, backgroundColor: 'rgba(0, 0, 0, 0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: '1'}),
-		function keydown(e: KeyboardEvent) {
-			if (e.key === 'Escape') {
-				e.stopPropagation()
-				close()
-			}
-		},
-		function click(e: MouseEvent) {
-			e.stopPropagation()
-			close()
-		},
-		content=dom.div(
-			attr.tabindex('0'),
-			style({backgroundColor: 'white', borderRadius: '.25em', padding: '1em', boxShadow: '0 0 20px rgba(0, 0, 0, 0.1)', border: '1px solid #ddd', maxWidth: '95vw', overflowX: 'auto', maxHeight: '95vh', overflowY: 'auto'}),
-			function click(e: MouseEvent) {
-				e.stopPropagation()
-			},
-			kids,
-		)
-	)
-	document.body.appendChild(root)
-	content.focus()
-	return close
-}
+const popup = (...kids: ElemArg[]) => dialog(() => {}, dom._class('accountDialog'), ...kids)
 
 const localStorageGet = (k: string): string | null => {
 	try {
@@ -175,33 +141,12 @@ const crumblink = (text: string, path: string) => {
 }
 const crumbs = (...l: ({text: string, path: string} | string)[]) => {
 	const crumbtext = (e: {text: string, path: string} | string) => typeof e === 'string' ? e : e.text
-	document.title = l.map(e => crumbtext(e)).join(' - ')
+	document.title = l.map(e => crumbtext(e)).join(' / ') + ' · devn Account'
 
 	const crumblink = (e: {text: string, path: string} | string) =>
 		typeof e === 'string' ? prewrap(e) : dom.a(e.text, attr.href(e.path))
 	return [
-		dom.div(
-			style({float: 'right'}),
-			localStorageGet('webaccountaddress') || '(unknown)',
-			' ',
-			dom.clickbutton('Logout', attr.title('Logout, invalidating this session.'), async function click(e: MouseEvent) {
-				const b = e.target! as HTMLButtonElement
-				try {
-					b.disabled = true
-					await client.Logout()
-				} catch (err) {
-					console.log('logout', err)
-					window.alert('Error: ' + errmsg(err))
-				} finally {
-					b.disabled = false
-				}
 
-				localStorageRemove('webaccountaddress')
-				localStorageRemove('webaccountcsrftoken')
-				// Reload so all state is cleared from memory.
-				window.location.reload()
-			}),
-		),
 		dom.h1(l.map((e, index) => index === 0 ? crumblink(e) : [' / ', crumblink(e)])),
 		dom.br()
 	]
@@ -211,7 +156,7 @@ const errmsg = (err: unknown) => ''+((err as any).message || '(no error message)
 
 const footer = () =>
 	dom.div(
-		style({marginTop: '6ex', opacity: 0.75}),
+		dom._class('uiFooter'),
 		link('https://www.xmox.nl', 'mox'),
 		' ',
 		moxversion,
@@ -230,24 +175,12 @@ const domainString = (d: api.Domain) => {
 	return d.ASCII
 }
 
-const box = (color: string, ...l: ElemArg[]) => [
-	dom.div(
-		style({
-			display: 'inline-block',
-			padding: '.125em .25em',
-			backgroundColor: color,
-			borderRadius: '3px',
-			margin: '.5ex 0',
-		}),
-		l,
-	),
-	dom.br(),
-]
+const box = (color: string, ...kids: ElemArg[]) => [callout(color, ...kids)]
 
 //const green = '#1dea20'
 const yellow = '#ffe400'
-const red = '#ff7443'
-const blue = '#8bc8ff'
+const red = 'var(--error)'
+const blue = 'var(--selected)'
 
 const age = (date: Date) => {
 	const r = dom.span(dom._class('notooltip'), attr.title(date.toString()))
@@ -759,7 +692,7 @@ const index = async () => {
 	}
 
 	const root = dom.div(
-		crumbs('Mox Account'),
+		crumbs('Account'),
 		dom.div(
 			'Default domain: ',
 			acc.DNSDomain.ASCII ? domainString(acc.DNSDomain) : '(none)',
@@ -1113,7 +1046,7 @@ openssl pkcs12 \\
 				await check(autoJunkFlagsFieldset, client.AutomaticJunkFlagsSave(autoJunkFlagsEnabled.checked, junkMailboxRegexp.value, neutralMailboxRegexp.value, notJunkMailboxRegexp.value))
 			},
 			autoJunkFlagsFieldset=dom.fieldset(
-				dom.div(style({display: 'flex', gap: '1em'}),
+				dom.div(dom._class('accountFields'),
 					dom.label(
 						'Enabled',
 						attr.title("If enabled, junk/nonjunk flags will be set automatically if they match a regular expression below. When two of the three mailbox regular expressions are set, the remaining one will match all unmatched messages. Messages are matched in order 'junk', 'neutral', 'not junk', and the search stops on the first match. Mailboxes are lowercased before matching."),
@@ -1131,7 +1064,7 @@ openssl pkcs12 \\
 						'Not Junk mailbox regexp',
 						dom.div(notJunkMailboxRegexp=dom.input(attr.value(acc.AutomaticJunkFlags.NotJunkMailboxRegexp))),
 					),
-					dom.div(dom.span('\u00a0'), dom.div(dom.submitbutton('Save'))),
+					dom.div(dom._class('accountFieldActions'), dom.submitbutton('Save')),
 				),
 			),
 		),
@@ -1162,7 +1095,7 @@ openssl pkcs12 \\
 				await check(junkFilterFields, (async () => await client.JunkFilterSave(xjunkFilter()))())
 			},
 			junkFilterFields=dom.fieldset(
-				dom.div(style({display: 'flex', gap: '1em'}),
+				dom.div(dom._class('accountFields'),
 					dom.label(
 						'Enabled',
 						attr.title("If enabled, the junk filter is used to classify incoming email from first-time senders. The result, along with other checks, determines if the message will be accepted or rejected"),
@@ -1208,7 +1141,7 @@ openssl pkcs12 \\
 						attr.title('Occurrences in word database until a word is considered rare and its influence in calculating probability reduced. E.g. 1 or 2.'),
 						dom.div(junkRareWords=dom.input(attr.value('' + (acc.JunkFilter?.RareWords || 2)))),
 					),
-					dom.div(dom.span('\u00a0'), dom.div(dom.submitbutton('Save'))),
+					dom.div(dom._class('accountFieldActions'), dom.submitbutton('Save')),
 				),
 			),
 		),
@@ -1422,7 +1355,7 @@ openssl pkcs12 \\
 									const x = dom.tr(
 										dom.td(input),
 										dom.td(
-											dom.clickbutton('Remove', function click() {
+											dom.clickbutton('Remove', dom._class('dangerButton'), function click() {
 												acc.FromIDLoginAddresses!.splice(index, 1)
 												render()
 											}),
@@ -1490,7 +1423,7 @@ openssl pkcs12 \\
 						dom.td(s.Reason),
 						dom.td(age(s.Created)),
 						dom.td(
-							dom.clickbutton('Remove', async function click(e: MouseEvent) {
+							dom.clickbutton('Remove', dom._class('dangerButton'), async function click(e: MouseEvent) {
 								await check(e.target! as HTMLButtonElement, client.SuppressionRemove(s.OriginalAddress))
 								window.location.reload() // todo: reload less
 							})
@@ -1700,59 +1633,37 @@ openssl pkcs12 \\
 	return root
 }
 
-const renderLoginAttempts = (loginAttempts: api.LoginAttempt[]) => {
-	// todo: pagination and search
-
-	return dom.table(
-		dom.thead(
-			dom.tr(
-				dom.th('Time'),
-				dom.th('Result'),
-				dom.th('Count'),
-				dom.th('LoginAddress'),
-				dom.th('Protocol'),
-				dom.th('Mechanism'),
-				dom.th('User Agent'),
-				dom.th('Remote IP'),
-				dom.th('Local IP'),
-				dom.th('TLS'),
-				dom.th('TLS pubkey fingerprint'),
-				dom.th('First seen'),
-			),
-		),
-		dom.tbody(
-			loginAttempts.length ? [] : dom.tr(dom.td(attr.colspan('11'), 'No login attempts in past 30 days.')),
-			loginAttempts.map(la =>
-				dom.tr(
-					dom.td(age(la.Last)),
-					dom.td(la.Result === 'ok' ? la.Result : box(red, la.Result)),
-					dom.td(''+la.Count),
-					dom.td(la.LoginAddress),
-					dom.td(la.Protocol),
-					dom.td(la.AuthMech),
-					dom.td(la.UserAgent),
-					dom.td(la.RemoteIP),
-					dom.td(la.LocalIP),
-					dom.td(la.TLS),
-					dom.td(la.TLSPubKeyFingerprint),
-					dom.td(age(la.First)),
-				),
-			),
-		),
-	)
-}
+const renderLoginAttempts = (rows: api.LoginAttempt[]) => loginAttemptsTable(false, rows, age)
 
 const loginattempts = async () => {
-	const loginAttempts = await client.LoginAttempts(0)
+	let next = ''
+	const rows: api.LoginAttempt[] = []
+	const table = dom.div()
+	const status = dom.span(dom._attrs({role: 'status'}))
+	const load = async () => {
+		const result = await client.LoginAttemptsPage(100, next)
+		rows.push(...(result.Attempts || []))
+		next = result.Next
+		dom._kids(table, renderLoginAttempts(rows))
+		more.hidden = !next
+		let text = rows.length + ' login attempts shown'
+		if (!next) { text += ' · No more results' }
+		dom._kids(status, text)
+	}
+	const more = dom.clickbutton('Load more', async function click(e: MouseEvent) {
+		await check(e.currentTarget! as HTMLButtonElement, load())
+	})
+	await load()
 
 	return dom.div(
 		crumbs(
-			crumblink('Mox Account', '#'),
+			crumblink('Account', '#'),
 			'Login attempts',
 		),
 		dom.h2('Login attempts'),
 		dom.p('Login attempts are stored for 30 days. At most 10000 failed login attempts are stored to prevent unlimited growth of the database.'),
-		renderLoginAttempts(loginAttempts || [])
+		table,
+		dom.div(dom._class('uiActions'), more, status)
 	)
 }
 
@@ -1784,12 +1695,24 @@ const destination = async (name: string) => {
 		comment: HTMLInputElement
 	}
 
-	let rulesetsTbody = dom.tbody()
+	const ruleLabels = () => [
+		dom.span('SMTP "MAIL FROM" regexp', attr.title('Matches if this regular expression matches (a substring of) the SMTP MAIL FROM address (not the message From-header). E.g. user@example.org.')),
+		dom.span('Message "From" address regexp', attr.title('Matches if this regular expression matches (a substring of) the single address in the message From header.')),
+		dom.span('Verified domain', attr.title('Matches if this domain matches an SPF- and/or DKIM-verified (sub)domain.')),
+		dom.span('Headers regexp', attr.title('Matches if these header field/value regular expressions all match (substrings of) the message headers. Header fields and valuees are converted to lower case before matching. Whitespace is trimmed from the value before matching. A header field can occur multiple times in a message, only one instance has to match. For mailing lists, you could match on ^list-id$ with the value typically the mailing list address in angled brackets with @ replaced with a dot, e.g. <name\\.lists\\.example\\.org>.')),
+		dom.span('Is Forward', attr.title("Influences spam filtering only, this option does not change whether a message matches this ruleset. Can only be used together with SMTPMailFromRegexp and VerifiedDomain. SMTPMailFromRegexp must be set to the address used to deliver the forwarded message, e.g. '^user(|\\+.*)@forward\\.example$'. Changes to junk analysis: 1. Messages are not rejected for failing a DMARC policy, because a legitimate forwarded message without valid/intact/aligned DKIM signature would be rejected because any verified SPF domain will be 'unaligned', of the forwarding mail server. 2. The sending mail server IP address, and sending EHLO and MAIL FROM domains and matching DKIM domain aren't used in future reputation-based spam classifications (but other verified DKIM domains are) because the forwarding server is not a useful spam signal for future messages.")),
+		dom.span('List allow domain', attr.title("Influences spam filtering only, this option does not change whether a message matches this ruleset. If this domain matches an SPF- and/or DKIM-verified (sub)domain, the message is accepted without further spam checks, such as a junk filter or DMARC reject evaluation. DMARC rejects should not apply for mailing lists that are not configured to rewrite the From-header of messages that don't have a passing DKIM signature of the From-domain. Otherwise, by rejecting messages, you may be automatically unsubscribed from the mailing list. The assumption is that mailing lists do their own spam filtering/moderation.")),
+		dom.span('Allow rejects to mailbox', attr.title("Influences spam filtering only, this option does not change whether a message matches this ruleset. If a message is classified as spam, it isn't rejected during the SMTP transaction (the normal behaviour), but accepted during the SMTP transaction and delivered to the specified mailbox. The specified mailbox is not automatically cleaned up like the account global Rejects mailbox, unless set to that Rejects mailbox.")),
+		dom.span('Mailbox', attr.title('Mailbox to deliver to if this ruleset matches.')),
+		dom.span('Comment', attr.title('Free-form comments.')),
+		dom.span('Action'),
+	]
+	let rulesetsTbody = dom.div(dom._class('ruleList'))
 	let rulesetsRows: Row[] = []
 
 	const addRulesetsRow = (rs: api.Ruleset) => {
 		let row: Row
-		let headersCell = dom.td()
+		let headersCell = dom.div(dom._class('ruleHeaders'))
 
 		const addHeader = (k: string, v: string) => {
 			let h: Header
@@ -1831,23 +1754,32 @@ const destination = async (name: string) => {
 		let mailbox: HTMLInputElement
 		let comment: HTMLInputElement
 
-		const root = dom.tr(
-			dom.td(smtpMailFromRegexp=dom.input(attr.value(rs.SMTPMailFromRegexp || ''))),
-			dom.td(msgFromRegexp=dom.input(attr.value(rs.MsgFromRegexp || ''))),
-			dom.td(verifiedDomain=dom.input(attr.value(rs.VerifiedDomain || ''))),
+		const root = dom.div(dom._class('ruleCard'),
+			dom.div(smtpMailFromRegexp=dom.input(attr.value(rs.SMTPMailFromRegexp || ''))),
+			dom.div(msgFromRegexp=dom.input(attr.value(rs.MsgFromRegexp || ''))),
+			dom.div(verifiedDomain=dom.input(attr.value(rs.VerifiedDomain || ''))),
 			headersCell,
-			dom.td(dom.label(isForward=dom.input(attr.type('checkbox'), rs.IsForward ? attr.checked('') : [] ))),
-			dom.td(listAllowDomain=dom.input(attr.value(rs.ListAllowDomain || ''))),
-			dom.td(acceptRejectsToMailbox=dom.input(attr.value(rs.AcceptRejectsToMailbox || ''))),
-			dom.td(mailbox=dom.input(attr.value(rs.Mailbox || ''))),
-			dom.td(comment=dom.input(attr.value(rs.Comment || ''))),
-			dom.td(
-				dom.clickbutton('Remove ruleset', function click() {
+			dom.div(dom.label(isForward=dom.input(attr.type('checkbox'), rs.IsForward ? attr.checked('') : [] ))),
+			dom.div(listAllowDomain=dom.input(attr.value(rs.ListAllowDomain || ''))),
+			dom.div(acceptRejectsToMailbox=dom.input(attr.value(rs.AcceptRejectsToMailbox || ''))),
+			dom.div(mailbox=dom.input(attr.value(rs.Mailbox || ''))),
+			dom.div(comment=dom.input(attr.value(rs.Comment || ''))),
+			dom.div(
+				dom.clickbutton('Remove ruleset', dom._class('dangerButton'), function click() {
 					row.root.remove()
 					rulesetsRows = rulesetsRows.filter(e => e !== row)
 				}),
 			),
 		)
+		const labels = ruleLabels()
+		Array.from(root.children).forEach((field, index) => {
+			const label = labels[index]
+			field.prepend(label)
+			for (const input of field.querySelectorAll('input')) {
+				input.setAttribute('aria-label', label.textContent || '')
+			}
+		})
+
 		row = {
 			root: root,
 			smtpMailFromRegexp: smtpMailFromRegexp,
@@ -1889,8 +1821,9 @@ const destination = async (name: string) => {
 	const addresses = [name, ...Object.keys(acc.Destinations || {}).filter(a => !a.startsWith('@') && a !== name)]
 
 	return dom.div(
+		dom._class('destinationPage'),
 		crumbs(
-			crumblink('Mox Account', '#'),
+			crumblink('Account', '#'),
 			'Destination ' + name,
 		),
 		dom.div(
@@ -1920,30 +1853,13 @@ const destination = async (name: string) => {
 
 		dom.h2('Rulesets'),
 		dom.p('Incoming messages are checked against the rulesets. If a ruleset matches, the message is delivered to the mailbox configured for the ruleset instead of to the default mailbox.'),
+		dom.details(dom._class('uiHelp'), dom.summary('How delivery rules work'),
 		dom.p('"Is Forward" does not affect matching, but changes prevents the sending mail server from being included in future junk classifications by clearing fields related to the forwarding email server (IP address, EHLO domain, MAIL FROM domain and a matching DKIM domain), and prevents DMARC rejects for forwarded messages.'),
 		dom.p('"List allow domain" does not affect matching, but skips the regular spam checks if one of the verified domains is a (sub)domain of the domain mentioned here.'),
 		dom.p('"Accept rejects to mailbox" does not affect matching, but causes messages classified as junk to be accepted and delivered to this mailbox, instead of being rejected during the SMTP transaction. Useful for incoming forwarded messages where rejecting incoming messages may cause the forwarding server to stop forwarding.'),
-		dom.table(
-			dom.thead(
-				dom.tr(
-					dom.th('SMTP "MAIL FROM" regexp', attr.title('Matches if this regular expression matches (a substring of) the SMTP MAIL FROM address (not the message From-header). E.g. user@example.org.')),
-					dom.th('Message "From" address regexp', attr.title('Matches if this regular expression matches (a substring of) the single address in the message From header.')),
-					dom.th('Verified domain', attr.title('Matches if this domain matches an SPF- and/or DKIM-verified (sub)domain.')),
-					dom.th('Headers regexp', attr.title('Matches if these header field/value regular expressions all match (substrings of) the message headers. Header fields and valuees are converted to lower case before matching. Whitespace is trimmed from the value before matching. A header field can occur multiple times in a message, only one instance has to match. For mailing lists, you could match on ^list-id$ with the value typically the mailing list address in angled brackets with @ replaced with a dot, e.g. <name\\.lists\\.example\\.org>.')),
-					dom.th('Is Forward', attr.title("Influences spam filtering only, this option does not change whether a message matches this ruleset. Can only be used together with SMTPMailFromRegexp and VerifiedDomain. SMTPMailFromRegexp must be set to the address used to deliver the forwarded message, e.g. '^user(|\\+.*)@forward\\.example$'. Changes to junk analysis: 1. Messages are not rejected for failing a DMARC policy, because a legitimate forwarded message without valid/intact/aligned DKIM signature would be rejected because any verified SPF domain will be 'unaligned', of the forwarding mail server. 2. The sending mail server IP address, and sending EHLO and MAIL FROM domains and matching DKIM domain aren't used in future reputation-based spam classifications (but other verified DKIM domains are) because the forwarding server is not a useful spam signal for future messages.")),
-					dom.th('List allow domain', attr.title("Influences spam filtering only, this option does not change whether a message matches this ruleset. If this domain matches an SPF- and/or DKIM-verified (sub)domain, the message is accepted without further spam checks, such as a junk filter or DMARC reject evaluation. DMARC rejects should not apply for mailing lists that are not configured to rewrite the From-header of messages that don't have a passing DKIM signature of the From-domain. Otherwise, by rejecting messages, you may be automatically unsubscribed from the mailing list. The assumption is that mailing lists do their own spam filtering/moderation.")),
-					dom.th('Allow rejects to mailbox', attr.title("Influences spam filtering only, this option does not change whether a message matches this ruleset. If a message is classified as spam, it isn't rejected during the SMTP transaction (the normal behaviour), but accepted during the SMTP transaction and delivered to the specified mailbox. The specified mailbox is not automatically cleaned up like the account global Rejects mailbox, unless set to that Rejects mailbox.")),
-					dom.th('Mailbox', attr.title('Mailbox to deliver to if this ruleset matches.')),
-					dom.th('Comment', attr.title('Free-form comments.')),
-					dom.th('Action'),
-				)
-			),
-			rulesetsTbody,
-			dom.tfoot(
-				dom.tr(
-					dom.td(attr.colspan('9')),
-					dom.td(
-						dom.clickbutton('Add ruleset', function click() {
+		),
+		rulesetsTbody,
+		dom.div(dom._class('uiActions'), dom.clickbutton('Add ruleset', function click() {
 							addRulesetsRow({
 								SMTPMailFromRegexp: '',
 								MsgFromRegexp: '',
@@ -1957,13 +1873,8 @@ const destination = async (name: string) => {
 								VerifiedDNSDomain: {ASCII: '', Unicode: ''},
 								ListAllowDNSDomain: {ASCII: '', Unicode: ''},
 							})
-						}),
-					),
-				),
-			),
-		),
-		dom.br(),
-		saveButton=dom.clickbutton('Save', async function click() {
+						})),
+		saveButton=dom.clickbutton('Save', dom._class('primaryButton', 'destinationSave'), async function click() {
 			const newDest = {
 				Mailbox: defaultMailbox.value,
 				FullName: fullName.value,
@@ -1991,6 +1902,7 @@ const destination = async (name: string) => {
 		dom.br(),
 		dom.br(),
 		dom.br(),
+		dom.h2('Mail client setup'),
 		dom.p("Apple's mail applications don't do account autoconfiguration, and when adding an account it can choose defaults that don't work with modern email servers. Adding an account through a \"mobileconfig\" profile file can be more convenient: It contains the IMAP/SMTP settings such as host name, port, TLS, authentication mechanism and user name. This profile does not contain a login password. Opening the profile in Safari adds it to the Files app on iOS. Opening the profile in the Files app then adds it under Profiles in System Preferences (macOS) or Settings (iOS), where you can install it. These profiles are not signed, so users will have to ignore the warnings about them being unsigned. ",
 			dom.br(),
 			dom.a(attr.href('https://autoconfig.'+domainName(acc.DNSDomain)+'/profile.mobileconfig?addresses='+encodeURIComponent(addresses.join(','))+'&name='+encodeURIComponent(dest.FullName)), attr.download(''), 'Download .mobileconfig email account profile'),
@@ -2000,10 +1912,84 @@ const destination = async (name: string) => {
 	)
 }
 
+const organizePage = (root: HTMLElement) => {
+	root.classList.add('accountPage')
+	const children = Array.from(root.childNodes)
+	let current: HTMLElement | undefined
+	for (const child of children) {
+		if (child instanceof HTMLHeadingElement && child.tagName === 'H1') { current = undefined; continue }
+		if (child instanceof HTMLElement && child.classList.contains('uiFooter')) { current = undefined; continue }
+		if (child instanceof HTMLBRElement) { child.remove(); continue }
+		if (child instanceof HTMLHeadingElement && child.tagName === 'H2') {
+			current = section(child.textContent || '')
+			current.firstChild!.remove()
+			current.id = 'setting-' + (child.textContent || '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/-$/, '')
+			root.insertBefore(current, child)
+		}
+		if (!current && child instanceof HTMLElement && child.tagName !== 'H1') {
+			let title = 'Profile'
+			if (root.classList.contains('destinationPage')) {
+				title = 'Delivery settings'
+			}
+			current = section(title)
+			current.id = 'setting-profile'
+			root.insertBefore(current, child)
+		}
+		if (current) { current.appendChild(child) }
+	}
+	for (const table of root.querySelectorAll<HTMLTableElement>('table')) {
+		if (table.querySelectorAll('thead tr:first-child th').length >= 9 && !table.classList.contains('loginAttemptsTable')) {
+			table.classList.add('rulesTable')
+			const scroll = dom.div(dom._class('uiScroll'))
+			table.before(scroll)
+			scroll.append(table)
+		}
+	}
+	return root
+}
+
+const accountNavigation = (root: HTMLElement, overview: boolean) => {
+	const nav = document.getElementById('accountNav')!
+	dom._kids(nav,
+		dom.div(dom._class('accountIdentity'), localStorageGet('webaccountaddress') || ''),
+		dom.a(attr.href('#'), 'Overview', function click() {
+			page.scrollTo(0, 0)
+			window.scrollTo(0, 0)
+		}),
+	)
+	if (overview) {
+		nav.append(dom.b(dom._class('navGroup'), 'Settings'))
+		for (const card of root.querySelectorAll<HTMLElement>(':scope > .uiSection[id]')) {
+			const title = card.querySelector('h2')!.textContent || ''
+			nav.append(dom.a(attr.href('#settings/' + card.id), title))
+		}
+	} else {
+		nav.append(dom.a(attr.href('#loginattempts'), 'Login attempts'))
+	}
+}
+
 const init = async () => {
+	themeControl(document.getElementById('accountTheme') as HTMLSelectElement, 'webaccounttheme')
 	let curhash: string | undefined
 
 	[moxversion, moxgoos, moxgoarch] = await client.Version()
+	document.getElementById('accountWebmail')!.before(dom.clickbutton('Logout', attr.title('Logout, invalidating this session.'), async function click(e: MouseEvent) {
+				const b = e.target! as HTMLButtonElement
+				try {
+					b.disabled = true
+					await client.Logout()
+				} catch (err) {
+					console.log('logout', err)
+					window.alert('Error: ' + errmsg(err))
+				} finally {
+					b.disabled = false
+				}
+
+				localStorageRemove('webaccountaddress')
+				localStorageRemove('webaccountcsrftoken')
+				// Reload so all state is cleared from memory.
+				window.location.reload()
+			}))
 
 	const hashChange = async () => {
 		if (curhash === window.location.hash) {
@@ -2014,10 +2000,32 @@ const init = async () => {
 			h = h.substring(1)
 		}
 		const t = h.split('/')
+		if (!h && page.querySelector('#setting-addresses')) {
+			page.scrollTo(0, 0)
+			window.scrollTo(0, 0)
+			for (const link of document.querySelectorAll<HTMLAnchorElement>('#accountNav a')) {
+				link.removeAttribute('aria-current')
+				if (link.getAttribute('href') === '#') { link.setAttribute('aria-current', 'page') }
+			}
+			curhash = window.location.hash
+			return
+		}
+		if (t[0] === 'settings' && t[1]) {
+			const target = page.querySelector<HTMLElement>('#' + CSS.escape(t[1] || ''))
+			if (target) {
+				target.scrollIntoView()
+				for (const link of document.querySelectorAll<HTMLAnchorElement>('#accountNav a')) {
+					link.removeAttribute('aria-current')
+					if (link.hash === window.location.hash) { link.setAttribute('aria-current', 'page') }
+				}
+				curhash = window.location.hash
+				return
+			}
+		}
 		page.classList.add('loading')
 		try {
 			let root: HTMLElement
-			if (h === '') {
+			if (h === '' || t[0] === 'settings') {
 				root = await index()
 			} else if (t[0] === 'loginattempts' && t.length === 1) {
 				root = await loginattempts()
@@ -2026,10 +2034,18 @@ const init = async () => {
 			} else {
 				root = dom.div('page not found')
 			}
+			organizePage(root)
+			accountNavigation(root, h === '' || t[0] === 'settings')
 			if ((window as any).moxBeforeDisplay) {
 				moxBeforeDisplay(root)
 			}
 			dom._kids(page, root)
+			page.scrollTo(0, 0)
+			window.scrollTo(0, 0)
+			if (t[0] === 'settings') { document.getElementById(t[1])?.scrollIntoView() }
+			for (const link of document.querySelectorAll<HTMLAnchorElement>('#accountNav a')) {
+				if (link.hash === window.location.hash || (link.getAttribute('href') === '#' && !h)) { link.setAttribute('aria-current', 'page') }
+			}
 		} catch (err) {
 			console.log({err})
 			window.alert('Error: ' + errmsg(err))

@@ -142,6 +142,252 @@
 		return { _styles: x };
 	}, "style");
 
+	// .js/ui.js
+	var themeCSS = `
+:root {
+	color-scheme: light;
+	--uiColor: #282520; --muted: #625e58; --bg: #fcfaf7; --panel: #f6f3ee;
+	--border: #e3ddd4; --control: #d7cfc4; --hover: #eee8df; --accent: #b94706;
+	--contrast: #fff; --selected: #f6e8d9; --warning: #f8e7c5; --success: #dcebd8; --error: #f8dcd0;
+}
+:root[data-theme="dark"] {
+	color-scheme: dark;
+	--uiColor: #eee8df; --muted: #c4baad; --bg: #211e1a; --panel: #28241f;
+	--border: #41392f; --control: #5f5243; --hover: #383026; --accent: #e99a5d;
+	--contrast: #211e1a; --selected: #47301d; --warning: #503b20; --success: #293e29; --error: #552e24;
+}
+
+:root { --color: var(--uiColor); --fontUI: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; --fontBrand: Georgia, serif; }
+`;
+	var settingsCSS = `
+.loginAttemptsTable { table-layout: fixed; overflow-wrap: anywhere; }
+.loginAttemptsTable td { vertical-align: top; }
+.loginAttemptsTable .loginAttemptsCount { width: 64px; }
+.loginAttemptsTable .queueInfo:first-child { margin-top: 0; }
+@media (max-width: 760px) { .loginAttemptsTable th, .loginAttemptsTable td { padding: 6px 4px; } }
+.queueInfo { margin-top: 4px; }
+.queueInfoLabel { color: var(--muted); margin-right: 6px; font-size: 12px; }
+.uiBadge { display: inline-block; padding: 2px 6px; border-radius: 4px; font-size: 12px; }
+.uiBadgeError { background: var(--error); }
+
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+body { background: var(--bg); color: var(--color); font: 14px/1.5 var(--fontUI); }
+a { color: var(--accent); text-underline-offset: 3px; }
+button, input, select, textarea { font: inherit; color: inherit; }
+button, select, input, textarea { border: 1px solid var(--control); border-radius: 6px; background: var(--bg); padding: 6px 10px; max-width: 100%; }
+button, select { min-height: 36px; cursor: pointer; }
+input:not([type=checkbox]):not([type=radio]):not([type=hidden]), select:not([multiple]):not([size]) { height: 36px; }
+button:hover { background: var(--hover); }
+button[type=submit], button.primaryButton { background: var(--accent); color: var(--contrast); border-color: var(--accent); font-weight: 600; }
+button:disabled, fieldset:disabled { opacity: .55; cursor: default; }
+input[type=checkbox], input[type=radio] { accent-color: var(--accent); vertical-align: middle; margin: 0 4px 0 0; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+fieldset { border: 0; padding: 0; margin: 0; min-width: 0; }
+label { line-height: 1.8; }
+h1, h2, h3, h4 { color: var(--color); line-height: 1.3; }
+h1 { font-size: 24px; letter-spacing: -.5px; margin: 0 0 20px; }
+h1 a { color: var(--muted); text-decoration: none; font-weight: 400; }
+h2 { font-size: 19px; margin: 24px 0 12px; }
+h3, h4 { font-size: 14px; margin: 16px 0 8px; }
+p { margin: 0 0 16px; max-width: 65em; }
+ul { padding-left: 22px; }
+li { margin: 3px 0; }
+[title] { text-decoration: none; }
+[title]:hover { text-decoration: underline dotted; text-underline-offset: 3px; }
+button[title]:hover, a[title]:hover { text-decoration: none; }
+.uiHeader { min-height: 74px; flex-wrap: wrap; display: flex; align-items: center; gap: 20px; padding: 0 24px; border-bottom: 1px solid var(--border); background: var(--panel); }
+.brandName { font: bold 38px var(--fontBrand); letter-spacing: -1.5px; text-decoration: none; color: var(--color); }
+.uiHeader > span { color: var(--muted); border-left: 1px solid var(--control); padding-left: 20px; }
+.uiHeader label { margin-left: auto; color: var(--muted); display: flex; align-items: center; gap: 8px; }
+.uiHeader > a:not(.brandName) { text-decoration: none; }
+.uiLayout { display: grid; grid-template-columns: 190px minmax(0, 1fr); min-height: calc(100vh - 74px); }
+.uiNav { background: var(--panel); border-right: 1px solid var(--border); padding: 16px 10px; }
+.uiNav a { display: block; color: var(--color); text-decoration: none; padding: 5px 10px; border-radius: 5px; margin: 1px 0; }
+.uiNav a:hover { background: var(--hover); }
+.uiNav a[aria-current=page] { background: var(--selected); color: var(--accent); font-weight: 600; }
+.uiNav strong { display: block; font-size: 11px; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); padding: 20px 10px 5px; }
+#page { min-width: 0; padding: 28px 32px; overflow-x: auto; }
+#page > div { max-width: 1500px; }
+#page > div > br { display: none; }
+form { margin: 12px 0; }
+form > fieldset > label { margin: 0 10px 8px 0; }
+table { width: 100%; border-spacing: 0; border-collapse: collapse; font-size: 13px; }
+td, th { padding: 7px 10px; text-align: left; border-bottom: 1px solid var(--border); }
+td.alignRight, th.alignRight { text-align: right; font-variant-numeric: tabular-nums; }
+th { color: var(--muted); font-weight: 600; background: var(--panel); }
+table table { width: auto; }
+table table td, table table th { padding: 3px 6px; }
+table.long > tbody > tr > td { padding: 10px; vertical-align: top; }
+table.hover > tbody > tr:hover { background: var(--panel); }
+thead { position: sticky; top: 0; z-index: 1; background: var(--panel); }
+.literal, pre { background: var(--panel); padding: 12px 16px; border: 1px solid var(--border); border-radius: 6px; white-space: pre-wrap; overflow-wrap: anywhere; font: 13px/1.6 ui-monospace, monospace; tab-size: 4; }
+.uiFooter { margin-top: 32px; padding-top: 12px; border-top: 1px solid var(--border); font-size: 12px; color: var(--muted); }
+.uiLogin { background: var(--panel); }
+.uiLogin .uiDialog { width: 340px; }
+.uiLogin input { width: 100%; }
+.uiLogin h1 { font: bold 38px var(--fontBrand); }
+.uiLogin button { width: 100%; }
+.loginNotice { margin: 0 0 20px; padding: 12px 14px; border: 1px solid var(--border); border-radius: 6px; background: var(--bg); font-size: 13px; line-height: 1.5; overflow-wrap: anywhere; }
+.loginNoticeTitle { display: block; margin-bottom: 4px; font-weight: 600; }
+.loginNotice > div:not(.loginNoticeTitle) { color: var(--muted); }
+#page, .loadend { opacity: 1; }
+#page.loading, .loadstart { opacity: .35; transition: opacity .15s; }
+/* Keeping the caret inset while preserving native dropdown behavior. */
+select:not([multiple]):not([size]), select:not([multiple])[size="1"] {
+	appearance: none;
+	padding-right: 32px;
+	background-image: linear-gradient(45deg, transparent 50%, currentColor 50%), linear-gradient(135deg, currentColor 50%, transparent 50%);
+	background-position: calc(100% - 14px) 50%, calc(100% - 10px) 50%;
+	background-size: 4px 4px;
+	background-repeat: no-repeat;
+}
+@media (forced-colors: active) {
+	select:not([multiple]):not([size]), select:not([multiple])[size="1"] { appearance: auto; background-image: none; }
+}
+
+
+@media (max-width: 760px) {
+ .uiHeader { padding: 12px 16px; gap: 12px; }
+ .uiHeader > span { display: none; }
+ .uiHeader label { font-size: 12px; }
+ .uiLayout { display: block; }
+ .uiNav { display: flex; gap: 4px; overflow-x: auto; border-right: 0; border-bottom: 1px solid var(--border); padding: 8px; }
+ .uiNav strong { display: none; }
+ .uiNav a { white-space: nowrap; }
+ #page { padding: 20px 16px; }
+ .uiSection { padding: 16px; }
+}
+`;
+	var componentCSS = `
+:root { --danger: #a52b27; --dangerBackground: #fce9e6; --dangerBorder: #d8a5a0; }
+:root[data-theme="dark"] { --danger: #f2a099; --dangerBackground: #472a26; --dangerBorder: #90544d; }
+button.dangerButton { color: var(--danger); border-color: var(--dangerBorder); background: transparent; }
+button.dangerButton:hover:not(:disabled) { background: var(--dangerBackground); border-color: var(--danger); }
+button.dangerButton:focus-visible { outline-color: var(--danger); }
+
+.uiOverlay { position: fixed; inset: 0; background: #28252055; display: flex; align-items: center; justify-content: center; z-index: 50; padding: 16px; }
+.uiDialog { background: var(--bg); border: 1px solid var(--border); border-radius: 10px; padding: 24px; box-shadow: 0 12px 36px #0002; max-width: 95vw; max-height: 95vh; overflow: auto; }
+.uiSection { min-width: 0; margin: 0 0 24px; padding: 20px; border: 1px solid var(--border); border-radius: 8px; background: var(--panel); scroll-margin-top: 20px; }
+.uiSection > h2:first-child { margin-top: 0; }
+.uiSection > :last-child { margin-bottom: 0; }
+.uiCallout { padding: 12px 14px; border: 1px solid var(--border); border-radius: 6px; margin: 12px 0; line-height: 1.5; overflow-wrap: anywhere; }
+.uiCallout p:last-child { margin-bottom: 0; }
+.uiActions { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-top: 16px; }
+.uiHelp { padding: 12px 14px; border: 1px solid var(--border); border-radius: 6px; margin: 16px 0; }
+.uiHelp summary { cursor: pointer; color: var(--muted); }
+.uiHelp[open] summary { margin-bottom: 12px; }
+.uiScroll { max-width: 100%; overflow: auto; }
+.uiDialog { min-width: min(340px, 100%); }
+.uiDialog:focus { outline: none; }
+.uiDialog > h1:first-child { margin-top: 0; }
+
+`;
+	var installUI = /* @__PURE__ */ __name((settings) => {
+		const sheet = document.createElement("style");
+		sheet.textContent = themeCSS + componentCSS;
+		if (settings) {
+			sheet.textContent += settingsCSS;
+		}
+		document.head.prepend(sheet);
+	}, "installUI");
+	var callout = /* @__PURE__ */ __name((color, ...kids) => dom.div(dom._class("uiCallout"), style({ backgroundColor: color }), kids), "callout");
+	var section = /* @__PURE__ */ __name((title, ...kids) => dom.div(dom._class("uiSection"), dom.h2(title), kids), "section");
+	var themeControl = /* @__PURE__ */ __name((select, storageKey) => {
+		const system = window.matchMedia("(prefers-color-scheme: dark)");
+		try {
+			const saved = localStorage.getItem(storageKey);
+			if (saved && ["system", "light", "dark"].includes(saved)) {
+				select.value = saved;
+			}
+		} catch (_) {
+		}
+		const apply = /* @__PURE__ */ __name(() => {
+			let dark = select.value === "dark";
+			if (select.value === "system") {
+				dark = system.matches;
+			}
+			document.documentElement.dataset.theme = "light";
+			if (dark) {
+				document.documentElement.dataset.theme = "dark";
+			}
+		}, "apply");
+		select.addEventListener("change", () => {
+			apply();
+			try {
+				localStorage.setItem(storageKey, select.value);
+			} catch (_) {
+			}
+		});
+		system.addEventListener("change", apply);
+		apply();
+	}, "themeControl");
+	var dialog = /* @__PURE__ */ __name((onClose, ...kids) => {
+		const original = document.activeElement;
+		let root;
+		const close = /* @__PURE__ */ __name(() => {
+			if (!root.isConnected) {
+				return;
+			}
+			root.remove();
+			onClose();
+			if (original instanceof HTMLElement && original.isConnected) {
+				original.focus();
+			}
+		}, "close");
+		let content;
+		root = dom.div(dom._class("uiOverlay"), /* @__PURE__ */ __name(function click() {
+			close();
+		}, "click"), /* @__PURE__ */ __name(function keydown(e) {
+			if (e.key === "Escape") {
+				e.stopPropagation();
+				close();
+				return;
+			}
+			if (e.key !== "Tab") {
+				return;
+			}
+			const focusable = Array.from(content.querySelectorAll("button, input, select, textarea, a[href], [tabindex]")).filter((e2) => e2.tabIndex >= 0 && !e2.matches(":disabled") && e2.getClientRects().length > 0);
+			if (!focusable.length) {
+				e.preventDefault();
+				content.focus();
+				return;
+			}
+			const first = focusable[0], last = focusable[focusable.length - 1];
+			if (e.shiftKey && (document.activeElement === first || document.activeElement === content)) {
+				e.preventDefault();
+				last.focus();
+			} else if (!e.shiftKey && (document.activeElement === last || document.activeElement === content)) {
+				e.preventDefault();
+				first.focus();
+			}
+		}, "keydown"), content = dom.div(dom._class("uiDialog"), attr.tabindex("-1"), dom._attrs({ role: "dialog", "aria-modal": "true", "aria-label": "Dialog" }), /* @__PURE__ */ __name(function click(e) {
+			e.stopPropagation();
+		}, "click"), kids));
+		const title = content.querySelector("h1, h2");
+		if (title) {
+			content.setAttribute("aria-label", title.textContent || "Dialog");
+		}
+		document.body.append(root);
+		content.focus();
+		return close;
+	}, "dialog");
+	var detailLine = /* @__PURE__ */ __name((label, ...value) => dom.div(dom._class("queueInfo"), dom.span(dom._class("queueInfoLabel"), label), value), "detailLine");
+	var sessionNotice = /* @__PURE__ */ __name((reason) => {
+		let message = reason;
+		if (reason.startsWith("unknown session")) {
+			message = "Your session has ended. Enter your password to continue.";
+		}
+		const notice = dom.div(dom._class("loginNotice"), dom._attrs({ role: "status" }), dom.div(dom._class("loginNoticeTitle"), "Please sign in again"), dom.div(message));
+		notice.hidden = !reason;
+		return notice;
+	}, "sessionNotice");
+
+	// .js/ui-loginattempts.js
+	var loginAttemptsTable = /* @__PURE__ */ __name((accountLinks, loginAttempts, age2) => {
+		return dom.table(dom._class("loginAttemptsTable"), dom.thead(dom.tr(dom.th("Time"), dom.th("Result"), dom.th(dom._class("alignRight", "loginAttemptsCount"), "Count"), dom.th("Account"), dom.th("Client"), dom.th("Connection"))), dom.tbody(loginAttempts.length ? [] : dom.tr(dom.td(attr.colspan("6"), "No login attempts in past 30 days.")), loginAttempts.map((la) => dom.tr(dom.td(detailLine("Last", age2(la.Last)), detailLine("First", age2(la.First))), dom.td(la.Result === "ok" ? la.Result : dom.span(dom._class("uiBadge", "uiBadgeError"), la.Result)), dom.td(dom._class("alignRight"), "" + la.Count), dom.td(accountLinks ? dom.a(attr.href("#accounts/l/" + la.AccountName + "/loginattempts"), la.AccountName) : la.AccountName, detailLine("Address", la.LoginAddress)), dom.td(detailLine("Protocol", la.Protocol), detailLine("Mechanism", la.AuthMech), detailLine("User agent", la.UserAgent)), dom.td(detailLine("Remote IP", la.RemoteIP), detailLine("Local IP", la.LocalIP), detailLine("TLS", la.TLS), detailLine("TLS pubkey fingerprint", la.TLSPubKeyFingerprint))))));
+	}, "loginAttemptsTable");
+
 	// .js/webaccount/api.js
 	var OutgoingEvent;
 	(function(OutgoingEvent2) {
@@ -166,7 +412,7 @@
 		AuthResult2["AuthError"] = "error";
 		AuthResult2["AuthAborted"] = "aborted";
 	})(AuthResult || (AuthResult = {}));
-	var structTypes = { "Account": true, "Address": true, "AddressAlias": true, "Alias": true, "AliasAddress": true, "AutomaticJunkFlags": true, "Destination": true, "Domain": true, "ImportProgress": true, "Incoming": true, "IncomingMeta": true, "IncomingWebhook": true, "JunkFilter": true, "LoginAttempt": true, "NameAddress": true, "Outgoing": true, "OutgoingWebhook": true, "Route": true, "Ruleset": true, "Structure": true, "SubjectPass": true, "Suppression": true, "TLSPublicKey": true };
+	var structTypes = { "Account": true, "Address": true, "AddressAlias": true, "Alias": true, "AliasAddress": true, "AutomaticJunkFlags": true, "Destination": true, "Domain": true, "ImportProgress": true, "Incoming": true, "IncomingMeta": true, "IncomingWebhook": true, "JunkFilter": true, "LoginAttempt": true, "LoginAttemptPage": true, "NameAddress": true, "Outgoing": true, "OutgoingWebhook": true, "Route": true, "Ruleset": true, "Structure": true, "SubjectPass": true, "Suppression": true, "TLSPublicKey": true };
 	var stringsTypes = { "AuthResult": true, "CSRFToken": true, "Localpart": true, "OutgoingEvent": true };
 	var intsTypes = {};
 	var types = {
@@ -193,6 +439,7 @@
 		"IncomingMeta": { "Name": "IncomingMeta", "Docs": "", "Fields": [{ "Name": "MsgID", "Docs": "", "Typewords": ["int64"] }, { "Name": "MailFrom", "Docs": "", "Typewords": ["string"] }, { "Name": "MailFromValidated", "Docs": "", "Typewords": ["bool"] }, { "Name": "MsgFromValidated", "Docs": "", "Typewords": ["bool"] }, { "Name": "RcptTo", "Docs": "", "Typewords": ["string"] }, { "Name": "DKIMVerifiedDomains", "Docs": "", "Typewords": ["[]", "string"] }, { "Name": "RemoteIP", "Docs": "", "Typewords": ["string"] }, { "Name": "Received", "Docs": "", "Typewords": ["timestamp"] }, { "Name": "MailboxName", "Docs": "", "Typewords": ["string"] }, { "Name": "Automated", "Docs": "", "Typewords": ["bool"] }] },
 		"TLSPublicKey": { "Name": "TLSPublicKey", "Docs": "", "Fields": [{ "Name": "Fingerprint", "Docs": "", "Typewords": ["string"] }, { "Name": "Created", "Docs": "", "Typewords": ["timestamp"] }, { "Name": "Type", "Docs": "", "Typewords": ["string"] }, { "Name": "Name", "Docs": "", "Typewords": ["string"] }, { "Name": "NoIMAPPreauth", "Docs": "", "Typewords": ["bool"] }, { "Name": "CertDER", "Docs": "", "Typewords": ["nullable", "string"] }, { "Name": "Account", "Docs": "", "Typewords": ["string"] }, { "Name": "LoginAddress", "Docs": "", "Typewords": ["string"] }] },
 		"LoginAttempt": { "Name": "LoginAttempt", "Docs": "", "Fields": [{ "Name": "Key", "Docs": "", "Typewords": ["nullable", "string"] }, { "Name": "Last", "Docs": "", "Typewords": ["timestamp"] }, { "Name": "First", "Docs": "", "Typewords": ["timestamp"] }, { "Name": "Count", "Docs": "", "Typewords": ["int64"] }, { "Name": "AccountName", "Docs": "", "Typewords": ["string"] }, { "Name": "LoginAddress", "Docs": "", "Typewords": ["string"] }, { "Name": "RemoteIP", "Docs": "", "Typewords": ["string"] }, { "Name": "LocalIP", "Docs": "", "Typewords": ["string"] }, { "Name": "TLS", "Docs": "", "Typewords": ["string"] }, { "Name": "TLSPubKeyFingerprint", "Docs": "", "Typewords": ["string"] }, { "Name": "Protocol", "Docs": "", "Typewords": ["string"] }, { "Name": "UserAgent", "Docs": "", "Typewords": ["string"] }, { "Name": "AuthMech", "Docs": "", "Typewords": ["string"] }, { "Name": "Result", "Docs": "", "Typewords": ["AuthResult"] }] },
+		"LoginAttemptPage": { "Name": "LoginAttemptPage", "Docs": "", "Fields": [{ "Name": "Attempts", "Docs": "", "Typewords": ["[]", "LoginAttempt"] }, { "Name": "Next", "Docs": "", "Typewords": ["string"] }] },
 		"CSRFToken": { "Name": "CSRFToken", "Docs": "", "Values": null },
 		"Localpart": { "Name": "Localpart", "Docs": "", "Values": null },
 		"OutgoingEvent": { "Name": "OutgoingEvent", "Docs": "", "Values": [{ "Name": "EventDelivered", "Value": "delivered", "Docs": "" }, { "Name": "EventSuppressed", "Value": "suppressed", "Docs": "" }, { "Name": "EventDelayed", "Value": "delayed", "Docs": "" }, { "Name": "EventFailed", "Value": "failed", "Docs": "" }, { "Name": "EventRelayed", "Value": "relayed", "Docs": "" }, { "Name": "EventExpanded", "Value": "expanded", "Docs": "" }, { "Name": "EventCanceled", "Value": "canceled", "Docs": "" }, { "Name": "EventUnrecognized", "Value": "unrecognized", "Docs": "" }] },
@@ -222,6 +469,7 @@
 		IncomingMeta: /* @__PURE__ */ __name((v) => parse("IncomingMeta", v), "IncomingMeta"),
 		TLSPublicKey: /* @__PURE__ */ __name((v) => parse("TLSPublicKey", v), "TLSPublicKey"),
 		LoginAttempt: /* @__PURE__ */ __name((v) => parse("LoginAttempt", v), "LoginAttempt"),
+		LoginAttemptPage: /* @__PURE__ */ __name((v) => parse("LoginAttemptPage", v), "LoginAttemptPage"),
 		CSRFToken: /* @__PURE__ */ __name((v) => parse("CSRFToken", v), "CSRFToken"),
 		Localpart: /* @__PURE__ */ __name((v) => parse("Localpart", v), "Localpart"),
 		OutgoingEvent: /* @__PURE__ */ __name((v) => parse("OutgoingEvent", v), "OutgoingEvent"),
@@ -516,6 +764,14 @@
 			const paramTypes = [["[]", "string"]];
 			const returnTypes = [];
 			const params = [capabilitiesDisabled];
+			return await _sherpaCall(this.baseURL, this.authState, { ...this.options }, paramTypes, returnTypes, fn, params);
+		}
+		// LoginAttemptsPage limits history reads to the authenticated account.
+		async LoginAttemptsPage(limit, cursor) {
+			const fn = "LoginAttemptsPage";
+			const paramTypes = [["int32"], ["string"]];
+			const returnTypes = [["LoginAttemptPage"]];
+			const params = [limit, cursor];
 			return await _sherpaCall(this.baseURL, this.authState, { ...this.options }, paramTypes, returnTypes, fn, params);
 		}
 	};
@@ -853,6 +1109,7 @@
 	}, "_sherpaCall");
 
 	// .js/webaccount/account.js
+	installUI(true);
 	var moxversion;
 	var moxgoos;
 	var moxgoarch;
@@ -864,7 +1121,7 @@
 			let autosize;
 			let username;
 			let password;
-			const root = dom.div(style({ position: "absolute", top: 0, right: 0, bottom: 0, left: 0, backgroundColor: "#eee", display: "flex", alignItems: "center", justifyContent: "center", zIndex: "1", animation: "fadein .15s ease-in" }), dom.div(style({ display: "flex", flexDirection: "column", alignItems: "center" }), reasonElem = reason ? dom.div(style({ marginBottom: "2ex", textAlign: "center" }), reason) : dom.div(), dom.div(style({ backgroundColor: "white", borderRadius: ".25em", padding: "1em", boxShadow: "0 0 20px rgba(0, 0, 0, 0.1)", border: "1px solid #ddd", maxWidth: "95vw", overflowX: "auto", maxHeight: "95vh", overflowY: "auto", marginBottom: "20vh" }), dom.form(/* @__PURE__ */ __name(async function submit(e) {
+			const root = dom.div(dom._class("uiOverlay", "uiLogin"), dom.div(style({ display: "flex", flexDirection: "column", alignItems: "center" }), dom.div(dom._class("uiDialog"), dom.form(/* @__PURE__ */ __name(async function submit(e) {
 				e.preventDefault();
 				e.stopPropagation();
 				reasonElem.remove();
@@ -889,7 +1146,7 @@
 				} finally {
 					fieldset.disabled = false;
 				}
-			}, "submit"), fieldset = dom.fieldset(dom.h1("Account"), dom.label(style({ display: "block", marginBottom: "2ex" }), dom.div("Email address", style({ marginBottom: ".5ex" })), autosize = dom.span(dom._class("autosize"), username = dom.input(attr.required(""), attr.autocomplete("email"), attr.placeholder("jane@example.org"), /* @__PURE__ */ __name(function change() {
+			}, "submit"), fieldset = dom.fieldset(dom.h1("devn"), dom.p("Account settings"), reasonElem = sessionNotice(reason), dom.label(style({ display: "block", marginBottom: "2ex" }), dom.div("Email address", style({ marginBottom: ".5ex" })), autosize = dom.span(dom._class("autosize"), username = dom.input(attr.required(""), attr.autocomplete("email"), attr.placeholder("jane@example.org"), /* @__PURE__ */ __name(function change() {
 				autosize.dataset.value = username.value;
 			}, "change"), /* @__PURE__ */ __name(function input() {
 				autosize.dataset.value = username.value;
@@ -898,33 +1155,8 @@
 			username.focus();
 		});
 	}, "login");
-	var popup = /* @__PURE__ */ __name((...kids) => {
-		const origFocus = document.activeElement;
-		const close = /* @__PURE__ */ __name(() => {
-			if (!root.parentNode) {
-				return;
-			}
-			root.remove();
-			if (origFocus && origFocus instanceof HTMLElement && origFocus.parentNode) {
-				origFocus.focus();
-			}
-		}, "close");
-		let content;
-		const root = dom.div(style({ position: "fixed", top: 0, right: 0, bottom: 0, left: 0, backgroundColor: "rgba(0, 0, 0, 0.1)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: "1" }), /* @__PURE__ */ __name(function keydown(e) {
-			if (e.key === "Escape") {
-				e.stopPropagation();
-				close();
-			}
-		}, "keydown"), /* @__PURE__ */ __name(function click(e) {
-			e.stopPropagation();
-			close();
-		}, "click"), content = dom.div(attr.tabindex("0"), style({ backgroundColor: "white", borderRadius: ".25em", padding: "1em", boxShadow: "0 0 20px rgba(0, 0, 0, 0.1)", border: "1px solid #ddd", maxWidth: "95vw", overflowX: "auto", maxHeight: "95vh", overflowY: "auto" }), /* @__PURE__ */ __name(function click(e) {
-			e.stopPropagation();
-		}, "click"), kids));
-		document.body.appendChild(root);
-		content.focus();
-		return close;
-	}, "popup");
+	var popup = /* @__PURE__ */ __name((...kids) => dialog(() => {
+	}, dom._class("accountDialog"), ...kids), "popup");
 	var localStorageGet = /* @__PURE__ */ __name((k) => {
 		try {
 			return window.localStorage.getItem(k);
@@ -961,30 +1193,15 @@
 	}, "crumblink");
 	var crumbs = /* @__PURE__ */ __name((...l) => {
 		const crumbtext = /* @__PURE__ */ __name((e) => typeof e === "string" ? e : e.text, "crumbtext");
-		document.title = l.map((e) => crumbtext(e)).join(" - ");
+		document.title = l.map((e) => crumbtext(e)).join(" / ") + " \xB7 devn Account";
 		const crumblink2 = /* @__PURE__ */ __name((e) => typeof e === "string" ? prewrap(e) : dom.a(e.text, attr.href(e.path)), "crumblink");
 		return [
-			dom.div(style({ float: "right" }), localStorageGet("webaccountaddress") || "(unknown)", " ", dom.clickbutton("Logout", attr.title("Logout, invalidating this session."), /* @__PURE__ */ __name(async function click(e) {
-				const b = e.target;
-				try {
-					b.disabled = true;
-					await client.Logout();
-				} catch (err) {
-					console.log("logout", err);
-					window.alert("Error: " + errmsg(err));
-				} finally {
-					b.disabled = false;
-				}
-				localStorageRemove("webaccountaddress");
-				localStorageRemove("webaccountcsrftoken");
-				window.location.reload();
-			}, "click"))),
 			dom.h1(l.map((e, index2) => index2 === 0 ? crumblink2(e) : [" / ", crumblink2(e)])),
 			dom.br()
 		];
 	}, "crumbs");
 	var errmsg = /* @__PURE__ */ __name((err) => "" + (err.message || "(no error message)"), "errmsg");
-	var footer = /* @__PURE__ */ __name(() => dom.div(style({ marginTop: "6ex", opacity: 0.75 }), link("https://www.xmox.nl", "mox"), " ", moxversion, moxgoos, "/", moxgoarch, ", ", dom.a(attr.href("licenses.txt"), "licenses")), "footer");
+	var footer = /* @__PURE__ */ __name(() => dom.div(dom._class("uiFooter"), link("https://www.xmox.nl", "mox"), " ", moxversion, moxgoos, "/", moxgoarch, ", ", dom.a(attr.href("licenses.txt"), "licenses")), "footer");
 	var domainName = /* @__PURE__ */ __name((d) => {
 		return d.Unicode || d.ASCII;
 	}, "domainName");
@@ -994,19 +1211,10 @@
 		}
 		return d.ASCII;
 	}, "domainString");
-	var box = /* @__PURE__ */ __name((color, ...l) => [
-		dom.div(style({
-			display: "inline-block",
-			padding: ".125em .25em",
-			backgroundColor: color,
-			borderRadius: "3px",
-			margin: ".5ex 0"
-		}), l),
-		dom.br()
-	], "box");
+	var box = /* @__PURE__ */ __name((color, ...kids) => [callout(color, ...kids)], "box");
 	var yellow = "#ffe400";
-	var red = "#ff7443";
-	var blue = "#8bc8ff";
+	var red = "var(--error)";
+	var blue = "var(--selected)";
 	var age = /* @__PURE__ */ __name((date) => {
 		const r = dom.span(dom._class("notooltip"), attr.title(date.toString()));
 		const nowSecs = (/* @__PURE__ */ new Date()).getTime() / 1e3;
@@ -1369,7 +1577,7 @@
 			onchange();
 		}, "popupTestIncoming");
 		const root = dom.div(
-			crumbs("Mox Account"),
+			crumbs("Account"),
 			dom.div("Default domain: ", acc.DNSDomain.ASCII ? domainString(acc.DNSDomain) : "(none)"),
 			dom.br(),
 			fullNameForm = dom.form(fullNameFieldset = dom.fieldset(dom.label(style({ display: "inline-block" }), "Full name", dom.br(), fullName = dom.input(attr.value(acc.FullName), attr.title("Name to use in From header when composing messages. Can be overridden per configured address."))), " ", dom.submitbutton("Save")), /* @__PURE__ */ __name(async function submit(e) {
@@ -1537,7 +1745,7 @@ openssl pkcs12 \\
 				e.preventDefault();
 				e.stopPropagation();
 				await check(autoJunkFlagsFieldset, client.AutomaticJunkFlagsSave(autoJunkFlagsEnabled.checked, junkMailboxRegexp.value, neutralMailboxRegexp.value, notJunkMailboxRegexp.value));
-			}, "submit"), autoJunkFlagsFieldset = dom.fieldset(dom.div(style({ display: "flex", gap: "1em" }), dom.label("Enabled", attr.title("If enabled, junk/nonjunk flags will be set automatically if they match a regular expression below. When two of the three mailbox regular expressions are set, the remaining one will match all unmatched messages. Messages are matched in order 'junk', 'neutral', 'not junk', and the search stops on the first match. Mailboxes are lowercased before matching."), dom.div(autoJunkFlagsEnabled = dom.input(attr.type("checkbox"), acc.AutomaticJunkFlags.Enabled ? attr.checked("") : []))), dom.label("Junk mailbox regexp", dom.div(junkMailboxRegexp = dom.input(attr.value(acc.AutomaticJunkFlags.JunkMailboxRegexp)))), dom.label("Neutral mailbox regexp", dom.div(neutralMailboxRegexp = dom.input(attr.value(acc.AutomaticJunkFlags.NeutralMailboxRegexp)))), dom.label("Not Junk mailbox regexp", dom.div(notJunkMailboxRegexp = dom.input(attr.value(acc.AutomaticJunkFlags.NotJunkMailboxRegexp)))), dom.div(dom.span("\xA0"), dom.div(dom.submitbutton("Save")))))),
+			}, "submit"), autoJunkFlagsFieldset = dom.fieldset(dom.div(dom._class("accountFields"), dom.label("Enabled", attr.title("If enabled, junk/nonjunk flags will be set automatically if they match a regular expression below. When two of the three mailbox regular expressions are set, the remaining one will match all unmatched messages. Messages are matched in order 'junk', 'neutral', 'not junk', and the search stops on the first match. Mailboxes are lowercased before matching."), dom.div(autoJunkFlagsEnabled = dom.input(attr.type("checkbox"), acc.AutomaticJunkFlags.Enabled ? attr.checked("") : []))), dom.label("Junk mailbox regexp", dom.div(junkMailboxRegexp = dom.input(attr.value(acc.AutomaticJunkFlags.JunkMailboxRegexp)))), dom.label("Neutral mailbox regexp", dom.div(neutralMailboxRegexp = dom.input(attr.value(acc.AutomaticJunkFlags.NeutralMailboxRegexp)))), dom.label("Not Junk mailbox regexp", dom.div(notJunkMailboxRegexp = dom.input(attr.value(acc.AutomaticJunkFlags.NotJunkMailboxRegexp)))), dom.div(dom._class("accountFieldActions"), dom.submitbutton("Save"))))),
 			dom.br(),
 			dom.h2("Junk filter", attr.title("Content-based filtering, using the junk-status of individual messages to rank words in such messages as spam or ham. It is recommended you always set the applicable (non)-junk status on messages, and that you do not empty your Trash because those messages contain valuable ham/spam training information.")),
 			dom.form(/* @__PURE__ */ __name(async function submit(e) {
@@ -1561,7 +1769,7 @@ openssl pkcs12 \\
 					return r;
 				}, "xjunkFilter");
 				await check(junkFilterFields, (async () => await client.JunkFilterSave(xjunkFilter()))());
-			}, "submit"), junkFilterFields = dom.fieldset(dom.div(style({ display: "flex", gap: "1em" }), dom.label("Enabled", attr.title("If enabled, the junk filter is used to classify incoming email from first-time senders. The result, along with other checks, determines if the message will be accepted or rejected"), dom.div(junkFilterEnabled = dom.input(attr.type("checkbox"), acc.JunkFilter ? attr.checked("") : []))), dom.label("Threshold", attr.title("Approximate spaminess score between 0 and 1 above which emails are rejected as spam. Each delivery attempt adds a little noise to make it slightly harder for spammers to identify words that strongly indicate non-spaminess and use it to bypass the filter. E.g. 0.95."), dom.div(junkThreshold = dom.input(attr.value("" + (acc.JunkFilter?.Threshold || "0.95"))))), dom.label("Onegrams", attr.title("Track ham/spam ranking for single words."), dom.div(junkOnegrams = dom.input(attr.type("checkbox"), acc.JunkFilter?.Onegrams ? attr.checked("") : []))), dom.label("Twograms", attr.title("Track ham/spam ranking for each two consecutive words."), dom.div(junkTwograms = dom.input(attr.type("checkbox"), acc.JunkFilter?.Twograms ? attr.checked("") : []))), dom.label("Threegrams", attr.title("Track ham/spam ranking for each three consecutive words. Can only be changed by admin."), dom.div(dom.input(attr.type("checkbox"), attr.disabled(""), acc.JunkFilter?.Threegrams ? attr.checked("") : []))), dom.label("Max power", attr.title("Maximum power a word (combination) can have. If spaminess is 0.99, and max power is 0.1, spaminess of the word will be set to 0.9. Similar for ham words."), dom.div(junkMaxPower = dom.input(attr.value("" + (acc.JunkFilter?.MaxPower || 0.01))))), dom.label("Top words", attr.title("Number of most spammy/hammy words to use for calculating probability. E.g. 10."), dom.div(junkTopWords = dom.input(attr.value("" + (acc.JunkFilter?.TopWords || 10))))), dom.label("Ignore words", attr.title("Ignore words that are this much away from 0.5 haminess/spaminess. E.g. 0.1, causing word (combinations) of 0.4 to 0.6 to be ignored."), dom.div(junkIgnoreWords = dom.input(attr.value("" + (acc.JunkFilter?.IgnoreWords || 0.1))))), dom.label("Rare words", attr.title("Occurrences in word database until a word is considered rare and its influence in calculating probability reduced. E.g. 1 or 2."), dom.div(junkRareWords = dom.input(attr.value("" + (acc.JunkFilter?.RareWords || 2))))), dom.div(dom.span("\xA0"), dom.div(dom.submitbutton("Save")))))),
+			}, "submit"), junkFilterFields = dom.fieldset(dom.div(dom._class("accountFields"), dom.label("Enabled", attr.title("If enabled, the junk filter is used to classify incoming email from first-time senders. The result, along with other checks, determines if the message will be accepted or rejected"), dom.div(junkFilterEnabled = dom.input(attr.type("checkbox"), acc.JunkFilter ? attr.checked("") : []))), dom.label("Threshold", attr.title("Approximate spaminess score between 0 and 1 above which emails are rejected as spam. Each delivery attempt adds a little noise to make it slightly harder for spammers to identify words that strongly indicate non-spaminess and use it to bypass the filter. E.g. 0.95."), dom.div(junkThreshold = dom.input(attr.value("" + (acc.JunkFilter?.Threshold || "0.95"))))), dom.label("Onegrams", attr.title("Track ham/spam ranking for single words."), dom.div(junkOnegrams = dom.input(attr.type("checkbox"), acc.JunkFilter?.Onegrams ? attr.checked("") : []))), dom.label("Twograms", attr.title("Track ham/spam ranking for each two consecutive words."), dom.div(junkTwograms = dom.input(attr.type("checkbox"), acc.JunkFilter?.Twograms ? attr.checked("") : []))), dom.label("Threegrams", attr.title("Track ham/spam ranking for each three consecutive words. Can only be changed by admin."), dom.div(dom.input(attr.type("checkbox"), attr.disabled(""), acc.JunkFilter?.Threegrams ? attr.checked("") : []))), dom.label("Max power", attr.title("Maximum power a word (combination) can have. If spaminess is 0.99, and max power is 0.1, spaminess of the word will be set to 0.9. Similar for ham words."), dom.div(junkMaxPower = dom.input(attr.value("" + (acc.JunkFilter?.MaxPower || 0.01))))), dom.label("Top words", attr.title("Number of most spammy/hammy words to use for calculating probability. E.g. 10."), dom.div(junkTopWords = dom.input(attr.value("" + (acc.JunkFilter?.TopWords || 10))))), dom.label("Ignore words", attr.title("Ignore words that are this much away from 0.5 haminess/spaminess. E.g. 0.1, causing word (combinations) of 0.4 to 0.6 to be ignored."), dom.div(junkIgnoreWords = dom.input(attr.value("" + (acc.JunkFilter?.IgnoreWords || 0.1))))), dom.label("Rare words", attr.title("Occurrences in word database until a word is considered rare and its influence in calculating probability reduced. E.g. 1 or 2."), dom.div(junkRareWords = dom.input(attr.value("" + (acc.JunkFilter?.RareWords || 2))))), dom.div(dom._class("accountFieldActions"), dom.submitbutton("Save"))))),
 			dom.br(),
 			dom.h2("Introbox"),
 			dom.form(/* @__PURE__ */ __name(async function submit(e) {
@@ -1628,7 +1836,7 @@ openssl pkcs12 \\
 					}, "submit"), fromIDLoginAddressesFieldset = dom.fieldset(dom.table(dom.tbody((acc.FromIDLoginAddresses || []).length === 0 ? dom.tr(dom.td("(None)"), dom.td()) : [], (acc.FromIDLoginAddresses || []).map((s, index2) => {
 						const input = dom.input(attr.required(""), attr.value(s));
 						inputs.push(input);
-						const x = dom.tr(dom.td(input), dom.td(dom.clickbutton("Remove", /* @__PURE__ */ __name(function click() {
+						const x = dom.tr(dom.td(input), dom.td(dom.clickbutton("Remove", dom._class("dangerButton"), /* @__PURE__ */ __name(function click() {
 							acc.FromIDLoginAddresses.splice(index2, 1);
 							render();
 						}, "click"))));
@@ -1655,7 +1863,7 @@ openssl pkcs12 \\
 				await check(e.target, client.SuppressionAdd(suppressionAddress.value, true, suppressionReason.value));
 				window.location.reload();
 			}, "submit")),
-			dom.table(dom.thead(dom.tr(dom.th("Address", attr.title('Address that caused this entry to be added to the list. The title (shown on hover) displays an address with a fictional simplified localpart, with lower-cased, dots removed, only first part before "+" or "-" (typicaly catchall separators). When checking if an address is on the suppression list, it is checked against this address.')), dom.th("Manual", attr.title("Whether suppression was added manually, instead of automatically based on bounces.")), dom.th("Reason"), dom.th("Since"), dom.th("Action"))), dom.tbody((suppressions || []).length === 0 ? dom.tr(dom.td(attr.colspan("5"), "(None)")) : [], (suppressions || []).map((s) => dom.tr(dom.td(prewrap(s.OriginalAddress), attr.title(s.BaseAddress)), dom.td(s.Manual ? "\u2713" : ""), dom.td(s.Reason), dom.td(age(s.Created)), dom.td(dom.clickbutton("Remove", /* @__PURE__ */ __name(async function click(e) {
+			dom.table(dom.thead(dom.tr(dom.th("Address", attr.title('Address that caused this entry to be added to the list. The title (shown on hover) displays an address with a fictional simplified localpart, with lower-cased, dots removed, only first part before "+" or "-" (typicaly catchall separators). When checking if an address is on the suppression list, it is checked against this address.')), dom.th("Manual", attr.title("Whether suppression was added manually, instead of automatically based on bounces.")), dom.th("Reason"), dom.th("Since"), dom.th("Action"))), dom.tbody((suppressions || []).length === 0 ? dom.tr(dom.td(attr.colspan("5"), "(None)")) : [], (suppressions || []).map((s) => dom.tr(dom.td(prewrap(s.OriginalAddress), attr.title(s.BaseAddress)), dom.td(s.Manual ? "\u2713" : ""), dom.td(s.Reason), dom.td(age(s.Created)), dom.td(dom.clickbutton("Remove", dom._class("dangerButton"), /* @__PURE__ */ __name(async function click(e) {
 				await check(e.target, client.SuppressionRemove(s.OriginalAddress));
 				window.location.reload();
 			}, "click")))))), dom.tfoot(dom.tr(dom.td(suppressionAddress = dom.input(attr.type("required"), attr.form("suppressionAdd"))), dom.td(), dom.td(suppressionReason = dom.input(style({ width: "100%" }), attr.form("suppressionAdd"))), dom.td(), dom.td(dom.submitbutton("Add suppression", attr.form("suppressionAdd")))))),
@@ -1764,12 +1972,29 @@ openssl pkcs12 \\
 		})();
 		return root;
 	}, "index");
-	var renderLoginAttempts = /* @__PURE__ */ __name((loginAttempts) => {
-		return dom.table(dom.thead(dom.tr(dom.th("Time"), dom.th("Result"), dom.th("Count"), dom.th("LoginAddress"), dom.th("Protocol"), dom.th("Mechanism"), dom.th("User Agent"), dom.th("Remote IP"), dom.th("Local IP"), dom.th("TLS"), dom.th("TLS pubkey fingerprint"), dom.th("First seen"))), dom.tbody(loginAttempts.length ? [] : dom.tr(dom.td(attr.colspan("11"), "No login attempts in past 30 days.")), loginAttempts.map((la) => dom.tr(dom.td(age(la.Last)), dom.td(la.Result === "ok" ? la.Result : box(red, la.Result)), dom.td("" + la.Count), dom.td(la.LoginAddress), dom.td(la.Protocol), dom.td(la.AuthMech), dom.td(la.UserAgent), dom.td(la.RemoteIP), dom.td(la.LocalIP), dom.td(la.TLS), dom.td(la.TLSPubKeyFingerprint), dom.td(age(la.First))))));
-	}, "renderLoginAttempts");
+	var renderLoginAttempts = /* @__PURE__ */ __name((rows) => loginAttemptsTable(false, rows, age), "renderLoginAttempts");
 	var loginattempts = /* @__PURE__ */ __name(async () => {
-		const loginAttempts = await client.LoginAttempts(0);
-		return dom.div(crumbs(crumblink("Mox Account", "#"), "Login attempts"), dom.h2("Login attempts"), dom.p("Login attempts are stored for 30 days. At most 10000 failed login attempts are stored to prevent unlimited growth of the database."), renderLoginAttempts(loginAttempts || []));
+		let next = "";
+		const rows = [];
+		const table = dom.div();
+		const status = dom.span(dom._attrs({ role: "status" }));
+		const load = /* @__PURE__ */ __name(async () => {
+			const result = await client.LoginAttemptsPage(100, next);
+			rows.push(...result.Attempts || []);
+			next = result.Next;
+			dom._kids(table, renderLoginAttempts(rows));
+			more.hidden = !next;
+			let text = rows.length + " login attempts shown";
+			if (!next) {
+				text += " \xB7 No more results";
+			}
+			dom._kids(status, text);
+		}, "load");
+		const more = dom.clickbutton("Load more", /* @__PURE__ */ __name(async function click(e) {
+			await check(e.currentTarget, load());
+		}, "click"));
+		await load();
+		return dom.div(crumbs(crumblink("Account", "#"), "Login attempts"), dom.h2("Login attempts"), dom.p("Login attempts are stored for 30 days. At most 10000 failed login attempts are stored to prevent unlimited growth of the database."), table, dom.div(dom._class("uiActions"), more, status));
 	}, "loginattempts");
 	var destination = /* @__PURE__ */ __name(async (name) => {
 		const [acc] = await client.Account();
@@ -1777,11 +2002,23 @@ openssl pkcs12 \\
 		if (!dest) {
 			throw new Error("destination not found");
 		}
-		let rulesetsTbody = dom.tbody();
+		const ruleLabels = /* @__PURE__ */ __name(() => [
+			dom.span('SMTP "MAIL FROM" regexp', attr.title("Matches if this regular expression matches (a substring of) the SMTP MAIL FROM address (not the message From-header). E.g. user@example.org.")),
+			dom.span('Message "From" address regexp', attr.title("Matches if this regular expression matches (a substring of) the single address in the message From header.")),
+			dom.span("Verified domain", attr.title("Matches if this domain matches an SPF- and/or DKIM-verified (sub)domain.")),
+			dom.span("Headers regexp", attr.title("Matches if these header field/value regular expressions all match (substrings of) the message headers. Header fields and valuees are converted to lower case before matching. Whitespace is trimmed from the value before matching. A header field can occur multiple times in a message, only one instance has to match. For mailing lists, you could match on ^list-id$ with the value typically the mailing list address in angled brackets with @ replaced with a dot, e.g. <name\\.lists\\.example\\.org>.")),
+			dom.span("Is Forward", attr.title("Influences spam filtering only, this option does not change whether a message matches this ruleset. Can only be used together with SMTPMailFromRegexp and VerifiedDomain. SMTPMailFromRegexp must be set to the address used to deliver the forwarded message, e.g. '^user(|\\+.*)@forward\\.example$'. Changes to junk analysis: 1. Messages are not rejected for failing a DMARC policy, because a legitimate forwarded message without valid/intact/aligned DKIM signature would be rejected because any verified SPF domain will be 'unaligned', of the forwarding mail server. 2. The sending mail server IP address, and sending EHLO and MAIL FROM domains and matching DKIM domain aren't used in future reputation-based spam classifications (but other verified DKIM domains are) because the forwarding server is not a useful spam signal for future messages.")),
+			dom.span("List allow domain", attr.title("Influences spam filtering only, this option does not change whether a message matches this ruleset. If this domain matches an SPF- and/or DKIM-verified (sub)domain, the message is accepted without further spam checks, such as a junk filter or DMARC reject evaluation. DMARC rejects should not apply for mailing lists that are not configured to rewrite the From-header of messages that don't have a passing DKIM signature of the From-domain. Otherwise, by rejecting messages, you may be automatically unsubscribed from the mailing list. The assumption is that mailing lists do their own spam filtering/moderation.")),
+			dom.span("Allow rejects to mailbox", attr.title("Influences spam filtering only, this option does not change whether a message matches this ruleset. If a message is classified as spam, it isn't rejected during the SMTP transaction (the normal behaviour), but accepted during the SMTP transaction and delivered to the specified mailbox. The specified mailbox is not automatically cleaned up like the account global Rejects mailbox, unless set to that Rejects mailbox.")),
+			dom.span("Mailbox", attr.title("Mailbox to deliver to if this ruleset matches.")),
+			dom.span("Comment", attr.title("Free-form comments.")),
+			dom.span("Action")
+		], "ruleLabels");
+		let rulesetsTbody = dom.div(dom._class("ruleList"));
 		let rulesetsRows = [];
 		const addRulesetsRow = /* @__PURE__ */ __name((rs) => {
 			let row;
-			let headersCell = dom.td();
+			let headersCell = dom.div(dom._class("ruleHeaders"));
 			const addHeader = /* @__PURE__ */ __name((k, v) => {
 				let h;
 				let key;
@@ -1811,10 +2048,18 @@ openssl pkcs12 \\
 			let acceptRejectsToMailbox;
 			let mailbox;
 			let comment;
-			const root = dom.tr(dom.td(smtpMailFromRegexp = dom.input(attr.value(rs.SMTPMailFromRegexp || ""))), dom.td(msgFromRegexp = dom.input(attr.value(rs.MsgFromRegexp || ""))), dom.td(verifiedDomain = dom.input(attr.value(rs.VerifiedDomain || ""))), headersCell, dom.td(dom.label(isForward = dom.input(attr.type("checkbox"), rs.IsForward ? attr.checked("") : []))), dom.td(listAllowDomain = dom.input(attr.value(rs.ListAllowDomain || ""))), dom.td(acceptRejectsToMailbox = dom.input(attr.value(rs.AcceptRejectsToMailbox || ""))), dom.td(mailbox = dom.input(attr.value(rs.Mailbox || ""))), dom.td(comment = dom.input(attr.value(rs.Comment || ""))), dom.td(dom.clickbutton("Remove ruleset", /* @__PURE__ */ __name(function click() {
+			const root = dom.div(dom._class("ruleCard"), dom.div(smtpMailFromRegexp = dom.input(attr.value(rs.SMTPMailFromRegexp || ""))), dom.div(msgFromRegexp = dom.input(attr.value(rs.MsgFromRegexp || ""))), dom.div(verifiedDomain = dom.input(attr.value(rs.VerifiedDomain || ""))), headersCell, dom.div(dom.label(isForward = dom.input(attr.type("checkbox"), rs.IsForward ? attr.checked("") : []))), dom.div(listAllowDomain = dom.input(attr.value(rs.ListAllowDomain || ""))), dom.div(acceptRejectsToMailbox = dom.input(attr.value(rs.AcceptRejectsToMailbox || ""))), dom.div(mailbox = dom.input(attr.value(rs.Mailbox || ""))), dom.div(comment = dom.input(attr.value(rs.Comment || ""))), dom.div(dom.clickbutton("Remove ruleset", dom._class("dangerButton"), /* @__PURE__ */ __name(function click() {
 				row.root.remove();
 				rulesetsRows = rulesetsRows.filter((e) => e !== row);
 			}, "click"))));
+			const labels = ruleLabels();
+			Array.from(root.children).forEach((field, index2) => {
+				const label = labels[index2];
+				field.prepend(label);
+				for (const input of field.querySelectorAll("input")) {
+					input.setAttribute("aria-label", label.textContent || "");
+				}
+			});
 			row = {
 				root,
 				smtpMailFromRegexp,
@@ -1847,7 +2092,7 @@ openssl pkcs12 \\
 		let msgAuthRequiredSMTPError;
 		let saveButton;
 		const addresses = [name, ...Object.keys(acc.Destinations || {}).filter((a) => !a.startsWith("@") && a !== name)];
-		return dom.div(crumbs(crumblink("Mox Account", "#"), "Destination " + name), dom.div(dom.span("Default mailbox", attr.title("Default mailbox where email for this recipient is delivered to if it does not match any ruleset. Default is Inbox.")), dom.br(), defaultMailbox = dom.input(attr.value(dest.Mailbox), attr.placeholder("Inbox"))), dom.br(), dom.div(dom.span("Full name", attr.title("Name to use in From header when composing messages. If not set, the account default full name is used.")), dom.br(), fullName = dom.input(attr.value(dest.FullName))), dom.br(), dom.div(dom.span("Reject deliveries with SMTP Error", attr.title("If non-empty, incoming delivery attempts to this destination will be rejected during SMTP RCPT TO with this error response line. The response line must start with an error code. Currently the following error resonse codes are allowed: 421 (temporary local error), 550 (mailbox not found). If the line consists of only an error code, an appropriate error message is added. Rejecting messages with a 4xx code invites later retries by the remote, while 5xx codes should prevent further delivery attempts.")), dom.br(), smtpError = dom.input(attr.value(dest.SMTPError), attr.placeholder("421 or 550..."))), dom.br(), dom.div(dom.span("Reject messages without authenticated domain (aligned SPF/DKIM)", attr.title("If non-empty, an additional DMARC-like message authentication check is done for incoming messages, validating the domain in the From-header of the message. Messages without either an aligned SPF or aligned DKIM pass are rejected during the SMTP DATA command with a permanent error code followed by the message in this field. The domain in the message 'From' header is matched in relaxed or strict mode according to the domain's DMARC policy if present, or relaxed mode (organizational instead of exact domain match) otherwise. Useful for autoresponders that don't want to accept messages they don't want to send an automated reply to.")), dom.br(), msgAuthRequiredSMTPError = dom.input(attr.value(dest.MessageAuthRequiredSMTPError), attr.placeholder("messages must have aligned spf/dkim for domain authentication..."))), dom.br(), dom.h2("Rulesets"), dom.p("Incoming messages are checked against the rulesets. If a ruleset matches, the message is delivered to the mailbox configured for the ruleset instead of to the default mailbox."), dom.p('"Is Forward" does not affect matching, but changes prevents the sending mail server from being included in future junk classifications by clearing fields related to the forwarding email server (IP address, EHLO domain, MAIL FROM domain and a matching DKIM domain), and prevents DMARC rejects for forwarded messages.'), dom.p('"List allow domain" does not affect matching, but skips the regular spam checks if one of the verified domains is a (sub)domain of the domain mentioned here.'), dom.p('"Accept rejects to mailbox" does not affect matching, but causes messages classified as junk to be accepted and delivered to this mailbox, instead of being rejected during the SMTP transaction. Useful for incoming forwarded messages where rejecting incoming messages may cause the forwarding server to stop forwarding.'), dom.table(dom.thead(dom.tr(dom.th('SMTP "MAIL FROM" regexp', attr.title("Matches if this regular expression matches (a substring of) the SMTP MAIL FROM address (not the message From-header). E.g. user@example.org.")), dom.th('Message "From" address regexp', attr.title("Matches if this regular expression matches (a substring of) the single address in the message From header.")), dom.th("Verified domain", attr.title("Matches if this domain matches an SPF- and/or DKIM-verified (sub)domain.")), dom.th("Headers regexp", attr.title("Matches if these header field/value regular expressions all match (substrings of) the message headers. Header fields and valuees are converted to lower case before matching. Whitespace is trimmed from the value before matching. A header field can occur multiple times in a message, only one instance has to match. For mailing lists, you could match on ^list-id$ with the value typically the mailing list address in angled brackets with @ replaced with a dot, e.g. <name\\.lists\\.example\\.org>.")), dom.th("Is Forward", attr.title("Influences spam filtering only, this option does not change whether a message matches this ruleset. Can only be used together with SMTPMailFromRegexp and VerifiedDomain. SMTPMailFromRegexp must be set to the address used to deliver the forwarded message, e.g. '^user(|\\+.*)@forward\\.example$'. Changes to junk analysis: 1. Messages are not rejected for failing a DMARC policy, because a legitimate forwarded message without valid/intact/aligned DKIM signature would be rejected because any verified SPF domain will be 'unaligned', of the forwarding mail server. 2. The sending mail server IP address, and sending EHLO and MAIL FROM domains and matching DKIM domain aren't used in future reputation-based spam classifications (but other verified DKIM domains are) because the forwarding server is not a useful spam signal for future messages.")), dom.th("List allow domain", attr.title("Influences spam filtering only, this option does not change whether a message matches this ruleset. If this domain matches an SPF- and/or DKIM-verified (sub)domain, the message is accepted without further spam checks, such as a junk filter or DMARC reject evaluation. DMARC rejects should not apply for mailing lists that are not configured to rewrite the From-header of messages that don't have a passing DKIM signature of the From-domain. Otherwise, by rejecting messages, you may be automatically unsubscribed from the mailing list. The assumption is that mailing lists do their own spam filtering/moderation.")), dom.th("Allow rejects to mailbox", attr.title("Influences spam filtering only, this option does not change whether a message matches this ruleset. If a message is classified as spam, it isn't rejected during the SMTP transaction (the normal behaviour), but accepted during the SMTP transaction and delivered to the specified mailbox. The specified mailbox is not automatically cleaned up like the account global Rejects mailbox, unless set to that Rejects mailbox.")), dom.th("Mailbox", attr.title("Mailbox to deliver to if this ruleset matches.")), dom.th("Comment", attr.title("Free-form comments.")), dom.th("Action"))), rulesetsTbody, dom.tfoot(dom.tr(dom.td(attr.colspan("9")), dom.td(dom.clickbutton("Add ruleset", /* @__PURE__ */ __name(function click() {
+		return dom.div(dom._class("destinationPage"), crumbs(crumblink("Account", "#"), "Destination " + name), dom.div(dom.span("Default mailbox", attr.title("Default mailbox where email for this recipient is delivered to if it does not match any ruleset. Default is Inbox.")), dom.br(), defaultMailbox = dom.input(attr.value(dest.Mailbox), attr.placeholder("Inbox"))), dom.br(), dom.div(dom.span("Full name", attr.title("Name to use in From header when composing messages. If not set, the account default full name is used.")), dom.br(), fullName = dom.input(attr.value(dest.FullName))), dom.br(), dom.div(dom.span("Reject deliveries with SMTP Error", attr.title("If non-empty, incoming delivery attempts to this destination will be rejected during SMTP RCPT TO with this error response line. The response line must start with an error code. Currently the following error resonse codes are allowed: 421 (temporary local error), 550 (mailbox not found). If the line consists of only an error code, an appropriate error message is added. Rejecting messages with a 4xx code invites later retries by the remote, while 5xx codes should prevent further delivery attempts.")), dom.br(), smtpError = dom.input(attr.value(dest.SMTPError), attr.placeholder("421 or 550..."))), dom.br(), dom.div(dom.span("Reject messages without authenticated domain (aligned SPF/DKIM)", attr.title("If non-empty, an additional DMARC-like message authentication check is done for incoming messages, validating the domain in the From-header of the message. Messages without either an aligned SPF or aligned DKIM pass are rejected during the SMTP DATA command with a permanent error code followed by the message in this field. The domain in the message 'From' header is matched in relaxed or strict mode according to the domain's DMARC policy if present, or relaxed mode (organizational instead of exact domain match) otherwise. Useful for autoresponders that don't want to accept messages they don't want to send an automated reply to.")), dom.br(), msgAuthRequiredSMTPError = dom.input(attr.value(dest.MessageAuthRequiredSMTPError), attr.placeholder("messages must have aligned spf/dkim for domain authentication..."))), dom.br(), dom.h2("Rulesets"), dom.p("Incoming messages are checked against the rulesets. If a ruleset matches, the message is delivered to the mailbox configured for the ruleset instead of to the default mailbox."), dom.details(dom._class("uiHelp"), dom.summary("How delivery rules work"), dom.p('"Is Forward" does not affect matching, but changes prevents the sending mail server from being included in future junk classifications by clearing fields related to the forwarding email server (IP address, EHLO domain, MAIL FROM domain and a matching DKIM domain), and prevents DMARC rejects for forwarded messages.'), dom.p('"List allow domain" does not affect matching, but skips the regular spam checks if one of the verified domains is a (sub)domain of the domain mentioned here.'), dom.p('"Accept rejects to mailbox" does not affect matching, but causes messages classified as junk to be accepted and delivered to this mailbox, instead of being rejected during the SMTP transaction. Useful for incoming forwarded messages where rejecting incoming messages may cause the forwarding server to stop forwarding.')), rulesetsTbody, dom.div(dom._class("uiActions"), dom.clickbutton("Add ruleset", /* @__PURE__ */ __name(function click() {
 			addRulesetsRow({
 				SMTPMailFromRegexp: "",
 				MsgFromRegexp: "",
@@ -1861,7 +2106,7 @@ openssl pkcs12 \\
 				VerifiedDNSDomain: { ASCII: "", Unicode: "" },
 				ListAllowDNSDomain: { ASCII: "", Unicode: "" }
 			});
-		}, "click")))))), dom.br(), saveButton = dom.clickbutton("Save", /* @__PURE__ */ __name(async function click() {
+		}, "click"))), saveButton = dom.clickbutton("Save", dom._class("primaryButton", "destinationSave"), /* @__PURE__ */ __name(async function click() {
 			const newDest = {
 				Mailbox: defaultMailbox.value,
 				FullName: fullName.value,
@@ -1885,11 +2130,89 @@ openssl pkcs12 \\
 			};
 			await check(saveButton, client.DestinationSave(name, dest, newDest));
 			window.location.reload();
-		}, "click")), dom.br(), dom.br(), dom.br(), dom.p(`Apple's mail applications don't do account autoconfiguration, and when adding an account it can choose defaults that don't work with modern email servers. Adding an account through a "mobileconfig" profile file can be more convenient: It contains the IMAP/SMTP settings such as host name, port, TLS, authentication mechanism and user name. This profile does not contain a login password. Opening the profile in Safari adds it to the Files app on iOS. Opening the profile in the Files app then adds it under Profiles in System Preferences (macOS) or Settings (iOS), where you can install it. These profiles are not signed, so users will have to ignore the warnings about them being unsigned. `, dom.br(), dom.a(attr.href("https://autoconfig." + domainName(acc.DNSDomain) + "/profile.mobileconfig?addresses=" + encodeURIComponent(addresses.join(",")) + "&name=" + encodeURIComponent(dest.FullName)), attr.download(""), "Download .mobileconfig email account profile"), dom.br(), dom.a(attr.href("https://autoconfig." + domainName(acc.DNSDomain) + "/profile.mobileconfig.qrcode.png?addresses=" + encodeURIComponent(addresses.join(",")) + "&name=" + encodeURIComponent(dest.FullName)), attr.download(""), "Open QR-code with link to .mobileconfig profile")));
+		}, "click")), dom.br(), dom.br(), dom.br(), dom.h2("Mail client setup"), dom.p(`Apple's mail applications don't do account autoconfiguration, and when adding an account it can choose defaults that don't work with modern email servers. Adding an account through a "mobileconfig" profile file can be more convenient: It contains the IMAP/SMTP settings such as host name, port, TLS, authentication mechanism and user name. This profile does not contain a login password. Opening the profile in Safari adds it to the Files app on iOS. Opening the profile in the Files app then adds it under Profiles in System Preferences (macOS) or Settings (iOS), where you can install it. These profiles are not signed, so users will have to ignore the warnings about them being unsigned. `, dom.br(), dom.a(attr.href("https://autoconfig." + domainName(acc.DNSDomain) + "/profile.mobileconfig?addresses=" + encodeURIComponent(addresses.join(",")) + "&name=" + encodeURIComponent(dest.FullName)), attr.download(""), "Download .mobileconfig email account profile"), dom.br(), dom.a(attr.href("https://autoconfig." + domainName(acc.DNSDomain) + "/profile.mobileconfig.qrcode.png?addresses=" + encodeURIComponent(addresses.join(",")) + "&name=" + encodeURIComponent(dest.FullName)), attr.download(""), "Open QR-code with link to .mobileconfig profile")));
 	}, "destination");
+	var organizePage = /* @__PURE__ */ __name((root) => {
+		root.classList.add("accountPage");
+		const children = Array.from(root.childNodes);
+		let current;
+		for (const child of children) {
+			if (child instanceof HTMLHeadingElement && child.tagName === "H1") {
+				current = void 0;
+				continue;
+			}
+			if (child instanceof HTMLElement && child.classList.contains("uiFooter")) {
+				current = void 0;
+				continue;
+			}
+			if (child instanceof HTMLBRElement) {
+				child.remove();
+				continue;
+			}
+			if (child instanceof HTMLHeadingElement && child.tagName === "H2") {
+				current = section(child.textContent || "");
+				current.firstChild.remove();
+				current.id = "setting-" + (child.textContent || "").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/-$/, "");
+				root.insertBefore(current, child);
+			}
+			if (!current && child instanceof HTMLElement && child.tagName !== "H1") {
+				let title = "Profile";
+				if (root.classList.contains("destinationPage")) {
+					title = "Delivery settings";
+				}
+				current = section(title);
+				current.id = "setting-profile";
+				root.insertBefore(current, child);
+			}
+			if (current) {
+				current.appendChild(child);
+			}
+		}
+		for (const table of root.querySelectorAll("table")) {
+			if (table.querySelectorAll("thead tr:first-child th").length >= 9 && !table.classList.contains("loginAttemptsTable")) {
+				table.classList.add("rulesTable");
+				const scroll = dom.div(dom._class("uiScroll"));
+				table.before(scroll);
+				scroll.append(table);
+			}
+		}
+		return root;
+	}, "organizePage");
+	var accountNavigation = /* @__PURE__ */ __name((root, overview) => {
+		const nav = document.getElementById("accountNav");
+		dom._kids(nav, dom.div(dom._class("accountIdentity"), localStorageGet("webaccountaddress") || ""), dom.a(attr.href("#"), "Overview", /* @__PURE__ */ __name(function click() {
+			page.scrollTo(0, 0);
+			window.scrollTo(0, 0);
+		}, "click")));
+		if (overview) {
+			nav.append(dom.b(dom._class("navGroup"), "Settings"));
+			for (const card of root.querySelectorAll(":scope > .uiSection[id]")) {
+				const title = card.querySelector("h2").textContent || "";
+				nav.append(dom.a(attr.href("#settings/" + card.id), title));
+			}
+		} else {
+			nav.append(dom.a(attr.href("#loginattempts"), "Login attempts"));
+		}
+	}, "accountNavigation");
 	var init = /* @__PURE__ */ __name(async () => {
+		themeControl(document.getElementById("accountTheme"), "webaccounttheme");
 		let curhash;
 		[moxversion, moxgoos, moxgoarch] = await client.Version();
+		document.getElementById("accountWebmail").before(dom.clickbutton("Logout", attr.title("Logout, invalidating this session."), /* @__PURE__ */ __name(async function click(e) {
+			const b = e.target;
+			try {
+				b.disabled = true;
+				await client.Logout();
+			} catch (err) {
+				console.log("logout", err);
+				window.alert("Error: " + errmsg(err));
+			} finally {
+				b.disabled = false;
+			}
+			localStorageRemove("webaccountaddress");
+			localStorageRemove("webaccountcsrftoken");
+			window.location.reload();
+		}, "click")));
 		const hashChange = /* @__PURE__ */ __name(async () => {
 			if (curhash === window.location.hash) {
 				return;
@@ -1899,10 +2222,36 @@ openssl pkcs12 \\
 				h = h.substring(1);
 			}
 			const t = h.split("/");
+			if (!h && page.querySelector("#setting-addresses")) {
+				page.scrollTo(0, 0);
+				window.scrollTo(0, 0);
+				for (const link2 of document.querySelectorAll("#accountNav a")) {
+					link2.removeAttribute("aria-current");
+					if (link2.getAttribute("href") === "#") {
+						link2.setAttribute("aria-current", "page");
+					}
+				}
+				curhash = window.location.hash;
+				return;
+			}
+			if (t[0] === "settings" && t[1]) {
+				const target = page.querySelector("#" + CSS.escape(t[1] || ""));
+				if (target) {
+					target.scrollIntoView();
+					for (const link2 of document.querySelectorAll("#accountNav a")) {
+						link2.removeAttribute("aria-current");
+						if (link2.hash === window.location.hash) {
+							link2.setAttribute("aria-current", "page");
+						}
+					}
+					curhash = window.location.hash;
+					return;
+				}
+			}
 			page.classList.add("loading");
 			try {
 				let root;
-				if (h === "") {
+				if (h === "" || t[0] === "settings") {
 					root = await index();
 				} else if (t[0] === "loginattempts" && t.length === 1) {
 					root = await loginattempts();
@@ -1911,10 +2260,22 @@ openssl pkcs12 \\
 				} else {
 					root = dom.div("page not found");
 				}
+				organizePage(root);
+				accountNavigation(root, h === "" || t[0] === "settings");
 				if (window.moxBeforeDisplay) {
 					moxBeforeDisplay(root);
 				}
 				dom._kids(page, root);
+				page.scrollTo(0, 0);
+				window.scrollTo(0, 0);
+				if (t[0] === "settings") {
+					document.getElementById(t[1])?.scrollIntoView();
+				}
+				for (const link2 of document.querySelectorAll("#accountNav a")) {
+					if (link2.hash === window.location.hash || link2.getAttribute("href") === "#" && !h) {
+						link2.setAttribute("aria-current", "page");
+					}
+				}
 			} catch (err) {
 				console.log({ err });
 				window.alert("Error: " + errmsg(err));

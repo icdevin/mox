@@ -145,6 +145,251 @@
 		return { _props: x };
 	}, "prop");
 
+	// .js/ui.js
+	var themeCSS = `
+:root {
+	color-scheme: light;
+	--uiColor: #282520; --muted: #625e58; --bg: #fcfaf7; --panel: #f6f3ee;
+	--border: #e3ddd4; --control: #d7cfc4; --hover: #eee8df; --accent: #b94706;
+	--contrast: #fff; --selected: #f6e8d9; --warning: #f8e7c5; --success: #dcebd8; --error: #f8dcd0;
+}
+:root[data-theme="dark"] {
+	color-scheme: dark;
+	--uiColor: #eee8df; --muted: #c4baad; --bg: #211e1a; --panel: #28241f;
+	--border: #41392f; --control: #5f5243; --hover: #383026; --accent: #e99a5d;
+	--contrast: #211e1a; --selected: #47301d; --warning: #503b20; --success: #293e29; --error: #552e24;
+}
+
+:root { --color: var(--uiColor); --fontUI: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; --fontBrand: Georgia, serif; }
+`;
+	var settingsCSS = `
+.loginAttemptsTable { table-layout: fixed; overflow-wrap: anywhere; }
+.loginAttemptsTable td { vertical-align: top; }
+.loginAttemptsTable .loginAttemptsCount { width: 64px; }
+.loginAttemptsTable .queueInfo:first-child { margin-top: 0; }
+@media (max-width: 760px) { .loginAttemptsTable th, .loginAttemptsTable td { padding: 6px 4px; } }
+.queueInfo { margin-top: 4px; }
+.queueInfoLabel { color: var(--muted); margin-right: 6px; font-size: 12px; }
+.uiBadge { display: inline-block; padding: 2px 6px; border-radius: 4px; font-size: 12px; }
+.uiBadgeError { background: var(--error); }
+
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+body { background: var(--bg); color: var(--color); font: 14px/1.5 var(--fontUI); }
+a { color: var(--accent); text-underline-offset: 3px; }
+button, input, select, textarea { font: inherit; color: inherit; }
+button, select, input, textarea { border: 1px solid var(--control); border-radius: 6px; background: var(--bg); padding: 6px 10px; max-width: 100%; }
+button, select { min-height: 36px; cursor: pointer; }
+input:not([type=checkbox]):not([type=radio]):not([type=hidden]), select:not([multiple]):not([size]) { height: 36px; }
+button:hover { background: var(--hover); }
+button[type=submit], button.primaryButton { background: var(--accent); color: var(--contrast); border-color: var(--accent); font-weight: 600; }
+button:disabled, fieldset:disabled { opacity: .55; cursor: default; }
+input[type=checkbox], input[type=radio] { accent-color: var(--accent); vertical-align: middle; margin: 0 4px 0 0; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+fieldset { border: 0; padding: 0; margin: 0; min-width: 0; }
+label { line-height: 1.8; }
+h1, h2, h3, h4 { color: var(--color); line-height: 1.3; }
+h1 { font-size: 24px; letter-spacing: -.5px; margin: 0 0 20px; }
+h1 a { color: var(--muted); text-decoration: none; font-weight: 400; }
+h2 { font-size: 19px; margin: 24px 0 12px; }
+h3, h4 { font-size: 14px; margin: 16px 0 8px; }
+p { margin: 0 0 16px; max-width: 65em; }
+ul { padding-left: 22px; }
+li { margin: 3px 0; }
+[title] { text-decoration: none; }
+[title]:hover { text-decoration: underline dotted; text-underline-offset: 3px; }
+button[title]:hover, a[title]:hover { text-decoration: none; }
+.uiHeader { min-height: 74px; flex-wrap: wrap; display: flex; align-items: center; gap: 20px; padding: 0 24px; border-bottom: 1px solid var(--border); background: var(--panel); }
+.brandName { font: bold 38px var(--fontBrand); letter-spacing: -1.5px; text-decoration: none; color: var(--color); }
+.uiHeader > span { color: var(--muted); border-left: 1px solid var(--control); padding-left: 20px; }
+.uiHeader label { margin-left: auto; color: var(--muted); display: flex; align-items: center; gap: 8px; }
+.uiHeader > a:not(.brandName) { text-decoration: none; }
+.uiLayout { display: grid; grid-template-columns: 190px minmax(0, 1fr); min-height: calc(100vh - 74px); }
+.uiNav { background: var(--panel); border-right: 1px solid var(--border); padding: 16px 10px; }
+.uiNav a { display: block; color: var(--color); text-decoration: none; padding: 5px 10px; border-radius: 5px; margin: 1px 0; }
+.uiNav a:hover { background: var(--hover); }
+.uiNav a[aria-current=page] { background: var(--selected); color: var(--accent); font-weight: 600; }
+.uiNav strong { display: block; font-size: 11px; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); padding: 20px 10px 5px; }
+#page { min-width: 0; padding: 28px 32px; overflow-x: auto; }
+#page > div { max-width: 1500px; }
+#page > div > br { display: none; }
+form { margin: 12px 0; }
+form > fieldset > label { margin: 0 10px 8px 0; }
+table { width: 100%; border-spacing: 0; border-collapse: collapse; font-size: 13px; }
+td, th { padding: 7px 10px; text-align: left; border-bottom: 1px solid var(--border); }
+td.alignRight, th.alignRight { text-align: right; font-variant-numeric: tabular-nums; }
+th { color: var(--muted); font-weight: 600; background: var(--panel); }
+table table { width: auto; }
+table table td, table table th { padding: 3px 6px; }
+table.long > tbody > tr > td { padding: 10px; vertical-align: top; }
+table.hover > tbody > tr:hover { background: var(--panel); }
+thead { position: sticky; top: 0; z-index: 1; background: var(--panel); }
+.literal, pre { background: var(--panel); padding: 12px 16px; border: 1px solid var(--border); border-radius: 6px; white-space: pre-wrap; overflow-wrap: anywhere; font: 13px/1.6 ui-monospace, monospace; tab-size: 4; }
+.uiFooter { margin-top: 32px; padding-top: 12px; border-top: 1px solid var(--border); font-size: 12px; color: var(--muted); }
+.uiLogin { background: var(--panel); }
+.uiLogin .uiDialog { width: 340px; }
+.uiLogin input { width: 100%; }
+.uiLogin h1 { font: bold 38px var(--fontBrand); }
+.uiLogin button { width: 100%; }
+.loginNotice { margin: 0 0 20px; padding: 12px 14px; border: 1px solid var(--border); border-radius: 6px; background: var(--bg); font-size: 13px; line-height: 1.5; overflow-wrap: anywhere; }
+.loginNoticeTitle { display: block; margin-bottom: 4px; font-weight: 600; }
+.loginNotice > div:not(.loginNoticeTitle) { color: var(--muted); }
+#page, .loadend { opacity: 1; }
+#page.loading, .loadstart { opacity: .35; transition: opacity .15s; }
+/* Keeping the caret inset while preserving native dropdown behavior. */
+select:not([multiple]):not([size]), select:not([multiple])[size="1"] {
+	appearance: none;
+	padding-right: 32px;
+	background-image: linear-gradient(45deg, transparent 50%, currentColor 50%), linear-gradient(135deg, currentColor 50%, transparent 50%);
+	background-position: calc(100% - 14px) 50%, calc(100% - 10px) 50%;
+	background-size: 4px 4px;
+	background-repeat: no-repeat;
+}
+@media (forced-colors: active) {
+	select:not([multiple]):not([size]), select:not([multiple])[size="1"] { appearance: auto; background-image: none; }
+}
+
+
+@media (max-width: 760px) {
+ .uiHeader { padding: 12px 16px; gap: 12px; }
+ .uiHeader > span { display: none; }
+ .uiHeader label { font-size: 12px; }
+ .uiLayout { display: block; }
+ .uiNav { display: flex; gap: 4px; overflow-x: auto; border-right: 0; border-bottom: 1px solid var(--border); padding: 8px; }
+ .uiNav strong { display: none; }
+ .uiNav a { white-space: nowrap; }
+ #page { padding: 20px 16px; }
+ .uiSection { padding: 16px; }
+}
+`;
+	var componentCSS = `
+:root { --danger: #a52b27; --dangerBackground: #fce9e6; --dangerBorder: #d8a5a0; }
+:root[data-theme="dark"] { --danger: #f2a099; --dangerBackground: #472a26; --dangerBorder: #90544d; }
+button.dangerButton { color: var(--danger); border-color: var(--dangerBorder); background: transparent; }
+button.dangerButton:hover:not(:disabled) { background: var(--dangerBackground); border-color: var(--danger); }
+button.dangerButton:focus-visible { outline-color: var(--danger); }
+
+.uiOverlay { position: fixed; inset: 0; background: #28252055; display: flex; align-items: center; justify-content: center; z-index: 50; padding: 16px; }
+.uiDialog { background: var(--bg); border: 1px solid var(--border); border-radius: 10px; padding: 24px; box-shadow: 0 12px 36px #0002; max-width: 95vw; max-height: 95vh; overflow: auto; }
+.uiSection { min-width: 0; margin: 0 0 24px; padding: 20px; border: 1px solid var(--border); border-radius: 8px; background: var(--panel); scroll-margin-top: 20px; }
+.uiSection > h2:first-child { margin-top: 0; }
+.uiSection > :last-child { margin-bottom: 0; }
+.uiCallout { padding: 12px 14px; border: 1px solid var(--border); border-radius: 6px; margin: 12px 0; line-height: 1.5; overflow-wrap: anywhere; }
+.uiCallout p:last-child { margin-bottom: 0; }
+.uiActions { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-top: 16px; }
+.uiHelp { padding: 12px 14px; border: 1px solid var(--border); border-radius: 6px; margin: 16px 0; }
+.uiHelp summary { cursor: pointer; color: var(--muted); }
+.uiHelp[open] summary { margin-bottom: 12px; }
+.uiScroll { max-width: 100%; overflow: auto; }
+.uiDialog { min-width: min(340px, 100%); }
+.uiDialog:focus { outline: none; }
+.uiDialog > h1:first-child { margin-top: 0; }
+
+`;
+	var installUI = /* @__PURE__ */ __name((settings) => {
+		const sheet = document.createElement("style");
+		sheet.textContent = themeCSS + componentCSS;
+		if (settings) {
+			sheet.textContent += settingsCSS;
+		}
+		document.head.prepend(sheet);
+	}, "installUI");
+	var callout = /* @__PURE__ */ __name((color, ...kids) => dom.div(dom._class("uiCallout"), style({ backgroundColor: color }), kids), "callout");
+	var themeControl = /* @__PURE__ */ __name((select, storageKey) => {
+		const system = window.matchMedia("(prefers-color-scheme: dark)");
+		try {
+			const saved = localStorage.getItem(storageKey);
+			if (saved && ["system", "light", "dark"].includes(saved)) {
+				select.value = saved;
+			}
+		} catch (_) {
+		}
+		const apply = /* @__PURE__ */ __name(() => {
+			let dark = select.value === "dark";
+			if (select.value === "system") {
+				dark = system.matches;
+			}
+			document.documentElement.dataset.theme = "light";
+			if (dark) {
+				document.documentElement.dataset.theme = "dark";
+			}
+		}, "apply");
+		select.addEventListener("change", () => {
+			apply();
+			try {
+				localStorage.setItem(storageKey, select.value);
+			} catch (_) {
+			}
+		});
+		system.addEventListener("change", apply);
+		apply();
+	}, "themeControl");
+	var dialog = /* @__PURE__ */ __name((onClose, ...kids) => {
+		const original = document.activeElement;
+		let root;
+		const close = /* @__PURE__ */ __name(() => {
+			if (!root.isConnected) {
+				return;
+			}
+			root.remove();
+			onClose();
+			if (original instanceof HTMLElement && original.isConnected) {
+				original.focus();
+			}
+		}, "close");
+		let content;
+		root = dom.div(dom._class("uiOverlay"), /* @__PURE__ */ __name(function click() {
+			close();
+		}, "click"), /* @__PURE__ */ __name(function keydown(e) {
+			if (e.key === "Escape") {
+				e.stopPropagation();
+				close();
+				return;
+			}
+			if (e.key !== "Tab") {
+				return;
+			}
+			const focusable = Array.from(content.querySelectorAll("button, input, select, textarea, a[href], [tabindex]")).filter((e2) => e2.tabIndex >= 0 && !e2.matches(":disabled") && e2.getClientRects().length > 0);
+			if (!focusable.length) {
+				e.preventDefault();
+				content.focus();
+				return;
+			}
+			const first = focusable[0], last = focusable[focusable.length - 1];
+			if (e.shiftKey && (document.activeElement === first || document.activeElement === content)) {
+				e.preventDefault();
+				last.focus();
+			} else if (!e.shiftKey && (document.activeElement === last || document.activeElement === content)) {
+				e.preventDefault();
+				first.focus();
+			}
+		}, "keydown"), content = dom.div(dom._class("uiDialog"), attr.tabindex("-1"), dom._attrs({ role: "dialog", "aria-modal": "true", "aria-label": "Dialog" }), /* @__PURE__ */ __name(function click(e) {
+			e.stopPropagation();
+		}, "click"), kids));
+		const title = content.querySelector("h1, h2");
+		if (title) {
+			content.setAttribute("aria-label", title.textContent || "Dialog");
+		}
+		document.body.append(root);
+		content.focus();
+		return close;
+	}, "dialog");
+	var detailLine = /* @__PURE__ */ __name((label, ...value) => dom.div(dom._class("queueInfo"), dom.span(dom._class("queueInfoLabel"), label), value), "detailLine");
+	var sessionNotice = /* @__PURE__ */ __name((reason) => {
+		let message = reason;
+		if (reason.startsWith("unknown session")) {
+			message = "Your session has ended. Enter your password to continue.";
+		}
+		const notice = dom.div(dom._class("loginNotice"), dom._attrs({ role: "status" }), dom.div(dom._class("loginNoticeTitle"), "Please sign in again"), dom.div(message));
+		notice.hidden = !reason;
+		return notice;
+	}, "sessionNotice");
+
+	// .js/ui-loginattempts.js
+	var loginAttemptsTable = /* @__PURE__ */ __name((accountLinks, loginAttempts, age2) => {
+		return dom.table(dom._class("loginAttemptsTable"), dom.thead(dom.tr(dom.th("Time"), dom.th("Result"), dom.th(dom._class("alignRight", "loginAttemptsCount"), "Count"), dom.th("Account"), dom.th("Client"), dom.th("Connection"))), dom.tbody(loginAttempts.length ? [] : dom.tr(dom.td(attr.colspan("6"), "No login attempts in past 30 days.")), loginAttempts.map((la) => dom.tr(dom.td(detailLine("Last", age2(la.Last)), detailLine("First", age2(la.First))), dom.td(la.Result === "ok" ? la.Result : dom.span(dom._class("uiBadge", "uiBadgeError"), la.Result)), dom.td(dom._class("alignRight"), "" + la.Count), dom.td(accountLinks ? dom.a(attr.href("#accounts/l/" + la.AccountName + "/loginattempts"), la.AccountName) : la.AccountName, detailLine("Address", la.LoginAddress)), dom.td(detailLine("Protocol", la.Protocol), detailLine("Mechanism", la.AuthMech), detailLine("User agent", la.UserAgent)), dom.td(detailLine("Remote IP", la.RemoteIP), detailLine("Local IP", la.LocalIP), detailLine("TLS", la.TLS), detailLine("TLS pubkey fingerprint", la.TLSPubKeyFingerprint))))));
+	}, "loginAttemptsTable");
+
 	// .js/webadmin/api.js
 	var DMARCPolicy;
 	(function(DMARCPolicy2) {
@@ -1638,20 +1883,17 @@
 	}, "queueCursor");
 
 	// .js/webadmin/admin.js
+	installUI(true);
 	var moxversion;
 	var moxgoos;
 	var moxgoarch;
 	var login = /* @__PURE__ */ __name(async (reason) => {
-		let notice = reason;
-		if (reason.startsWith("unknown session")) {
-			notice = "Your session has ended. Enter your password to continue.";
-		}
 		return new Promise((resolve, _) => {
 			const origFocus = document.activeElement;
 			let reasonElem;
 			let fieldset;
 			let password;
-			const root = dom.div(dom._class("adminOverlay", "adminLogin"), dom.div(style({ display: "flex", flexDirection: "column", alignItems: "center" }), dom.div(dom._class("adminDialog"), dom.form(/* @__PURE__ */ __name(async function submit(e) {
+			const root = dom.div(dom._class("uiOverlay", "uiLogin"), dom.div(style({ display: "flex", flexDirection: "column", alignItems: "center" }), dom.div(dom._class("uiDialog"), dom.form(/* @__PURE__ */ __name(async function submit(e) {
 				e.preventDefault();
 				e.stopPropagation();
 				reasonElem.remove();
@@ -1675,38 +1917,13 @@
 				} finally {
 					fieldset.disabled = false;
 				}
-			}, "submit"), fieldset = dom.fieldset(dom.h1("devn"), dom.p("Administration"), reasonElem = dom.div(dom._class("loginNotice"), dom._attrs({ role: "status" }), prop({ hidden: !reason }), dom.div(dom._class("loginNoticeTitle"), "Please sign in again"), dom.div(notice)), dom.label(style({ display: "block", marginBottom: "2ex" }), dom.div("Password", style({ marginBottom: ".5ex" })), password = dom.input(attr.type("password"), attr.autocomplete("current-password"), attr.required(""))), dom.div(style({ textAlign: "center" }), dom.submitbutton("Login")))))));
+			}, "submit"), fieldset = dom.fieldset(dom.h1("devn"), dom.p("Administration"), reasonElem = sessionNotice(reason), dom.label(style({ display: "block", marginBottom: "2ex" }), dom.div("Password", style({ marginBottom: ".5ex" })), password = dom.input(attr.type("password"), attr.autocomplete("current-password"), attr.required(""))), dom.div(style({ textAlign: "center" }), dom.submitbutton("Login")))))));
 			document.body.appendChild(root);
 			password.focus();
 		});
 	}, "login");
-	var popup = /* @__PURE__ */ __name((...kids) => {
-		const origFocus = document.activeElement;
-		const close = /* @__PURE__ */ __name(() => {
-			if (!root.parentNode) {
-				return;
-			}
-			root.remove();
-			if (origFocus && origFocus instanceof HTMLElement && origFocus.parentNode) {
-				origFocus.focus();
-			}
-		}, "close");
-		let content;
-		const root = dom.div(dom._class("adminOverlay"), /* @__PURE__ */ __name(function keydown(e) {
-			if (e.key === "Escape") {
-				e.stopPropagation();
-				close();
-			}
-		}, "keydown"), /* @__PURE__ */ __name(function click(e) {
-			e.stopPropagation();
-			close();
-		}, "click"), content = dom.div(attr.tabindex("0"), dom._class("adminDialog"), /* @__PURE__ */ __name(function click(e) {
-			e.stopPropagation();
-		}, "click"), kids));
-		document.body.appendChild(root);
-		content.focus();
-		return close;
-	}, "popup");
+	var popup = /* @__PURE__ */ __name((...kids) => dialog(() => {
+	}, ...kids), "popup");
 	var detailsDialog = /* @__PURE__ */ __name((title, size, ...kids) => {
 		const close = popup(dom._class("detailsDialog", size + "Dialog"), dom._attrs({ "role": "dialog", "aria-label": title }), dom.div(dom._class("detailsDialogHeader"), dom.h1(title), dom.clickbutton("Close", /* @__PURE__ */ __name(function click() {
 			close();
@@ -1760,7 +1977,7 @@
 		];
 	}, "crumbs");
 	var errmsg = /* @__PURE__ */ __name((err) => "" + (err.message || "(no error message)"), "errmsg");
-	var footer = /* @__PURE__ */ __name(() => dom.div(dom._class("adminFooter"), link("https://www.xmox.nl", "mox"), " ", moxversion, " ", moxgoos, "/", moxgoarch, ", ", dom.a(attr.href("licenses.txt"), "licenses")), "footer");
+	var footer = /* @__PURE__ */ __name(() => dom.div(dom._class("uiFooter"), link("https://www.xmox.nl", "mox"), " ", moxversion, " ", moxgoos, "/", moxgoarch, ", ", dom.a(attr.href("licenses.txt"), "licenses")), "footer");
 	var age = /* @__PURE__ */ __name((date, future, nowSecs) => {
 		if (!nowSecs) {
 			nowSecs = (/* @__PURE__ */ new Date()).getTime() / 1e3;
@@ -1969,16 +2186,7 @@
 			window.location.reload();
 		}, "submit"), fieldset = dom.fieldset(dom.label(style({ display: "inline-block" }), "Package", dom.br(), pkg = dom.input(attr.required(""))), " ", dom.label(style({ display: "inline-block" }), "Level", dom.br(), level = dom.select(attr.required(""), levels.map((l) => dom.option(l, l === "debug" ? attr.selected("") : [])))), " ", dom.submitbutton("Add")), dom.br(), dom.p("Suggestions for packages: autotls dkim dmarc dmarcdb dns dnsbl dsn http imapserver iprev junk message metrics mox moxio mtasts mtastsdb publicsuffix queue sendmail serve smtpserver spf store subjectpass tlsrpt tlsrptdb updates")));
 	}, "loglevels");
-	var box = /* @__PURE__ */ __name((color, ...l) => [
-		dom.div(style({
-			display: "inline-block",
-			padding: "8px 12px",
-			backgroundColor: color,
-			borderRadius: "3px",
-			margin: ".5ex 0"
-		}), l),
-		dom.br()
-	], "box");
+	var box = /* @__PURE__ */ __name((color, ...kids) => [callout(color, ...kids)], "box");
 	var inlineBox = /* @__PURE__ */ __name((color, ...l) => dom.span(style({
 		display: "inline-block",
 		padding: color ? "0.05em 0.2em" : "",
@@ -2045,10 +2253,7 @@
 		update();
 		return dom.div(table, dom.div(dom._class("loginAttemptsMore"), style({ display: "flex", alignItems: "center", gap: "12px" }), loadMore, status));
 	}, "pagedLoginAttempts");
-	var renderLoginAttempts = /* @__PURE__ */ __name((accountLinks, loginAttempts) => {
-		const nowSecs = (/* @__PURE__ */ new Date()).getTime() / 1e3;
-		return dom.table(dom._class("loginAttemptsTable"), dom.thead(dom.tr(dom.th("Time"), dom.th("Result"), dom.th(dom._class("alignRight", "loginAttemptsCount"), "Count"), dom.th("Account"), dom.th("Client"), dom.th("Connection"))), dom.tbody(loginAttempts.length ? [] : dom.tr(dom.td(attr.colspan("6"), "No login attempts in past 30 days.")), loginAttempts.map((la) => dom.tr(dom.td(queueInfo("Last", age(la.Last, false, nowSecs)), queueInfo("First", age(la.First, false, nowSecs))), dom.td(la.Result === "ok" ? la.Result : inlineBox(red, la.Result)), dom.td(dom._class("alignRight"), "" + la.Count), dom.td(accountLinks ? dom.a(attr.href("#accounts/l/" + la.AccountName + "/loginattempts"), la.AccountName) : la.AccountName, queueInfo("Address", la.LoginAddress)), dom.td(queueInfo("Protocol", la.Protocol), queueInfo("Mechanism", la.AuthMech), queueInfo("User agent", la.UserAgent)), dom.td(queueInfo("Remote IP", la.RemoteIP), queueInfo("Local IP", la.LocalIP), queueInfo("TLS", la.TLS), queueInfo("TLS pubkey fingerprint", la.TLSPubKeyFingerprint))))));
-	}, "renderLoginAttempts");
+	var renderLoginAttempts = /* @__PURE__ */ __name((accountLinks, rows) => loginAttemptsTable(accountLinks, rows, (date) => age(date, false, Date.now() / 1e3)), "renderLoginAttempts");
 	var formatQuotaSize = /* @__PURE__ */ __name((v) => {
 		if (v === 0) {
 			return "0";
@@ -3220,7 +3425,7 @@
 			dnsbl();
 		}, "submit"), fieldset = dom.fieldset(dom.div("One per line"), dom.div(style({ marginBottom: ".5ex" }), monitorTextarea = dom.textarea(style({ width: "20rem" }), attr.rows("" + Math.max(5, 1 + (monitorZones || []).length)), new String((monitorZones || []).map((zone) => domainName(zone)).join("\n"))), dom.div("Examples: sbl.spamhaus.org or bl.spamcop.net")), dom.div(dom.submitbutton("Save")))));
 	}, "dnsbl");
-	var queueInfo = /* @__PURE__ */ __name((label, ...value) => dom.div(dom._class("queueInfo"), dom.span(dom._class("queueInfoLabel"), label), value), "queueInfo");
+	var queueInfo = detailLine;
 	var queueError = /* @__PURE__ */ __name((results) => {
 		if (!results?.length || !results[results.length - 1].Error) {
 			return [];
@@ -4237,31 +4442,7 @@
 	}, "webserver");
 	var init = /* @__PURE__ */ __name(async () => {
 		const themeSelect = document.getElementById("adminTheme");
-		const systemTheme = window.matchMedia("(prefers-color-scheme: dark)");
-		const savedTheme = localStorageGet("webadmintheme");
-		if (savedTheme && ["system", "light", "dark"].includes(savedTheme)) {
-			themeSelect.value = savedTheme;
-		}
-		const applyTheme = /* @__PURE__ */ __name(() => {
-			let dark = themeSelect.value === "dark";
-			if (themeSelect.value === "system") {
-				dark = systemTheme.matches;
-			}
-			document.documentElement.dataset.theme = "light";
-			if (dark) {
-				document.documentElement.dataset.theme = "dark";
-			}
-		}, "applyTheme");
-		themeSelect.addEventListener("change", () => {
-			applyTheme();
-			try {
-				window.localStorage.setItem("webadmintheme", themeSelect.value);
-			} catch (err) {
-				console.log("saving admin theme", err);
-			}
-		});
-		systemTheme.addEventListener("change", applyTheme);
-		applyTheme();
+		themeControl(themeSelect, "webadmintheme");
 		let curhash;
 		[moxversion, moxgoos, moxgoarch] = await client.Version();
 		document.getElementById("adminWebmail").before(dom.clickbutton("Logout", attr.title("Logout, invalidating this session."), /* @__PURE__ */ __name(async function click(e) {
@@ -4359,7 +4540,7 @@
 					moxBeforeDisplay(root);
 				}
 				dom._kids(page, root);
-				for (const item of document.querySelectorAll(".adminNav a")) {
+				for (const item of document.querySelectorAll(".uiNav a")) {
 					const target = item.hash.substring(1);
 					item.removeAttribute("aria-current");
 					if (h === target || target && h.startsWith(target + "/")) {

@@ -140,20 +140,20 @@ install-js0:
 	-mkdir -p node_modules/.bin
 	npm install --ignore-scripts --save-dev --save-exact typescript@7.0.2 esbuild@v0.28.1
 
-webmail/webmail.js: webmail/webmail.ts webmail/icons.ts webmail/api.ts webmail/lib.ts lib.ts
-	./tsc.sh $@ webmail/webmail.ts webmail/icons.ts webmail/api.ts webmail/lib.ts lib.ts
+webmail/webmail.js: webmail/webmail.ts webmail/icons.ts webmail/api.ts webmail/lib.ts lib.ts ui.ts
+	./tsc.sh $@ webmail/webmail.ts webmail/icons.ts webmail/api.ts webmail/lib.ts lib.ts ui.ts
 
-webmail/msg.js: webmail/msg.ts webmail/api.ts webmail/lib.ts lib.ts
-	./tsc.sh $@ webmail/msg.ts webmail/api.ts webmail/lib.ts lib.ts
+webmail/msg.js: webmail/msg.ts webmail/api.ts webmail/lib.ts lib.ts ui.ts
+	./tsc.sh $@ webmail/msg.ts webmail/api.ts webmail/lib.ts lib.ts ui.ts
 
-webmail/text.js: webmail/text.ts webmail/api.ts webmail/lib.ts lib.ts
-	./tsc.sh $@ webmail/text.ts webmail/api.ts webmail/lib.ts lib.ts
+webmail/text.js: webmail/text.ts webmail/api.ts webmail/lib.ts lib.ts ui.ts
+	./tsc.sh $@ webmail/text.ts webmail/api.ts webmail/lib.ts lib.ts ui.ts
 
-webadmin/admin.js: webadmin/admin.ts webadmin/pagination.ts webadmin/api.ts lib.ts
-	./tsc.sh $@ webadmin/admin.ts webadmin/api.ts lib.ts
+webadmin/admin.js: ui-loginattempts.ts webadmin/admin.ts webadmin/pagination.ts webadmin/api.ts lib.ts ui.ts
+	./tsc.sh $@ webadmin/admin.ts webadmin/api.ts lib.ts ui.ts
 
-webaccount/account.js: webaccount/account.ts webaccount/api.ts lib.ts
-	./tsc.sh $@ webaccount/account.ts webaccount/api.ts lib.ts
+webaccount/account.js: ui-loginattempts.ts webaccount/account.ts webaccount/api.ts lib.ts ui.ts
+	./tsc.sh $@ webaccount/account.ts webaccount/api.ts lib.ts ui.ts
 
 frontend: node_modules/.bin/tsc webadmin/admin.js webaccount/account.js webmail/webmail.js webmail/msg.js webmail/text.js
 

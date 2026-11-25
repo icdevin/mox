@@ -1,3 +1,4 @@
+import {dialog} from '../ui'
 /* Javascript is generated from typescript, do not modify generated javascript because changes will be overwritten. */
 
 /*
@@ -1127,43 +1128,8 @@ const popover = (target: HTMLElement, opts: {transparent?: boolean, fullscreen?:
 // to handle keys themselves, e.g. for scrolling.
 let popupOpen = false
 const popup = (...kids: ElemArg[]) => {
-	const origFocus = document.activeElement
-	const close = () => {
-		if (!root.parentNode) {
-			return
-		}
-		popupOpen = false
-		root.remove()
-		if (origFocus && origFocus instanceof HTMLElement && origFocus.parentNode) {
-			origFocus.focus()
-		}
-	}
-	let content: HTMLElement
-	const root = dom.div(
-		css('popupOverlay', {position: 'absolute', top: 0, right: 0, bottom: 0, left: 0, backgroundColor: styles.overlayBackgroundColor, display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: zindexes.popup}),
-		function keydown(e: KeyboardEvent) {
-			if (e.key === 'Escape') {
-				e.stopPropagation()
-				close()
-			}
-		},
-		function click(e: MouseEvent) {
-			e.stopPropagation()
-			close()
-		},
-		content=dom.div(
-			attr.tabindex('0'),
-			css('popupContent', {backgroundColor: styles.popupBackgroundColor, boxShadow: styles.boxShadow, border: '1px solid', borderColor: styles.popupBorderColor, borderRadius: '.25em', padding: '1em', maxWidth: '95vw', overflowX: 'auto', maxHeight: '95vh', overflowY: 'auto'}),
-			function click(e: MouseEvent) {
-				e.stopPropagation()
-			},
-			kids,
-		)
-	)
 	popupOpen = true
-	document.body.appendChild(root)
-	content.focus()
-	return close
+	return dialog(() => { popupOpen = false }, ...kids)
 }
 
 // Show settings screen.
@@ -1614,7 +1580,7 @@ const compose = (opts: ComposeOptions, listMailboxes: listMailboxes, setLocation
 							resolve('save')
 							remove()
 						}), ' ',
-						draftMessageID ? dom.clickbutton('Remove draft', function click() {
+						draftMessageID ? dom.clickbutton('Remove draft', dom._class('dangerButton'), function click() {
 							resolve('remove')
 							remove()
 						}) : [], ' ',
@@ -3369,7 +3335,7 @@ const newMsgView = (miv: MsgitemView, msglistView: MsglistView, listMailboxes: l
 				dom.clickbutton(icons.forward(), ' Forward', attr.title('Compose a forwarding message, optionally including attachments.'), clickCmd(cmdForward, shortcuts)), ' ',
 				dom.clickbutton(icons.archive(), ' Archive', attr.title('Move to the Archive mailbox.'), clickCmd(msglistView.cmdArchive, shortcuts)), ' ',
 				m.MailboxID === trashMailboxID ?
-					dom.clickbutton('Delete', attr.title('Permanently delete message.'), clickCmd(msglistView.cmdDelete, shortcuts)) :
+					dom.clickbutton('Delete', dom._class('dangerButton'), attr.title('Permanently delete message.'), clickCmd(msglistView.cmdDelete, shortcuts)) :
 					dom.clickbutton(icons.trash(), ' Trash', attr.title('Move to the Trash mailbox.'), clickCmd(msglistView.cmdTrash, shortcuts)),
 				' ',
 				dom.clickbutton('More...', attr.title('Show more actions.'), function click(e: MouseEvent) {
@@ -4259,7 +4225,7 @@ const newMsglistView = (msgElem: HTMLElement, activeMailbox: () => api.Mailbox |
 						dom.div(
 							dom.clickbutton('Archive', attr.title('Move to the Archive mailbox. Messages in the designated Sent mailbox are only moved if a single message is selected, or the current mailbox is the Sent mailbox.'), clickCmd(cmdArchive, shortcuts)), ' ',
 							allTrash ?
-								dom.clickbutton('Delete', attr.title('Permanently delete messages.'), clickCmd(cmdDelete, shortcuts)) :
+								dom.clickbutton('Delete', dom._class('dangerButton'), attr.title('Permanently delete messages.'), clickCmd(cmdDelete, shortcuts)) :
 								dom.clickbutton('Trash', attr.title('Move to the Trash mailbox. Messages in the designated Sent mailbox are only moved if a single message is selected, or the current mailbox is the Sent mailbox.'), clickCmd(cmdTrash, shortcuts)),
 							' ',
 							dom.clickbutton('Junk', attr.title('Move to Junk mailbox, marking as junk and causing this message to be used in spam classification of new incoming messages. Messages in the designated Sent mailbox are only moved if a single message is selected, or the current mailbox is the Sent mailbox.'), clickCmd(cmdJunk, shortcuts)), ' ',
@@ -5404,7 +5370,7 @@ const newMailboxView = (xmb: api.Mailbox, mailboxlistView: MailboxlistView, othe
 					}),
 				),
 				dom.div(
-					dom.clickbutton('Delete mailbox', attr.title('Permanently delete this mailbox and all its messages.'), async function click() {
+					dom.clickbutton('Delete mailbox', dom._class('dangerButton'), attr.title('Permanently delete this mailbox and all its messages.'), async function click() {
 						if (!window.confirm('Are you sure you want to permanently delete this mailbox and all its messages?')) {
 							return
 						}

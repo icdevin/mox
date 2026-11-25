@@ -1,3 +1,6 @@
+import {installUI} from '../ui'
+installUI(false)
+
 // Javascript is generated from typescript, do not modify generated javascript because changes will be overwritten.
 
 // We build CSS rules in JS. For several reasons:
@@ -127,9 +130,9 @@ ensureCSS(':root', {
 	'--buttonTristateOnBackground': ['#c4ffa9', '#277e00'],
 	'--buttonTristateOffBackground': ['#ffb192', '#bf410f'],
 
-	'--warningBackgroundColor': ['#ffca91', '#a85700'],
+	'--warningBackgroundColor': ['var(--warning)', 'var(--warning)'],
 
-	'--successBackground': ['#d2f791', '#1fa204'],
+	'--successBackground': ['var(--success)', 'var(--success)'],
 	'--emphasisBackground': ['#666', '#aaa'],
 
 	// For authentication/security results.

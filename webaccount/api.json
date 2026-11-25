@@ -614,6 +614,32 @@
 				}
 			],
 			"Returns": []
+		},
+		{
+			"Name": "LoginAttemptsPage",
+			"Docs": "LoginAttemptsPage limits history reads to the authenticated account.",
+			"Params": [
+				{
+					"Name": "limit",
+					"Typewords": [
+						"int32"
+					]
+				},
+				{
+					"Name": "cursor",
+					"Typewords": [
+						"string"
+					]
+				}
+			],
+			"Returns": [
+				{
+					"Name": "r0",
+					"Typewords": [
+						"LoginAttemptPage"
+					]
+				}
+			]
 		}
 	],
 	"Sections": [],
@@ -1896,6 +1922,27 @@
 					"Docs": "",
 					"Typewords": [
 						"AuthResult"
+					]
+				}
+			]
+		},
+		{
+			"Name": "LoginAttemptPage",
+			"Docs": "LoginAttemptPage keeps the next cursor at full database timestamp precision.",
+			"Fields": [
+				{
+					"Name": "Attempts",
+					"Docs": "",
+					"Typewords": [
+						"[]",
+						"LoginAttempt"
+					]
+				},
+				{
+					"Name": "Next",
+					"Docs": "",
+					"Typewords": [
+						"string"
 					]
 				}
 			]

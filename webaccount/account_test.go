@@ -589,3 +589,39 @@ func fakeCert(t *testing.T) []byte {
 	tcheck(t, err, "making certificate")
 	return localCertBuf
 }
+
+func TestLoginAttemptsPageAccountScope(t *testing.T) {
+	db, err := bstore.Open(ctxbg, filepath.Join(t.TempDir(), "auth.db"), nil, store.LoginAttempt{})
+	tcheck(t, err, "opening auth database")
+	previous := store.AuthDB
+	store.AuthDB = db
+	defer func() {
+		store.AuthDB = previous
+		db.Close()
+	}()
+
+	now := time.Now().UTC()
+	for i, account := range []string{"one", "two", "one", "two"} {
+		attempt := store.LoginAttempt{Key: bytes.Repeat([]byte{byte(i + 1)}, 32), First: now, Last: now.Add(-time.Duration(i) * time.Second), AccountName: account, Count: 1, Result: store.AuthSuccess}
+		tcheck(t, db.Insert(ctxbg, &attempt), "inserting login attempt")
+	}
+
+	ctx := context.WithValue(ctxbg, requestInfoCtxKey, requestInfo{AccountName: "one"})
+	api := Account{}
+	first := api.LoginAttemptsPage(ctx, 1, "")
+	if len(first.Attempts) != 1 || first.Attempts[0].AccountName != "one" || first.Next == "" {
+		t.Fatalf("unexpected first page: %+v", first)
+	}
+	last := api.LoginAttemptsPage(ctx, 1, first.Next)
+	if len(last.Attempts) != 1 || last.Attempts[0].AccountName != "one" || last.Next != "" || bytes.Equal(last.Attempts[0].Key, first.Attempts[0].Key) {
+		t.Fatalf("unexpected last page: %+v", last)
+	}
+
+	other := context.WithValue(ctxbg, requestInfoCtxKey, requestInfo{AccountName: "two"})
+	tneedErrorCode(t, "server:error", func() { api.LoginAttemptsPage(other, 1, first.Next) })
+	missing := context.WithValue(ctxbg, requestInfoCtxKey, requestInfo{AccountName: "missing"})
+	empty := api.LoginAttemptsPage(missing, 1, "")
+	if len(empty.Attempts) != 0 || empty.Next != "" {
+		t.Fatalf("unexpected empty page: %+v", empty)
+	}
+}
