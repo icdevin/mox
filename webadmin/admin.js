@@ -3272,6 +3272,31 @@
 		let requiretls;
 		let transport;
 		let toggles = /* @__PURE__ */ new Map();
+		let bulkControls;
+		const selectionStatus = dom.p(dom._attrs({ role: "status" }));
+		const selectAll = dom.input(attr.type("checkbox"), dom._attrs({ "aria-label": "Select all loaded messages" }), /* @__PURE__ */ __name(function change() {
+			for (const toggle of toggles.values()) {
+				toggle.checked = selectAll.checked;
+			}
+			updateSelection();
+		}, "change"));
+		const updateSelection = /* @__PURE__ */ __name(() => {
+			const count = Array.from(toggles.values()).filter((toggle) => toggle.checked).length;
+			selectAll.checked = count > 0 && count === toggles.size;
+			selectAll.indeterminate = count > 0 && count < toggles.size;
+			selectAll.disabled = toggles.size === 0;
+			if (bulkControls) {
+				bulkControls.disabled = count === 0;
+			}
+			let message = "Select messages to enable actions.";
+			if (count > 0) {
+				message = count + " messages selected";
+				if (count === 1) {
+					message = "1 message selected";
+				}
+			}
+			dom._kids(selectionStatus, message);
+		}, "updateSelection");
 		const gatherIDs = /* @__PURE__ */ __name(() => {
 			const f = {
 				Max: 0,
@@ -3290,13 +3315,16 @@
 			return f;
 		}, "gatherIDs");
 		let tbody = dom.tbody();
-		const render = /* @__PURE__ */ __name(() => {
+		const render = /* @__PURE__ */ __name((resetSelection = false) => {
 			if (loadMore) {
 				loadMore.hidden = endReached;
 			}
+			const previous = toggles;
 			toggles = /* @__PURE__ */ new Map();
 			for (const m of msgs) {
-				toggles.set(m.ID, dom.input(attr.type("checkbox"), msgs.length === 1 ? attr.checked("") : []));
+				toggles.set(m.ID, dom.input(attr.type("checkbox"), prop({ checked: !resetSelection && !!previous.get(m.ID)?.checked }), dom._attrs({ "aria-label": "Select message" }), /* @__PURE__ */ __name(function change() {
+					updateSelection();
+				}, "change")));
 			}
 			const ntbody = dom.tbody(dom._class("loadend"), msgs.length === 0 ? dom.tr(dom.td(attr.colspan("6"), "No messages.")) : [], msgs.map((m) => {
 				return dom.tr(dom.td(toggles.get(m.ID)), dom.td(dom.b(m.Subject || "(no subject)"), queueInfo("Account", m.SenderAccount || "\u2014")), dom.td(queueInfo("From", prewrap(m.SenderLocalpart, "@", ipdomainString(m.SenderDomain))), queueInfo("To", prewrap(m.RecipientLocalpart, "@", ipdomainString(m.RecipientDomain)))), dom.td(m.Hold ? "On hold" : "Queued", queueInfo("Attempts", "" + m.Attempts), queueError(m.Results)), dom.td(queueInfo("Submitted", age(m.Queued, false, nowSecs)), queueInfo("Next", age(m.NextAttempt, true, nowSecs))), dom.td(dom.clickbutton("Details", /* @__PURE__ */ __name(function click() {
@@ -3305,6 +3333,7 @@
 			}));
 			tbody.replaceWith(ntbody);
 			tbody = ntbody;
+			updateSelection();
 		}, "render");
 		render();
 		const buttonNextAttemptSet = /* @__PURE__ */ __name((text, minutes) => dom.clickbutton(text, /* @__PURE__ */ __name(async function click(e) {
@@ -3392,7 +3421,7 @@
 					msgs = results;
 					endReached = msgs.length <= filter.Max;
 					msgs = msgs.slice(0, filter.Max);
-					render();
+					render(true);
 				}, "submit")
 			),
 			dom.h2("Messages"),
@@ -3406,12 +3435,7 @@
 				filterForm.reset();
 				filterForm.requestSubmit();
 			}, "click")))),
-			dom.table(dom._class("hover", "queueTable", "queueSelectable"), dom.thead(dom.tr(dom.td(dom.input(attr.type("checkbox"), msgs.length === 1 ? attr.checked("") : [], attr.form("queuefilter"), /* @__PURE__ */ __name(function change(e) {
-				const elem = e.target;
-				for (const [_, toggle] of toggles) {
-					toggle.checked = elem.checked;
-				}
-			}, "change"))), dom.th("Message"), dom.th("Addresses"), dom.th("Status"), dom.th("Timing"), dom.th("Actions"))), tbody, dom.tfoot(dom.tr(dom.td(
+			dom.table(dom._class("hover", "queueTable", "queueSelectable"), dom.thead(dom.tr(dom.td(selectAll), dom.th("Message"), dom.th("Addresses"), dom.th("Status"), dom.th("Timing"), dom.th("Actions"))), tbody, dom.tfoot(dom.tr(dom.td(
 				attr.colspan("6"),
 				// todo: consider implementing infinite scroll, autoloading more pages. means the operations on selected messages should be moved from below to above the table. and probably only show them when at least one message is selected to prevent clutter.
 				loadMore = dom.clickbutton("Load more", prop({ hidden: endReached }), /* @__PURE__ */ __name(async function click(e) {
@@ -3440,7 +3464,7 @@
 			)))),
 			dom.br(),
 			dom.br(),
-			dom.div(dom._class("unclutter"), dom.h2("Change selected messages"), dom.div(style({ display: "flex", gap: "2em" }), dom.div(dom.div("Hold"), dom.div(dom.clickbutton("On", /* @__PURE__ */ __name(async function click(e) {
+			dom.div(dom._class("bulkActions"), dom.h2("Change selected messages"), selectionStatus, bulkControls = dom.fieldset(prop({ disabled: true }), dom._class("bulkActionGroups"), dom.div(dom.div("Hold"), dom.div(dom.clickbutton("On", /* @__PURE__ */ __name(async function click(e) {
 				const n = await check(e.target, (async () => await client.QueueHoldSet(gatherIDs(), true))());
 				window.alert("" + n + " message(s) updated");
 				window.location.reload();
@@ -3629,6 +3653,31 @@
 		let filterEvent;
 		let filterNextAttempt;
 		let toggles = /* @__PURE__ */ new Map();
+		let bulkControls;
+		const selectionStatus = dom.p(dom._attrs({ role: "status" }));
+		const selectAll = dom.input(attr.type("checkbox"), dom._attrs({ "aria-label": "Select all loaded webhooks" }), /* @__PURE__ */ __name(function change() {
+			for (const toggle of toggles.values()) {
+				toggle.checked = selectAll.checked;
+			}
+			updateSelection();
+		}, "change"));
+		const updateSelection = /* @__PURE__ */ __name(() => {
+			const count = Array.from(toggles.values()).filter((toggle) => toggle.checked).length;
+			selectAll.checked = count > 0 && count === toggles.size;
+			selectAll.indeterminate = count > 0 && count < toggles.size;
+			selectAll.disabled = toggles.size === 0;
+			if (bulkControls) {
+				bulkControls.disabled = count === 0;
+			}
+			let message = "Select webhooks to enable actions.";
+			if (count > 0) {
+				message = count + " webhooks selected";
+				if (count === 1) {
+					message = "1 webhook selected";
+				}
+			}
+			dom._kids(selectionStatus, message);
+		}, "updateSelection");
 		const gatherIDs = /* @__PURE__ */ __name(() => {
 			const f = {
 				Max: 0,
@@ -3644,16 +3693,20 @@
 			return f;
 		}, "gatherIDs");
 		let tbody = dom.tbody();
-		const render = /* @__PURE__ */ __name(() => {
+		const render = /* @__PURE__ */ __name((resetSelection = false) => {
+			const previous = toggles;
 			toggles = /* @__PURE__ */ new Map();
 			for (const h of hooks || []) {
-				toggles.set(h.ID, dom.input(attr.type("checkbox"), (hooks || []).length === 1 ? attr.checked("") : []));
+				toggles.set(h.ID, dom.input(attr.type("checkbox"), prop({ checked: !resetSelection && !!previous.get(h.ID)?.checked }), dom._attrs({ "aria-label": "Select webhook" }), /* @__PURE__ */ __name(function change() {
+					updateSelection();
+				}, "change")));
 			}
 			const ntbody = dom.tbody(dom._class("loadend"), hooks.length === 0 ? dom.tr(dom.td(attr.colspan("6"), "No webhooks.")) : [], hooks.map((h) => dom.tr(dom.td(toggles.get(h.ID)), dom.td(dom.b(h.IsIncoming ? "incoming" : h.OutgoingEvent), queueInfo("Account", h.Account || "\u2014"), dom.div(h.Subject || "(no subject)")), dom.td(h.URL), dom.td("Queued", queueInfo("Attempts", "" + h.Attempts), queueError(h.Results)), dom.td(queueInfo("Submitted", age(h.Submitted, false, nowSecs)), queueInfo("Next", age(h.NextAttempt, true, nowSecs))), dom.td(dom.clickbutton("Details", /* @__PURE__ */ __name(function click() {
 				webhookDetails(h);
 			}, "click"))))));
 			tbody.replaceWith(ntbody);
 			tbody = ntbody;
+			updateSelection();
 		}, "render");
 		render();
 		const buttonNextAttemptSet = /* @__PURE__ */ __name((text, minutes) => dom.clickbutton(text, /* @__PURE__ */ __name(async function click(e) {
@@ -3684,12 +3737,7 @@
 				filterForm.reset();
 				filterForm.requestSubmit();
 			}, "click")))),
-			dom.table(dom._class("hover", "queueTable", "queueSelectable"), dom.thead(dom.tr(dom.td(dom.input(attr.type("checkbox"), (hooks || []).length === 1 ? attr.checked("") : [], attr.form("hooksfilter"), /* @__PURE__ */ __name(function change(e) {
-				const elem = e.target;
-				for (const [_, toggle] of toggles) {
-					toggle.checked = elem.checked;
-				}
-			}, "change"))), dom.th("Event"), dom.th("Endpoint"), dom.th("Status"), dom.th("Timing"), dom.th("Actions"))), tbody, dom.tfoot(dom.tr(dom.td(attr.colspan("6"), loadMore = dom.clickbutton("Load more", prop({ hidden: endReached }), attr.title("Loads the next page of matching webhooks."), /* @__PURE__ */ __name(async function click(e) {
+			dom.table(dom._class("hover", "queueTable", "queueSelectable"), dom.thead(dom.tr(dom.td(selectAll), dom.th("Event"), dom.th("Endpoint"), dom.th("Status"), dom.th("Timing"), dom.th("Actions"))), tbody, dom.tfoot(dom.tr(dom.td(attr.colspan("6"), loadMore = dom.clickbutton("Load more", prop({ hidden: endReached }), attr.title("Loads the next page of matching webhooks."), /* @__PURE__ */ __name(async function click(e) {
 				if (hooks.length === 0) {
 					sort.LastID = 0;
 					sort.Last = null;
@@ -3747,12 +3795,12 @@
 					hooks = hooks.slice(0, filter.Max);
 					updatePageStatus();
 					loadMore.hidden = endReached;
-					render();
+					render(true);
 				}, "submit")
 			),
 			dom.br(),
 			dom.br(),
-			dom.div(dom._class("unclutter"), dom.h2("Change selected webhooks"), dom.div(style({ display: "flex", gap: "2em" }), dom.div(dom.div("Schedule next delivery attempt"), buttonNextAttemptSet("Now", 0), " ", dom.clickbutton("More...", /* @__PURE__ */ __name(function click(e) {
+			dom.div(dom._class("bulkActions"), dom.h2("Change selected webhooks"), selectionStatus, bulkControls = dom.fieldset(prop({ disabled: true }), dom._class("bulkActionGroups"), dom.div(dom.div("Schedule next delivery attempt"), buttonNextAttemptSet("Now", 0), " ", dom.clickbutton("More...", /* @__PURE__ */ __name(function click(e) {
 				e.target.replaceWith(dom.div(dom.br(), dom.div("Scheduled time plus"), dom.div(buttonNextAttemptAdd("1m", 1), " ", buttonNextAttemptAdd("5m", 5), " ", buttonNextAttemptAdd("30m", 30), " ", buttonNextAttemptAdd("1h", 60), " ", buttonNextAttemptAdd("2h", 2 * 60), " ", buttonNextAttemptAdd("4h", 4 * 60), " ", buttonNextAttemptAdd("8h", 8 * 60), " ", buttonNextAttemptAdd("16h", 16 * 60), " "), dom.br(), dom.div("Now plus"), dom.div(buttonNextAttemptSet("1m", 1), " ", buttonNextAttemptSet("5m", 5), " ", buttonNextAttemptSet("30m", 30), " ", buttonNextAttemptSet("1h", 60), " ", buttonNextAttemptSet("2h", 2 * 60), " ", buttonNextAttemptSet("4h", 4 * 60), " ", buttonNextAttemptSet("8h", 8 * 60), " ", buttonNextAttemptSet("16h", 16 * 60), " ")));
 			}, "click"))), dom.div(dom.div("Delivery"), dom.clickbutton("Cancel", dom._class("dangerButton"), attr.title("Retires webhooks, preventing further delivery attempts."), /* @__PURE__ */ __name(async function click(e) {
 				e.preventDefault();

@@ -144,8 +144,14 @@ thead { position: sticky; top: 0; z-index: 1; background: var(--panel); }
 .text { max-width: 65em; }
 .twocols { display: flex; flex-wrap: wrap; gap: 24px; }
 .twocols > * { min-width: 0; }
-.unclutter { opacity: .65; }
-.unclutter:hover, .unclutter:focus-within { opacity: 1; }
+.bulkActionGroups { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr)); gap: 16px; align-items: start; }
+.bulkActionGroups > div { min-width: 0; padding: 14px; border: 1px solid var(--border); border-radius: 8px; background: var(--panel); }
+.bulkActionGroups form { margin: 0; }
+.bulkActionGroups > div > div:first-child, .bulkActionGroups form > label { display: block; margin: 0 0 8px; line-height: 1.5; font-weight: 600; }
+.bulkActionGroups fieldset { display: flex; flex-wrap: wrap; gap: 8px; align-items: start; }
+.bulkActionGroups select { flex: 1; min-width: 0; }
+.bulkActionGroups button { min-height: 36px; }
+.bulkActionGroups:disabled fieldset, .bulkActionGroups:disabled button { opacity: 1; }
 .adminFooter { margin-top: 32px; padding-top: 12px; border-top: 1px solid var(--border); font-size: 12px; color: var(--muted); }
 .adminOverlay { position: fixed; inset: 0; background: #28252055; display: flex; align-items: center; justify-content: center; z-index: 10; padding: 16px; }
 .adminDialog { background: var(--bg); border: 1px solid var(--border); border-radius: 10px; padding: 24px; box-shadow: 0 12px 36px #0002; max-width: 95vw; max-height: 95vh; overflow: auto; }

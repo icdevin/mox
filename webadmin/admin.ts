@@ -3487,6 +3487,32 @@ const queueList = async () => {
 
 	// Message ID to checkbox.
 	let toggles = new Map<number, HTMLInputElement>()
+	let bulkControls: HTMLFieldSetElement | undefined
+	const selectionStatus = dom.p(dom._attrs({role: 'status'}))
+	const selectAll = dom.input(attr.type('checkbox'), dom._attrs({'aria-label': 'Select all loaded messages'}), function change() {
+		for (const toggle of toggles.values()) {
+			toggle.checked = selectAll.checked
+		}
+		updateSelection()
+	})
+	const updateSelection = () => {
+		const count = Array.from(toggles.values()).filter(toggle => toggle.checked).length
+		selectAll.checked = count > 0 && count === toggles.size
+		selectAll.indeterminate = count > 0 && count < toggles.size
+		selectAll.disabled = toggles.size === 0
+		if (bulkControls) {
+			bulkControls.disabled = count === 0
+		}
+		let message = 'Select messages to enable actions.'
+		if (count > 0) {
+			message = count + ' messages selected'
+			if (count === 1) {
+				message = '1 message selected'
+			}
+		}
+		dom._kids(selectionStatus, message)
+	}
+
 	// We operate on what the user has selected, not what the filters would currently
 	// evaluate to. This function can throw an error, which is why we have awkward
 	// syntax when calling this as parameter in api client calls below.
@@ -3512,13 +3538,16 @@ const queueList = async () => {
 
 	let tbody = dom.tbody()
 
-	const render = () => {
+	const render = (resetSelection = false) => {
 		if (loadMore) {
 			loadMore.hidden = endReached
 		}
+		const previous = toggles
 		toggles = new Map<number, HTMLInputElement>()
 		for (const m of msgs) {
-			toggles.set(m.ID, dom.input(attr.type('checkbox'), msgs.length === 1 ? attr.checked('') : [], ))
+			toggles.set(m.ID, dom.input(attr.type('checkbox'), prop({checked: !resetSelection && !!previous.get(m.ID)?.checked}), dom._attrs({'aria-label': 'Select message'}), function change() {
+				updateSelection()
+			}))
 		}
 
 		const ntbody = dom.tbody(
@@ -3541,6 +3570,7 @@ const queueList = async () => {
 		)
 		tbody.replaceWith(ntbody)
 		tbody = ntbody
+		updateSelection()
 	}
 	render()
 
@@ -3671,7 +3701,7 @@ const queueList = async () => {
 				msgs = results
 				endReached = msgs.length <= filter.Max
 				msgs = msgs.slice(0, filter.Max)
-				render()
+				render(true)
 			},
 		),
 
@@ -3731,12 +3761,7 @@ const queueList = async () => {
 			dom.thead(
 				dom.tr(
 					dom.td(
-						dom.input(attr.type('checkbox'), msgs.length === 1 ? attr.checked('') : [], attr.form('queuefilter'), function change(e: MouseEvent) {
-							const elem = e.target! as HTMLInputElement
-							for (const [_, toggle] of toggles) {
-								toggle.checked = elem.checked
-							}
-						}),
+						selectAll,
 					),
 					dom.th('Message'),
 					dom.th('Addresses'),
@@ -3781,10 +3806,12 @@ const queueList = async () => {
 		dom.br(),
 		dom.br(),
 		dom.div(
-			dom._class('unclutter'),
+			dom._class('bulkActions'),
 			dom.h2('Change selected messages'),
-			dom.div(
-				style({display: 'flex', gap: '2em'}),
+			selectionStatus,
+			bulkControls=dom.fieldset(
+				prop({disabled: true}),
+				dom._class('bulkActionGroups'),
 				dom.div(
 					dom.div('Hold'),
 					dom.div(
@@ -4192,6 +4219,32 @@ const hooksList = async () => {
 
 	// Hook ID to checkbox.
 	let toggles = new Map<number, HTMLInputElement>()
+	let bulkControls: HTMLFieldSetElement | undefined
+	const selectionStatus = dom.p(dom._attrs({role: 'status'}))
+	const selectAll = dom.input(attr.type('checkbox'), dom._attrs({'aria-label': 'Select all loaded webhooks'}), function change() {
+		for (const toggle of toggles.values()) {
+			toggle.checked = selectAll.checked
+		}
+		updateSelection()
+	})
+	const updateSelection = () => {
+		const count = Array.from(toggles.values()).filter(toggle => toggle.checked).length
+		selectAll.checked = count > 0 && count === toggles.size
+		selectAll.indeterminate = count > 0 && count < toggles.size
+		selectAll.disabled = toggles.size === 0
+		if (bulkControls) {
+			bulkControls.disabled = count === 0
+		}
+		let message = 'Select webhooks to enable actions.'
+		if (count > 0) {
+			message = count + ' webhooks selected'
+			if (count === 1) {
+				message = '1 webhook selected'
+			}
+		}
+		dom._kids(selectionStatus, message)
+	}
+
 
 	// We operate on what the user has selected, not what the filters would currently
 	// evaluate to. This function can throw an error, which is why we have awkward
@@ -4215,10 +4268,13 @@ const hooksList = async () => {
 
 	let tbody = dom.tbody()
 
-	const render = () => {
+	const render = (resetSelection = false) => {
+		const previous = toggles
 		toggles = new Map<number, HTMLInputElement>()
 		for (const h of (hooks || [])) {
-			toggles.set(h.ID, dom.input(attr.type('checkbox'), (hooks || []).length === 1 ? attr.checked('') : [], ))
+			toggles.set(h.ID, dom.input(attr.type('checkbox'), prop({checked: !resetSelection && !!previous.get(h.ID)?.checked}), dom._attrs({'aria-label': 'Select webhook'}), function change() {
+				updateSelection()
+			}))
 		}
 
 		const ntbody = dom.tbody(
@@ -4241,6 +4297,7 @@ const hooksList = async () => {
 		)
 		tbody.replaceWith(ntbody)
 		tbody = ntbody
+		updateSelection()
 	}
 	render()
 
@@ -4305,12 +4362,7 @@ const hooksList = async () => {
 			dom.thead(
 				dom.tr(
 					dom.td(
-						dom.input(attr.type('checkbox'), (hooks || []).length === 1 ? attr.checked('') : [], attr.form('hooksfilter'), function change(e: MouseEvent) {
-							const elem = e.target! as HTMLInputElement
-							for (const [_, toggle] of toggles) {
-								toggle.checked = elem.checked
-							}
-						}),
+						selectAll,
 					),
 					dom.th('Event'),
 					dom.th('Endpoint'),
@@ -4389,17 +4441,19 @@ const hooksList = async () => {
 				hooks = hooks.slice(0, filter.Max)
 				updatePageStatus()
 				loadMore.hidden = endReached
-				render()
+				render(true)
 			},
 		),
 
 		dom.br(),
 		dom.br(),
 		dom.div(
-			dom._class('unclutter'),
+			dom._class('bulkActions'),
 			dom.h2('Change selected webhooks'),
-			dom.div(
-				style({display: 'flex', gap: '2em'}),
+			selectionStatus,
+			bulkControls=dom.fieldset(
+				prop({disabled: true}),
+				dom._class('bulkActionGroups'),
 				dom.div(
 					dom.div('Schedule next delivery attempt'),
 					buttonNextAttemptSet('Now', 0), ' ',
