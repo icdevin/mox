@@ -13,6 +13,10 @@ let moxgoos: string
 let moxgoarch: string
 
 const login = async (reason: string) => {
+	let notice = reason
+	if (reason.startsWith('unknown session')) {
+		notice = 'Your session has ended. Enter your password to continue.'
+	}
 	return new Promise<string>((resolve: (v: string) => void, _) => {
 		const origFocus = document.activeElement
 		let reasonElem: HTMLElement
@@ -22,7 +26,6 @@ const login = async (reason: string) => {
 			dom._class('adminOverlay', 'adminLogin'),
 			dom.div(
 				style({display: 'flex', flexDirection: 'column', alignItems: 'center'}),
-				reasonElem=reason ? dom.div(style({marginBottom: '2ex', textAlign: 'center'}), reason) : dom.div(),
 				dom.div(
 					dom._class('adminDialog'),
 					dom.form(
@@ -56,6 +59,13 @@ const login = async (reason: string) => {
 						fieldset=dom.fieldset(
 							dom.h1('devn'),
 							dom.p('Administration'),
+							reasonElem=dom.div(
+								dom._class('loginNotice'),
+								dom._attrs({role: 'status'}),
+								prop({hidden: !reason}),
+								dom.div(dom._class('loginNoticeTitle'), 'Please sign in again'),
+								dom.div(notice),
+							),
 							dom.label(
 								style({display: 'block', marginBottom: '2ex'}),
 								dom.div('Password', style({marginBottom: '.5ex'})),

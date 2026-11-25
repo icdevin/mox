@@ -1700,12 +1700,16 @@
 	var moxgoos;
 	var moxgoarch;
 	var login = /* @__PURE__ */ __name(async (reason) => {
+		let notice = reason;
+		if (reason.startsWith("unknown session")) {
+			notice = "Your session has ended. Enter your password to continue.";
+		}
 		return new Promise((resolve, _) => {
 			const origFocus = document.activeElement;
 			let reasonElem;
 			let fieldset;
 			let password;
-			const root = dom.div(dom._class("adminOverlay", "adminLogin"), dom.div(style({ display: "flex", flexDirection: "column", alignItems: "center" }), reasonElem = reason ? dom.div(style({ marginBottom: "2ex", textAlign: "center" }), reason) : dom.div(), dom.div(dom._class("adminDialog"), dom.form(/* @__PURE__ */ __name(async function submit(e) {
+			const root = dom.div(dom._class("adminOverlay", "adminLogin"), dom.div(style({ display: "flex", flexDirection: "column", alignItems: "center" }), dom.div(dom._class("adminDialog"), dom.form(/* @__PURE__ */ __name(async function submit(e) {
 				e.preventDefault();
 				e.stopPropagation();
 				reasonElem.remove();
@@ -1729,7 +1733,7 @@
 				} finally {
 					fieldset.disabled = false;
 				}
-			}, "submit"), fieldset = dom.fieldset(dom.h1("devn"), dom.p("Administration"), dom.label(style({ display: "block", marginBottom: "2ex" }), dom.div("Password", style({ marginBottom: ".5ex" })), password = dom.input(attr.type("password"), attr.autocomplete("current-password"), attr.required(""))), dom.div(style({ textAlign: "center" }), dom.submitbutton("Login")))))));
+			}, "submit"), fieldset = dom.fieldset(dom.h1("devn"), dom.p("Administration"), reasonElem = dom.div(dom._class("loginNotice"), dom._attrs({ role: "status" }), prop({ hidden: !reason }), dom.div(dom._class("loginNoticeTitle"), "Please sign in again"), dom.div(notice)), dom.label(style({ display: "block", marginBottom: "2ex" }), dom.div("Password", style({ marginBottom: ".5ex" })), password = dom.input(attr.type("password"), attr.autocomplete("current-password"), attr.required(""))), dom.div(style({ textAlign: "center" }), dom.submitbutton("Login")))))));
 			document.body.appendChild(root);
 			password.focus();
 		});
