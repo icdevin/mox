@@ -2795,3 +2795,10 @@ func (Admin) LoginAttempts(ctx context.Context, accountName string, limit int) [
 	xcheckf(ctx, err, "listing login attempts")
 	return l
 }
+
+// LoginAttemptsPage returns a bounded page, with an empty Next cursor at the end.
+func (Admin) LoginAttemptsPage(ctx context.Context, accountName string, limit int, cursor string) store.LoginAttemptPage {
+	page, err := store.LoginAttemptListPage(ctx, accountName, limit, cursor)
+	xcheckf(ctx, err, "listing login attempts page")
+	return page
+}

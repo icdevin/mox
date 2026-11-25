@@ -667,7 +667,7 @@ const accounts = async () => {
 }
 
 const loginattempts = async () => {
-	const loginAttempts = await client.LoginAttempts("", 0)
+	const attempts = await pagedLoginAttempts('', true)
 
 	return dom.div(
 		crumbs(
@@ -677,12 +677,12 @@ const loginattempts = async () => {
 		),
 		dom.h2('Login attempts'),
 		dom.p('Login attempts are stored for 30 days. At most 10000 failed login attempts are stored per account to prevent unlimited growth of the database.'),
-		renderLoginAttempts(true, loginAttempts || [])
+		attempts
 	)
 }
 
 const accountloginattempts = async (accountName: string) => {
-	const loginAttempts = await client.LoginAttempts(accountName, 0)
+	const attempts = await pagedLoginAttempts(accountName, false)
 
 	return dom.div(
 		crumbs(
@@ -693,12 +693,41 @@ const accountloginattempts = async (accountName: string) => {
 		),
 		dom.h2('Login attempts'),
 		dom.p('Login attempts are stored for 30 days. At most 10000 failed login attempts are stored per account to prevent unlimited growth of the database.'),
-		renderLoginAttempts(false, loginAttempts || [])
+		attempts
 	)
 }
 
+const pagedLoginAttempts = async (accountName: string, accountLinks: boolean) => {
+	const pageSize = 100
+	let page = await client.LoginAttemptsPage(accountName, pageSize, '')
+	const table = renderLoginAttempts(accountLinks, page.Attempts || [])
+	const status = dom.span(dom._attrs({role: 'status'}))
+	let count = (page.Attempts || []).length
+	const loadMore = dom.clickbutton('Load more', async function click(e: MouseEvent) {
+		const next = await check(e.currentTarget! as HTMLButtonElement, client.LoginAttemptsPage(accountName, pageSize, page.Next))
+		const rows = next.Attempts || []
+		if (rows.length) {
+			const batch = renderLoginAttempts(accountLinks, rows)
+			table.tBodies[0].append(...Array.from(batch.tBodies[0].rows))
+		}
+		count += rows.length
+		page = next
+		update()
+	})
+	const update = () => {
+		loadMore.hidden = !page.Next
+		let message = count + ' login attempts shown'
+		if (!page.Next) {
+			message += ' · No more results'
+		}
+		dom._kids(status, message)
+	}
+	update()
+	return dom.div(table, dom.div(dom._class('loginAttemptsMore'), style({display: 'flex', alignItems: 'center', gap: '12px'}), loadMore, status))
+}
+
 const renderLoginAttempts = (accountLinks: boolean, loginAttempts: api.LoginAttempt[]) => {
-	// todo: pagination and search
+	// todo: search
 
 	const nowSecs = new Date().getTime()/1000
 	return dom.table(
@@ -3420,10 +3449,13 @@ const queueList = async () => {
 	let sort: api.Sort = {Field: "NextAttempt", LastID: 0, Last: null, Asc: true}
 	let [holdRules, msgs0, transports] = await Promise.all([
 		client.QueueHoldRuleList(),
-		queuePage(client.withOptions({skipReturnCheck: true}).QueueList(filter, sort), api.parser.Msg, sort.Field),
+		queuePage(client.withOptions({skipReturnCheck: true}).QueueList({...filter, Max: filter.Max+1}, sort), api.parser.Msg, sort.Field),
 		client.Transports(),
 	])
 	let msgs: api.Msg[] = msgs0 || []
+	let endReached = msgs.length <= filter.Max
+	msgs = msgs.slice(0, filter.Max)
+	let loadMore: HTMLButtonElement
 
 	// todo: more sorting
 	// todo: after making changes, don't reload entire page. probably best to fetch messages by id and rerender. also report on which messages weren't affected (e.g. no longer in queue).
@@ -3481,6 +3513,9 @@ const queueList = async () => {
 	let tbody = dom.tbody()
 
 	const render = () => {
+		if (loadMore) {
+			loadMore.hidden = endReached
+		}
 		toggles = new Map<number, HTMLInputElement>()
 		for (const m of msgs) {
 			toggles.set(m.ID, dom.input(attr.type('checkbox'), msgs.length === 1 ? attr.checked('') : [], ))
@@ -3628,7 +3663,14 @@ const queueList = async () => {
 					Asc: sortElem.value.endsWith('asc'),
 				}
 				tbody.classList.add('loadstart')
-				msgs = await check({disabled: false}, queuePage(client.withOptions({skipReturnCheck: true}).QueueList(filter, sort), api.parser.Msg, sort.Field)) || []
+				const requestedSort = sort
+				const results = await check({disabled: false}, queuePage(client.withOptions({skipReturnCheck: true}).QueueList({...filter, Max: filter.Max+1}, sort), api.parser.Msg, sort.Field)) || []
+				if (sort !== requestedSort) {
+					return
+				}
+				msgs = results
+				endReached = msgs.length <= filter.Max
+				msgs = msgs.slice(0, filter.Max)
 				render()
 			},
 		),
@@ -3709,7 +3751,7 @@ const queueList = async () => {
 					dom.td(
 						attr.colspan('6'),
 						// todo: consider implementing infinite scroll, autoloading more pages. means the operations on selected messages should be moved from below to above the table. and probably only show them when at least one message is selected to prevent clutter.
-						dom.clickbutton('Load more', attr.title('Try to load more entries. You can still try to load more entries when at the end of the list, new entries may have been appended since the previous call.'), async function click(e: MouseEvent) {
+						loadMore=dom.clickbutton('Load more', prop({hidden: endReached}), async function click(e: MouseEvent) {
 							if (msgs.length === 0) {
 								sort.LastID = 0
 								sort.Last = null
@@ -3719,9 +3761,18 @@ const queueList = async () => {
 								sort.Last = queueCursor(lm)
 							}
 							tbody.classList.add('loadstart')
-							const l = await check(e.target! as HTMLButtonElement, queuePage(client.withOptions({skipReturnCheck: true}).QueueList(filter, sort), api.parser.Msg, sort.Field)) || []
-							msgs.push(...l)
-							render()
+							const requestedSort = sort
+							try {
+								const l = await check(e.currentTarget! as HTMLButtonElement, queuePage(client.withOptions({skipReturnCheck: true}).QueueList({...filter, Max: filter.Max+1}, sort), api.parser.Msg, sort.Field)) || []
+								if (sort !== requestedSort) {
+									return
+								}
+								endReached = l.length <= filter.Max
+								msgs.push(...l.slice(0, filter.Max))
+								render()
+							} finally {
+								tbody.classList.remove('loadstart')
+							}
 						}),
 					),
 				),
@@ -3859,10 +3910,13 @@ const retiredList = async () => {
 	let filter: api.RetiredFilter = {Max: parseInt(localStorageGet('adminpaginationsize') || '') || 100, IDs: [], Account: '', From: '', To: '', Submitted: '', LastActivity: '', Transport: null}
 	let sort: api.RetiredSort = {Field: "LastActivity", LastID: 0, Last: null, Asc: false}
 	const [retired0, transports0] = await Promise.all([
-		queuePage(client.withOptions({skipReturnCheck: true}).RetiredList(filter, sort), api.parser.MsgRetired, sort.Field),
+		queuePage(client.withOptions({skipReturnCheck: true}).RetiredList({...filter, Max: filter.Max+1}, sort), api.parser.MsgRetired, sort.Field),
 		client.Transports(),
 	])
 	let retired: api.MsgRetired[] = retired0 || []
+	let endReached = retired.length <= filter.Max
+	retired = retired.slice(0, filter.Max)
+	let loadMore: HTMLButtonElement
 	let transports: { [key: string]: api.Transport } = transports0 || {}
 
 	const nowSecs = new Date().getTime()/1000
@@ -3881,6 +3935,9 @@ const retiredList = async () => {
 	let tbody = dom.tbody()
 
 	const render = () => {
+		if (loadMore) {
+			loadMore.hidden = endReached
+		}
 		const ntbody = dom.tbody(
 			dom._class('loadend'),
 			retired.length === 0 ? dom.tr(dom.td(attr.colspan('5'), 'No retired messages.')) : [],
@@ -3935,7 +3992,14 @@ const retiredList = async () => {
 					Asc: sortElem.value.endsWith('asc'),
 				}
 				tbody.classList.add('loadstart')
-				retired = await check({disabled: false}, queuePage(client.withOptions({skipReturnCheck: true}).RetiredList(filter, sort), api.parser.MsgRetired, sort.Field)) || []
+				const requestedSort = sort
+				const results = await check({disabled: false}, queuePage(client.withOptions({skipReturnCheck: true}).RetiredList({...filter, Max: filter.Max+1}, sort), api.parser.MsgRetired, sort.Field)) || []
+				if (sort !== requestedSort) {
+					return
+				}
+				retired = results
+				endReached = retired.length <= filter.Max
+				retired = retired.slice(0, filter.Max)
 				render()
 			},
 		),
@@ -4008,7 +4072,7 @@ const retiredList = async () => {
 				dom.tr(
 					dom.td(
 						attr.colspan('5'),
-						dom.clickbutton('Load more', attr.title('Try to load more entries. You can still try to load more entries when at the end of the list, new entries may have been appended since the previous call.'), async function click(e: MouseEvent) {
+						loadMore=dom.clickbutton('Load more', prop({hidden: endReached}), async function click(e: MouseEvent) {
 							if (retired.length === 0) {
 								sort.LastID = 0
 								sort.Last = null
@@ -4018,9 +4082,18 @@ const retiredList = async () => {
 								sort.Last = queueCursor(lm)
 							}
 							tbody.classList.add('loadstart')
-							const l = await check(e.target! as HTMLButtonElement, queuePage(client.withOptions({skipReturnCheck: true}).RetiredList(filter, sort), api.parser.MsgRetired, sort.Field)) || []
-							retired.push(...l)
-							render()
+							const requestedSort = sort
+							try {
+								const l = await check(e.currentTarget! as HTMLButtonElement, queuePage(client.withOptions({skipReturnCheck: true}).RetiredList({...filter, Max: filter.Max+1}, sort), api.parser.MsgRetired, sort.Field)) || []
+								if (sort !== requestedSort) {
+									return
+								}
+								endReached = l.length <= filter.Max
+								retired.push(...l.slice(0, filter.Max))
+								render()
+							} finally {
+								tbody.classList.remove('loadstart')
+							}
 						}),
 					),
 				),
@@ -4093,15 +4166,12 @@ const webhookDetails = (h: api.Hook | api.HookRetired) => {
 const hooksList = async () => {
 	let filter: api.HookFilter = {Max: parseInt(localStorageGet('adminpaginationsize') || '') || 100, IDs: [], Account: '', Submitted: '', NextAttempt: '', Event: ''}
 	let sort: api.HookSort = {Field: "NextAttempt", LastID: 0, Last: null, Asc: true}
-	let hooks: api.Hook[] = await queuePage(client.withOptions({skipReturnCheck: true}).HookList(filter, sort), api.parser.Hook, sort.Field) || []
+	let hooks: api.Hook[] = await queuePage(client.withOptions({skipReturnCheck: true}).HookList({...filter, Max: filter.Max+1}, sort), api.parser.Hook, sort.Field) || []
 
-	let endReached = hooks.length < filter.Max
+	let endReached = hooks.length <= filter.Max
+	hooks = hooks.slice(0, filter.Max)
 	const pageStatus = dom.span(dom._attrs({'role': 'status'}), style({marginLeft: '12px'}))
 	let loadMore: HTMLButtonElement
-	let loadMoreLabel = 'Load more'
-	if (endReached) {
-		loadMoreLabel = 'Check for more'
-	}
 	const updatePageStatus = () => {
 		let message = hooks.length + ' webhooks shown'
 		if (endReached) {
@@ -4254,7 +4324,7 @@ const hooksList = async () => {
 				dom.tr(
 					dom.td(
 						attr.colspan('6'),
-						loadMore=dom.clickbutton(loadMoreLabel, attr.title('Loads the next page of matching webhooks.'), async function click(e: MouseEvent) {
+						loadMore=dom.clickbutton('Load more', prop({hidden: endReached}), attr.title('Loads the next page of matching webhooks.'), async function click(e: MouseEvent) {
 							if (hooks.length === 0) {
 								sort.LastID = 0
 								sort.Last = null
@@ -4266,20 +4336,17 @@ const hooksList = async () => {
 
 							const requestedSort = sort
 							try {
-								const l = await check(e.currentTarget! as HTMLButtonElement, queuePage(client.withOptions({skipReturnCheck: true}).HookList(filter, sort), api.parser.Hook, sort.Field))
+								const l = await check(e.currentTarget! as HTMLButtonElement, queuePage(client.withOptions({skipReturnCheck: true}).HookList({...filter, Max: filter.Max+1}, sort), api.parser.Hook, sort.Field))
 								if (sort !== requestedSort) {
 									return
 								}
-								endReached = l.length < filter.Max
+								endReached = l.length <= filter.Max
 								if (l.length > 0) {
-									hooks.push(...l)
+									hooks.push(...l.slice(0, filter.Max))
 									render()
 								}
 								updatePageStatus()
-								loadMore.textContent = 'Load more'
-								if (endReached) {
-									loadMore.textContent = 'Check for more'
-								}
+								loadMore.hidden = endReached
 							} finally {
 								tbody.classList.remove('loadstart')
 							}
@@ -4312,13 +4379,16 @@ const hooksList = async () => {
 					Asc: sortElem.value.endsWith('asc'),
 				}
 				tbody.classList.add('loadstart')
-				hooks = await check({disabled: false}, queuePage(client.withOptions({skipReturnCheck: true}).HookList(filter, sort), api.parser.Hook, sort.Field)) || []
-				endReached = hooks.length < filter.Max
-				updatePageStatus()
-				loadMore.textContent = 'Load more'
-				if (endReached) {
-					loadMore.textContent = 'Check for more'
+				const requestedSort = sort
+				const results = await check({disabled: false}, queuePage(client.withOptions({skipReturnCheck: true}).HookList({...filter, Max: filter.Max+1}, sort), api.parser.Hook, sort.Field)) || []
+				if (sort !== requestedSort) {
+					return
 				}
+				hooks = results
+				endReached = hooks.length <= filter.Max
+				hooks = hooks.slice(0, filter.Max)
+				updatePageStatus()
+				loadMore.hidden = endReached
 				render()
 			},
 		),
@@ -4384,15 +4454,12 @@ const hooksList = async () => {
 const hooksRetiredList = async () => {
 	let filter: api.HookRetiredFilter = {Max: parseInt(localStorageGet('adminpaginationsize') || '') || 100, IDs: [], Account: '', Submitted: '', LastActivity: '', Event: ''}
 	let sort: api.HookRetiredSort = {Field: "LastActivity", LastID: 0, Last: null, Asc: false}
-	let hooks = await queuePage(client.withOptions({skipReturnCheck: true}).HookRetiredList(filter, sort), api.parser.HookRetired, sort.Field) || []
+	let hooks = await queuePage(client.withOptions({skipReturnCheck: true}).HookRetiredList({...filter, Max: filter.Max+1}, sort), api.parser.HookRetired, sort.Field) || []
 
-	let endReached = hooks.length < filter.Max
+	let endReached = hooks.length <= filter.Max
+	hooks = hooks.slice(0, filter.Max)
 	const pageStatus = dom.span(dom._attrs({'role': 'status'}), style({marginLeft: '12px'}))
 	let loadMore: HTMLButtonElement
-	let loadMoreLabel = 'Load more'
-	if (endReached) {
-		loadMoreLabel = 'Check for more'
-	}
 	const updatePageStatus = () => {
 		let message = hooks.length + ' webhooks shown'
 		if (endReached) {
@@ -4499,7 +4566,7 @@ const hooksRetiredList = async () => {
 				dom.tr(
 					dom.td(
 						attr.colspan('5'),
-						loadMore=dom.clickbutton(loadMoreLabel, attr.title('Loads the next page of matching webhooks.'), async function click(e: MouseEvent) {
+						loadMore=dom.clickbutton('Load more', prop({hidden: endReached}), attr.title('Loads the next page of matching webhooks.'), async function click(e: MouseEvent) {
 							if (hooks.length === 0) {
 								sort.LastID = 0
 								sort.Last = null
@@ -4510,20 +4577,17 @@ const hooksRetiredList = async () => {
 							}
 							const requestedSort = sort
 							try {
-								const l = await check(e.currentTarget! as HTMLButtonElement, queuePage(client.withOptions({skipReturnCheck: true}).HookRetiredList(filter, sort), api.parser.HookRetired, sort.Field))
+								const l = await check(e.currentTarget! as HTMLButtonElement, queuePage(client.withOptions({skipReturnCheck: true}).HookRetiredList({...filter, Max: filter.Max+1}, sort), api.parser.HookRetired, sort.Field))
 								if (sort !== requestedSort) {
 									return
 								}
-								endReached = l.length < filter.Max
+								endReached = l.length <= filter.Max
 								if (l.length > 0) {
-									hooks.push(...l)
+									hooks.push(...l.slice(0, filter.Max))
 									render()
 								}
 								updatePageStatus()
-								loadMore.textContent = 'Load more'
-								if (endReached) {
-									loadMore.textContent = 'Check for more'
-								}
+								loadMore.hidden = endReached
 							} finally {
 								tbody.classList.remove('loadstart')
 							}
@@ -4555,13 +4619,16 @@ const hooksRetiredList = async () => {
 					Asc: sortElem.value.endsWith('asc'),
 				}
 				tbody.classList.add('loadstart')
-				hooks = await check({disabled: false}, queuePage(client.withOptions({skipReturnCheck: true}).HookRetiredList(filter, sort), api.parser.HookRetired, sort.Field)) || []
-				endReached = hooks.length < filter.Max
-				updatePageStatus()
-				loadMore.textContent = 'Load more'
-				if (endReached) {
-					loadMore.textContent = 'Check for more'
+				const requestedSort = sort
+				const results = await check({disabled: false}, queuePage(client.withOptions({skipReturnCheck: true}).HookRetiredList({...filter, Max: filter.Max+1}, sort), api.parser.HookRetired, sort.Field)) || []
+				if (sort !== requestedSort) {
+					return
 				}
+				hooks = results
+				endReached = hooks.length <= filter.Max
+				hooks = hooks.slice(0, filter.Max)
+				updatePageStatus()
+				loadMore.hidden = endReached
 				render()
 			},
 		),

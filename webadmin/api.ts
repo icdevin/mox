@@ -1103,6 +1103,12 @@ export interface LoginAttempt {
 	Result: AuthResult
 }
 
+// LoginAttemptPage keeps the next cursor at full database timestamp precision.
+export interface LoginAttemptPage {
+	Attempts?: LoginAttempt[] | null
+	Next: string
+}
+
 export type CSRFToken = string
 
 // Policy as used in DMARC DNS record for "p=" or "sp=".
@@ -1160,7 +1166,7 @@ export enum AuthResult {
 	AuthAborted = "aborted",
 }
 
-export const structTypes: {[typename: string]: boolean} = {"Account":true,"Address":true,"AddressAlias":true,"Alias":true,"AliasAddress":true,"AuthResults":true,"AutoconfCheckResult":true,"AutodiscoverCheckResult":true,"AutodiscoverSRV":true,"AutomaticJunkFlags":true,"Canonicalization":true,"CheckResult":true,"ClientConfigs":true,"ClientConfigsEntry":true,"ConfigDomain":true,"DANECheckResult":true,"DKIM":true,"DKIMAuthResult":true,"DKIMCheckResult":true,"DKIMRecord":true,"DMARC":true,"DMARCCheckResult":true,"DMARCRecord":true,"DMARCSummary":true,"DNSSECResult":true,"DateRange":true,"Destination":true,"Directive":true,"Domain":true,"DomainFeedback":true,"Dynamic":true,"Evaluation":true,"EvaluationStat":true,"Extension":true,"FailureDetails":true,"Filter":true,"HoldRule":true,"Hook":true,"HookFilter":true,"HookResult":true,"HookRetired":true,"HookRetiredFilter":true,"HookRetiredSort":true,"HookSort":true,"IPDomain":true,"IPRevCheckResult":true,"Identifiers":true,"IncomingWebhook":true,"JunkFilter":true,"LoginAttempt":true,"MTASTS":true,"MTASTSCheckResult":true,"MTASTSRecord":true,"MX":true,"MXCheckResult":true,"Modifier":true,"Msg":true,"MsgResult":true,"MsgRetired":true,"OutgoingWebhook":true,"Pair":true,"Policy":true,"PolicyEvaluated":true,"PolicyOverrideReason":true,"PolicyPublished":true,"PolicyRecord":true,"Record":true,"Report":true,"ReportMetadata":true,"ReportRecord":true,"Result":true,"ResultPolicy":true,"RetiredFilter":true,"RetiredSort":true,"Reverse":true,"Route":true,"Row":true,"Ruleset":true,"SMTPAuth":true,"SPFAuthResult":true,"SPFCheckResult":true,"SPFRecord":true,"SRV":true,"SRVConfCheckResult":true,"STSMX":true,"Selector":true,"Sort":true,"SubjectPass":true,"Summary":true,"SuppressAddress":true,"TLSCheckResult":true,"TLSPublicKey":true,"TLSRPT":true,"TLSRPTCheckResult":true,"TLSRPTDateRange":true,"TLSRPTRecord":true,"TLSRPTSummary":true,"TLSRPTSuppressAddress":true,"TLSReportRecord":true,"TLSResult":true,"Transport":true,"TransportDirect":true,"TransportFail":true,"TransportSMTP":true,"TransportSocks":true,"URI":true,"WebForward":true,"WebHandler":true,"WebInternal":true,"WebRedirect":true,"WebStatic":true,"WebserverConfig":true}
+export const structTypes: {[typename: string]: boolean} = {"Account":true,"Address":true,"AddressAlias":true,"Alias":true,"AliasAddress":true,"AuthResults":true,"AutoconfCheckResult":true,"AutodiscoverCheckResult":true,"AutodiscoverSRV":true,"AutomaticJunkFlags":true,"Canonicalization":true,"CheckResult":true,"ClientConfigs":true,"ClientConfigsEntry":true,"ConfigDomain":true,"DANECheckResult":true,"DKIM":true,"DKIMAuthResult":true,"DKIMCheckResult":true,"DKIMRecord":true,"DMARC":true,"DMARCCheckResult":true,"DMARCRecord":true,"DMARCSummary":true,"DNSSECResult":true,"DateRange":true,"Destination":true,"Directive":true,"Domain":true,"DomainFeedback":true,"Dynamic":true,"Evaluation":true,"EvaluationStat":true,"Extension":true,"FailureDetails":true,"Filter":true,"HoldRule":true,"Hook":true,"HookFilter":true,"HookResult":true,"HookRetired":true,"HookRetiredFilter":true,"HookRetiredSort":true,"HookSort":true,"IPDomain":true,"IPRevCheckResult":true,"Identifiers":true,"IncomingWebhook":true,"JunkFilter":true,"LoginAttempt":true,"LoginAttemptPage":true,"MTASTS":true,"MTASTSCheckResult":true,"MTASTSRecord":true,"MX":true,"MXCheckResult":true,"Modifier":true,"Msg":true,"MsgResult":true,"MsgRetired":true,"OutgoingWebhook":true,"Pair":true,"Policy":true,"PolicyEvaluated":true,"PolicyOverrideReason":true,"PolicyPublished":true,"PolicyRecord":true,"Record":true,"Report":true,"ReportMetadata":true,"ReportRecord":true,"Result":true,"ResultPolicy":true,"RetiredFilter":true,"RetiredSort":true,"Reverse":true,"Route":true,"Row":true,"Ruleset":true,"SMTPAuth":true,"SPFAuthResult":true,"SPFCheckResult":true,"SPFRecord":true,"SRV":true,"SRVConfCheckResult":true,"STSMX":true,"Selector":true,"Sort":true,"SubjectPass":true,"Summary":true,"SuppressAddress":true,"TLSCheckResult":true,"TLSPublicKey":true,"TLSRPT":true,"TLSRPTCheckResult":true,"TLSRPTDateRange":true,"TLSRPTRecord":true,"TLSRPTSummary":true,"TLSRPTSuppressAddress":true,"TLSReportRecord":true,"TLSResult":true,"Transport":true,"TransportDirect":true,"TransportFail":true,"TransportSMTP":true,"TransportSocks":true,"URI":true,"WebForward":true,"WebHandler":true,"WebInternal":true,"WebRedirect":true,"WebStatic":true,"WebserverConfig":true}
 export const stringsTypes: {[typename: string]: boolean} = {"Align":true,"AuthResult":true,"CSRFToken":true,"DMARCPolicy":true,"IP":true,"Localpart":true,"Mode":true,"RUA":true}
 export const intsTypes: {[typename: string]: boolean} = {}
 export const types: TypenameMap = {
@@ -1276,6 +1282,7 @@ export const types: TypenameMap = {
 	"Dynamic": {"Name":"Dynamic","Docs":"","Fields":[{"Name":"Domains","Docs":"","Typewords":["{}","ConfigDomain"]},{"Name":"Accounts","Docs":"","Typewords":["{}","Account"]},{"Name":"WebDomainRedirects","Docs":"","Typewords":["{}","string"]},{"Name":"WebHandlers","Docs":"","Typewords":["[]","WebHandler"]},{"Name":"Routes","Docs":"","Typewords":["[]","Route"]},{"Name":"MonitorDNSBLs","Docs":"","Typewords":["[]","string"]},{"Name":"MonitorDNSBLZones","Docs":"","Typewords":["[]","Domain"]}]},
 	"TLSPublicKey": {"Name":"TLSPublicKey","Docs":"","Fields":[{"Name":"Fingerprint","Docs":"","Typewords":["string"]},{"Name":"Created","Docs":"","Typewords":["timestamp"]},{"Name":"Type","Docs":"","Typewords":["string"]},{"Name":"Name","Docs":"","Typewords":["string"]},{"Name":"NoIMAPPreauth","Docs":"","Typewords":["bool"]},{"Name":"CertDER","Docs":"","Typewords":["nullable","string"]},{"Name":"Account","Docs":"","Typewords":["string"]},{"Name":"LoginAddress","Docs":"","Typewords":["string"]}]},
 	"LoginAttempt": {"Name":"LoginAttempt","Docs":"","Fields":[{"Name":"Key","Docs":"","Typewords":["nullable","string"]},{"Name":"Last","Docs":"","Typewords":["timestamp"]},{"Name":"First","Docs":"","Typewords":["timestamp"]},{"Name":"Count","Docs":"","Typewords":["int64"]},{"Name":"AccountName","Docs":"","Typewords":["string"]},{"Name":"LoginAddress","Docs":"","Typewords":["string"]},{"Name":"RemoteIP","Docs":"","Typewords":["string"]},{"Name":"LocalIP","Docs":"","Typewords":["string"]},{"Name":"TLS","Docs":"","Typewords":["string"]},{"Name":"TLSPubKeyFingerprint","Docs":"","Typewords":["string"]},{"Name":"Protocol","Docs":"","Typewords":["string"]},{"Name":"UserAgent","Docs":"","Typewords":["string"]},{"Name":"AuthMech","Docs":"","Typewords":["string"]},{"Name":"Result","Docs":"","Typewords":["AuthResult"]}]},
+	"LoginAttemptPage": {"Name":"LoginAttemptPage","Docs":"","Fields":[{"Name":"Attempts","Docs":"","Typewords":["[]","LoginAttempt"]},{"Name":"Next","Docs":"","Typewords":["string"]}]},
 	"CSRFToken": {"Name":"CSRFToken","Docs":"","Values":null},
 	"DMARCPolicy": {"Name":"DMARCPolicy","Docs":"","Values":[{"Name":"PolicyEmpty","Value":"","Docs":""},{"Name":"PolicyNone","Value":"none","Docs":""},{"Name":"PolicyQuarantine","Value":"quarantine","Docs":""},{"Name":"PolicyReject","Value":"reject","Docs":""}]},
 	"Align": {"Name":"Align","Docs":"","Values":[{"Name":"AlignStrict","Value":"s","Docs":""},{"Name":"AlignRelaxed","Value":"r","Docs":""}]},
@@ -1399,6 +1406,7 @@ export const parser = {
 	Dynamic: (v: any) => parse("Dynamic", v) as Dynamic,
 	TLSPublicKey: (v: any) => parse("TLSPublicKey", v) as TLSPublicKey,
 	LoginAttempt: (v: any) => parse("LoginAttempt", v) as LoginAttempt,
+	LoginAttemptPage: (v: any) => parse("LoginAttemptPage", v) as LoginAttemptPage,
 	CSRFToken: (v: any) => parse("CSRFToken", v) as CSRFToken,
 	DMARCPolicy: (v: any) => parse("DMARCPolicy", v) as DMARCPolicy,
 	Align: (v: any) => parse("Align", v) as Align,
@@ -2351,6 +2359,15 @@ export class Client {
 		const returnTypes: string[][] = [["[]","LoginAttempt"]]
 		const params: any[] = [accountName, limit]
 		return await _sherpaCall(this.baseURL, this.authState, { ...this.options }, paramTypes, returnTypes, fn, params) as LoginAttempt[] | null
+	}
+
+	// LoginAttemptsPage returns a bounded page, with an empty Next cursor at the end.
+	async LoginAttemptsPage(accountName: string, limit: number, cursor: string): Promise<LoginAttemptPage> {
+		const fn: string = "LoginAttemptsPage"
+		const paramTypes: string[][] = [["string"],["int32"],["string"]]
+		const returnTypes: string[][] = [["LoginAttemptPage"]]
+		const params: any[] = [accountName, limit, cursor]
+		return await _sherpaCall(this.baseURL, this.authState, { ...this.options }, paramTypes, returnTypes, fn, params) as LoginAttemptPage
 	}
 }
 

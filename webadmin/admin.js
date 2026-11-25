@@ -244,7 +244,7 @@
 		AuthResult2["AuthError"] = "error";
 		AuthResult2["AuthAborted"] = "aborted";
 	})(AuthResult || (AuthResult = {}));
-	var structTypes = { "Account": true, "Address": true, "AddressAlias": true, "Alias": true, "AliasAddress": true, "AuthResults": true, "AutoconfCheckResult": true, "AutodiscoverCheckResult": true, "AutodiscoverSRV": true, "AutomaticJunkFlags": true, "Canonicalization": true, "CheckResult": true, "ClientConfigs": true, "ClientConfigsEntry": true, "ConfigDomain": true, "DANECheckResult": true, "DKIM": true, "DKIMAuthResult": true, "DKIMCheckResult": true, "DKIMRecord": true, "DMARC": true, "DMARCCheckResult": true, "DMARCRecord": true, "DMARCSummary": true, "DNSSECResult": true, "DateRange": true, "Destination": true, "Directive": true, "Domain": true, "DomainFeedback": true, "Dynamic": true, "Evaluation": true, "EvaluationStat": true, "Extension": true, "FailureDetails": true, "Filter": true, "HoldRule": true, "Hook": true, "HookFilter": true, "HookResult": true, "HookRetired": true, "HookRetiredFilter": true, "HookRetiredSort": true, "HookSort": true, "IPDomain": true, "IPRevCheckResult": true, "Identifiers": true, "IncomingWebhook": true, "JunkFilter": true, "LoginAttempt": true, "MTASTS": true, "MTASTSCheckResult": true, "MTASTSRecord": true, "MX": true, "MXCheckResult": true, "Modifier": true, "Msg": true, "MsgResult": true, "MsgRetired": true, "OutgoingWebhook": true, "Pair": true, "Policy": true, "PolicyEvaluated": true, "PolicyOverrideReason": true, "PolicyPublished": true, "PolicyRecord": true, "Record": true, "Report": true, "ReportMetadata": true, "ReportRecord": true, "Result": true, "ResultPolicy": true, "RetiredFilter": true, "RetiredSort": true, "Reverse": true, "Route": true, "Row": true, "Ruleset": true, "SMTPAuth": true, "SPFAuthResult": true, "SPFCheckResult": true, "SPFRecord": true, "SRV": true, "SRVConfCheckResult": true, "STSMX": true, "Selector": true, "Sort": true, "SubjectPass": true, "Summary": true, "SuppressAddress": true, "TLSCheckResult": true, "TLSPublicKey": true, "TLSRPT": true, "TLSRPTCheckResult": true, "TLSRPTDateRange": true, "TLSRPTRecord": true, "TLSRPTSummary": true, "TLSRPTSuppressAddress": true, "TLSReportRecord": true, "TLSResult": true, "Transport": true, "TransportDirect": true, "TransportFail": true, "TransportSMTP": true, "TransportSocks": true, "URI": true, "WebForward": true, "WebHandler": true, "WebInternal": true, "WebRedirect": true, "WebStatic": true, "WebserverConfig": true };
+	var structTypes = { "Account": true, "Address": true, "AddressAlias": true, "Alias": true, "AliasAddress": true, "AuthResults": true, "AutoconfCheckResult": true, "AutodiscoverCheckResult": true, "AutodiscoverSRV": true, "AutomaticJunkFlags": true, "Canonicalization": true, "CheckResult": true, "ClientConfigs": true, "ClientConfigsEntry": true, "ConfigDomain": true, "DANECheckResult": true, "DKIM": true, "DKIMAuthResult": true, "DKIMCheckResult": true, "DKIMRecord": true, "DMARC": true, "DMARCCheckResult": true, "DMARCRecord": true, "DMARCSummary": true, "DNSSECResult": true, "DateRange": true, "Destination": true, "Directive": true, "Domain": true, "DomainFeedback": true, "Dynamic": true, "Evaluation": true, "EvaluationStat": true, "Extension": true, "FailureDetails": true, "Filter": true, "HoldRule": true, "Hook": true, "HookFilter": true, "HookResult": true, "HookRetired": true, "HookRetiredFilter": true, "HookRetiredSort": true, "HookSort": true, "IPDomain": true, "IPRevCheckResult": true, "Identifiers": true, "IncomingWebhook": true, "JunkFilter": true, "LoginAttempt": true, "LoginAttemptPage": true, "MTASTS": true, "MTASTSCheckResult": true, "MTASTSRecord": true, "MX": true, "MXCheckResult": true, "Modifier": true, "Msg": true, "MsgResult": true, "MsgRetired": true, "OutgoingWebhook": true, "Pair": true, "Policy": true, "PolicyEvaluated": true, "PolicyOverrideReason": true, "PolicyPublished": true, "PolicyRecord": true, "Record": true, "Report": true, "ReportMetadata": true, "ReportRecord": true, "Result": true, "ResultPolicy": true, "RetiredFilter": true, "RetiredSort": true, "Reverse": true, "Route": true, "Row": true, "Ruleset": true, "SMTPAuth": true, "SPFAuthResult": true, "SPFCheckResult": true, "SPFRecord": true, "SRV": true, "SRVConfCheckResult": true, "STSMX": true, "Selector": true, "Sort": true, "SubjectPass": true, "Summary": true, "SuppressAddress": true, "TLSCheckResult": true, "TLSPublicKey": true, "TLSRPT": true, "TLSRPTCheckResult": true, "TLSRPTDateRange": true, "TLSRPTRecord": true, "TLSRPTSummary": true, "TLSRPTSuppressAddress": true, "TLSReportRecord": true, "TLSResult": true, "Transport": true, "TransportDirect": true, "TransportFail": true, "TransportSMTP": true, "TransportSocks": true, "URI": true, "WebForward": true, "WebHandler": true, "WebInternal": true, "WebRedirect": true, "WebStatic": true, "WebserverConfig": true };
 	var stringsTypes = { "Align": true, "AuthResult": true, "CSRFToken": true, "DMARCPolicy": true, "IP": true, "Localpart": true, "Mode": true, "RUA": true };
 	var intsTypes = {};
 	var types = {
@@ -360,6 +360,7 @@
 		"Dynamic": { "Name": "Dynamic", "Docs": "", "Fields": [{ "Name": "Domains", "Docs": "", "Typewords": ["{}", "ConfigDomain"] }, { "Name": "Accounts", "Docs": "", "Typewords": ["{}", "Account"] }, { "Name": "WebDomainRedirects", "Docs": "", "Typewords": ["{}", "string"] }, { "Name": "WebHandlers", "Docs": "", "Typewords": ["[]", "WebHandler"] }, { "Name": "Routes", "Docs": "", "Typewords": ["[]", "Route"] }, { "Name": "MonitorDNSBLs", "Docs": "", "Typewords": ["[]", "string"] }, { "Name": "MonitorDNSBLZones", "Docs": "", "Typewords": ["[]", "Domain"] }] },
 		"TLSPublicKey": { "Name": "TLSPublicKey", "Docs": "", "Fields": [{ "Name": "Fingerprint", "Docs": "", "Typewords": ["string"] }, { "Name": "Created", "Docs": "", "Typewords": ["timestamp"] }, { "Name": "Type", "Docs": "", "Typewords": ["string"] }, { "Name": "Name", "Docs": "", "Typewords": ["string"] }, { "Name": "NoIMAPPreauth", "Docs": "", "Typewords": ["bool"] }, { "Name": "CertDER", "Docs": "", "Typewords": ["nullable", "string"] }, { "Name": "Account", "Docs": "", "Typewords": ["string"] }, { "Name": "LoginAddress", "Docs": "", "Typewords": ["string"] }] },
 		"LoginAttempt": { "Name": "LoginAttempt", "Docs": "", "Fields": [{ "Name": "Key", "Docs": "", "Typewords": ["nullable", "string"] }, { "Name": "Last", "Docs": "", "Typewords": ["timestamp"] }, { "Name": "First", "Docs": "", "Typewords": ["timestamp"] }, { "Name": "Count", "Docs": "", "Typewords": ["int64"] }, { "Name": "AccountName", "Docs": "", "Typewords": ["string"] }, { "Name": "LoginAddress", "Docs": "", "Typewords": ["string"] }, { "Name": "RemoteIP", "Docs": "", "Typewords": ["string"] }, { "Name": "LocalIP", "Docs": "", "Typewords": ["string"] }, { "Name": "TLS", "Docs": "", "Typewords": ["string"] }, { "Name": "TLSPubKeyFingerprint", "Docs": "", "Typewords": ["string"] }, { "Name": "Protocol", "Docs": "", "Typewords": ["string"] }, { "Name": "UserAgent", "Docs": "", "Typewords": ["string"] }, { "Name": "AuthMech", "Docs": "", "Typewords": ["string"] }, { "Name": "Result", "Docs": "", "Typewords": ["AuthResult"] }] },
+		"LoginAttemptPage": { "Name": "LoginAttemptPage", "Docs": "", "Fields": [{ "Name": "Attempts", "Docs": "", "Typewords": ["[]", "LoginAttempt"] }, { "Name": "Next", "Docs": "", "Typewords": ["string"] }] },
 		"CSRFToken": { "Name": "CSRFToken", "Docs": "", "Values": null },
 		"DMARCPolicy": { "Name": "DMARCPolicy", "Docs": "", "Values": [{ "Name": "PolicyEmpty", "Value": "", "Docs": "" }, { "Name": "PolicyNone", "Value": "none", "Docs": "" }, { "Name": "PolicyQuarantine", "Value": "quarantine", "Docs": "" }, { "Name": "PolicyReject", "Value": "reject", "Docs": "" }] },
 		"Align": { "Name": "Align", "Docs": "", "Values": [{ "Name": "AlignStrict", "Value": "s", "Docs": "" }, { "Name": "AlignRelaxed", "Value": "r", "Docs": "" }] },
@@ -482,6 +483,7 @@
 		Dynamic: /* @__PURE__ */ __name((v) => parse("Dynamic", v), "Dynamic"),
 		TLSPublicKey: /* @__PURE__ */ __name((v) => parse("TLSPublicKey", v), "TLSPublicKey"),
 		LoginAttempt: /* @__PURE__ */ __name((v) => parse("LoginAttempt", v), "LoginAttempt"),
+		LoginAttemptPage: /* @__PURE__ */ __name((v) => parse("LoginAttemptPage", v), "LoginAttemptPage"),
 		CSRFToken: /* @__PURE__ */ __name((v) => parse("CSRFToken", v), "CSRFToken"),
 		DMARCPolicy: /* @__PURE__ */ __name((v) => parse("DMARCPolicy", v), "DMARCPolicy"),
 		Align: /* @__PURE__ */ __name((v) => parse("Align", v), "Align"),
@@ -1333,6 +1335,14 @@
 			const params = [accountName, limit];
 			return await _sherpaCall(this.baseURL, this.authState, { ...this.options }, paramTypes, returnTypes, fn, params);
 		}
+		// LoginAttemptsPage returns a bounded page, with an empty Next cursor at the end.
+		async LoginAttemptsPage(accountName, limit, cursor) {
+			const fn = "LoginAttemptsPage";
+			const paramTypes = [["string"], ["int32"], ["string"]];
+			const returnTypes = [["LoginAttemptPage"]];
+			const params = [accountName, limit, cursor];
+			return await _sherpaCall(this.baseURL, this.authState, { ...this.options }, paramTypes, returnTypes, fn, params);
+		}
 	};
 	var defaultBaseURL = (function() {
 		let p = location.pathname;
@@ -2068,13 +2078,41 @@
 		}, "change"))), " ", dom.submitbutton("Add account", attr.title("The account will be added and the config reloaded.")))), dom.br(), dom.h2("Recent login attempts", attr.title("Login attempts are stored for 30 days. At most 10000 failed login attempts are stored per account to prevent unlimited growth of the database.")), renderLoginAttempts(true, loginAttempts || []), dom.br(), loginAttempts && loginAttempts.length >= 10 ? dom.p(dom._class("loginAttemptsMore"), "See ", dom.a(attr.href("#accounts/loginattempts"), "all login attempts"), ".") : []);
 	}, "accounts");
 	var loginattempts = /* @__PURE__ */ __name(async () => {
-		const loginAttempts = await client.LoginAttempts("", 0);
-		return dom.div(crumbs(crumblink("Overview", "#"), crumblink("Accounts", "#accounts"), "Login attempts"), dom.h2("Login attempts"), dom.p("Login attempts are stored for 30 days. At most 10000 failed login attempts are stored per account to prevent unlimited growth of the database."), renderLoginAttempts(true, loginAttempts || []));
+		const attempts = await pagedLoginAttempts("", true);
+		return dom.div(crumbs(crumblink("Overview", "#"), crumblink("Accounts", "#accounts"), "Login attempts"), dom.h2("Login attempts"), dom.p("Login attempts are stored for 30 days. At most 10000 failed login attempts are stored per account to prevent unlimited growth of the database."), attempts);
 	}, "loginattempts");
 	var accountloginattempts = /* @__PURE__ */ __name(async (accountName) => {
-		const loginAttempts = await client.LoginAttempts(accountName, 0);
-		return dom.div(crumbs(crumblink("Overview", "#"), crumblink("Accounts", "#accounts"), ["(admin)", "-"].includes(accountName) ? accountName : crumblink(accountName, "#accounts/l/" + accountName), "Login attempts"), dom.h2("Login attempts"), dom.p("Login attempts are stored for 30 days. At most 10000 failed login attempts are stored per account to prevent unlimited growth of the database."), renderLoginAttempts(false, loginAttempts || []));
+		const attempts = await pagedLoginAttempts(accountName, false);
+		return dom.div(crumbs(crumblink("Overview", "#"), crumblink("Accounts", "#accounts"), ["(admin)", "-"].includes(accountName) ? accountName : crumblink(accountName, "#accounts/l/" + accountName), "Login attempts"), dom.h2("Login attempts"), dom.p("Login attempts are stored for 30 days. At most 10000 failed login attempts are stored per account to prevent unlimited growth of the database."), attempts);
 	}, "accountloginattempts");
+	var pagedLoginAttempts = /* @__PURE__ */ __name(async (accountName, accountLinks) => {
+		const pageSize = 100;
+		let page2 = await client.LoginAttemptsPage(accountName, pageSize, "");
+		const table = renderLoginAttempts(accountLinks, page2.Attempts || []);
+		const status = dom.span(dom._attrs({ role: "status" }));
+		let count = (page2.Attempts || []).length;
+		const loadMore = dom.clickbutton("Load more", /* @__PURE__ */ __name(async function click(e) {
+			const next = await check(e.currentTarget, client.LoginAttemptsPage(accountName, pageSize, page2.Next));
+			const rows = next.Attempts || [];
+			if (rows.length) {
+				const batch = renderLoginAttempts(accountLinks, rows);
+				table.tBodies[0].append(...Array.from(batch.tBodies[0].rows));
+			}
+			count += rows.length;
+			page2 = next;
+			update();
+		}, "click"));
+		const update = /* @__PURE__ */ __name(() => {
+			loadMore.hidden = !page2.Next;
+			let message = count + " login attempts shown";
+			if (!page2.Next) {
+				message += " \xB7 No more results";
+			}
+			dom._kids(status, message);
+		}, "update");
+		update();
+		return dom.div(table, dom.div(dom._class("loginAttemptsMore"), style({ display: "flex", alignItems: "center", gap: "12px" }), loadMore, status));
+	}, "pagedLoginAttempts");
 	var renderLoginAttempts = /* @__PURE__ */ __name((accountLinks, loginAttempts) => {
 		const nowSecs = (/* @__PURE__ */ new Date()).getTime() / 1e3;
 		return dom.table(dom._class("loginAttemptsTable"), dom.thead(dom.tr(dom.th("Time"), dom.th("Result"), dom.th(dom._class("alignRight", "loginAttemptsCount"), "Count"), dom.th("Account"), dom.th("Client"), dom.th("Connection"))), dom.tbody(loginAttempts.length ? [] : dom.tr(dom.td(attr.colspan("6"), "No login attempts in past 30 days.")), loginAttempts.map((la) => dom.tr(dom.td(queueInfo("Last", age(la.Last, false, nowSecs)), queueInfo("First", age(la.First, false, nowSecs))), dom.td(la.Result === "ok" ? la.Result : inlineBox(red, la.Result)), dom.td(dom._class("alignRight"), "" + la.Count), dom.td(accountLinks ? dom.a(attr.href("#accounts/l/" + la.AccountName + "/loginattempts"), la.AccountName) : la.AccountName, queueInfo("Address", la.LoginAddress)), dom.td(queueInfo("Protocol", la.Protocol), queueInfo("Mechanism", la.AuthMech), queueInfo("User agent", la.UserAgent)), dom.td(queueInfo("Remote IP", la.RemoteIP), queueInfo("Local IP", la.LocalIP), queueInfo("TLS", la.TLS), queueInfo("TLS pubkey fingerprint", la.TLSPubKeyFingerprint))))));
@@ -3277,10 +3315,13 @@
 		let sort = { Field: "NextAttempt", LastID: 0, Last: null, Asc: true };
 		let [holdRules, msgs0, transports] = await Promise.all([
 			client.QueueHoldRuleList(),
-			queuePage(client.withOptions({ skipReturnCheck: true }).QueueList(filter, sort), parser.Msg, sort.Field),
+			queuePage(client.withOptions({ skipReturnCheck: true }).QueueList({ ...filter, Max: filter.Max + 1 }, sort), parser.Msg, sort.Field),
 			client.Transports()
 		]);
 		let msgs = msgs0 || [];
+		let endReached = msgs.length <= filter.Max;
+		msgs = msgs.slice(0, filter.Max);
+		let loadMore;
 		const nowSecs = (/* @__PURE__ */ new Date()).getTime() / 1e3;
 		let holdRuleAccount;
 		let holdRuleSenderDomain;
@@ -3318,6 +3359,9 @@
 		}, "gatherIDs");
 		let tbody = dom.tbody();
 		const render = /* @__PURE__ */ __name(() => {
+			if (loadMore) {
+				loadMore.hidden = endReached;
+			}
 			toggles = /* @__PURE__ */ new Map();
 			for (const m of msgs) {
 				toggles.set(m.ID, dom.input(attr.type("checkbox"), msgs.length === 1 ? attr.checked("") : []));
@@ -3408,7 +3452,14 @@
 						Asc: sortElem.value.endsWith("asc")
 					};
 					tbody.classList.add("loadstart");
-					msgs = await check({ disabled: false }, queuePage(client.withOptions({ skipReturnCheck: true }).QueueList(filter, sort), parser.Msg, sort.Field)) || [];
+					const requestedSort = sort;
+					const results = await check({ disabled: false }, queuePage(client.withOptions({ skipReturnCheck: true }).QueueList({ ...filter, Max: filter.Max + 1 }, sort), parser.Msg, sort.Field)) || [];
+					if (sort !== requestedSort) {
+						return;
+					}
+					msgs = results;
+					endReached = msgs.length <= filter.Max;
+					msgs = msgs.slice(0, filter.Max);
 					render();
 				}, "submit")
 			),
@@ -3431,7 +3482,7 @@
 			}, "change"))), dom.th("Message"), dom.th("Addresses"), dom.th("Status"), dom.th("Timing"), dom.th("Actions"))), tbody, dom.tfoot(dom.tr(dom.td(
 				attr.colspan("6"),
 				// todo: consider implementing infinite scroll, autoloading more pages. means the operations on selected messages should be moved from below to above the table. and probably only show them when at least one message is selected to prevent clutter.
-				dom.clickbutton("Load more", attr.title("Try to load more entries. You can still try to load more entries when at the end of the list, new entries may have been appended since the previous call."), /* @__PURE__ */ __name(async function click(e) {
+				loadMore = dom.clickbutton("Load more", prop({ hidden: endReached }), /* @__PURE__ */ __name(async function click(e) {
 					if (msgs.length === 0) {
 						sort.LastID = 0;
 						sort.Last = null;
@@ -3441,9 +3492,18 @@
 						sort.Last = queueCursor(lm);
 					}
 					tbody.classList.add("loadstart");
-					const l = await check(e.target, queuePage(client.withOptions({ skipReturnCheck: true }).QueueList(filter, sort), parser.Msg, sort.Field)) || [];
-					msgs.push(...l);
-					render();
+					const requestedSort = sort;
+					try {
+						const l = await check(e.currentTarget, queuePage(client.withOptions({ skipReturnCheck: true }).QueueList({ ...filter, Max: filter.Max + 1 }, sort), parser.Msg, sort.Field)) || [];
+						if (sort !== requestedSort) {
+							return;
+						}
+						endReached = l.length <= filter.Max;
+						msgs.push(...l.slice(0, filter.Max));
+						render();
+					} finally {
+						tbody.classList.remove("loadstart");
+					}
 				}, "click"))
 			)))),
 			dom.br(),
@@ -3493,10 +3553,13 @@
 		let filter = { Max: parseInt(localStorageGet("adminpaginationsize") || "") || 100, IDs: [], Account: "", From: "", To: "", Submitted: "", LastActivity: "", Transport: null };
 		let sort = { Field: "LastActivity", LastID: 0, Last: null, Asc: false };
 		const [retired0, transports0] = await Promise.all([
-			queuePage(client.withOptions({ skipReturnCheck: true }).RetiredList(filter, sort), parser.MsgRetired, sort.Field),
+			queuePage(client.withOptions({ skipReturnCheck: true }).RetiredList({ ...filter, Max: filter.Max + 1 }, sort), parser.MsgRetired, sort.Field),
 			client.Transports()
 		]);
 		let retired = retired0 || [];
+		let endReached = retired.length <= filter.Max;
+		retired = retired.slice(0, filter.Max);
+		let loadMore;
 		let transports = transports0 || {};
 		const nowSecs = (/* @__PURE__ */ new Date()).getTime() / 1e3;
 		let sortElem;
@@ -3510,6 +3573,9 @@
 		let filterSuccess;
 		let tbody = dom.tbody();
 		const render = /* @__PURE__ */ __name(() => {
+			if (loadMore) {
+				loadMore.hidden = endReached;
+			}
 			const ntbody = dom.tbody(dom._class("loadend"), retired.length === 0 ? dom.tr(dom.td(attr.colspan("5"), "No retired messages.")) : [], retired.map((m) => dom.tr(dom.td(dom.b(m.Subject || "(no subject)"), queueInfo("Account", m.SenderAccount || "\u2014")), dom.td(queueInfo("From", prewrap(m.SenderLocalpart, "@", m.SenderDomainStr)), queueInfo("To", prewrap(m.RecipientLocalpart, "@", m.RecipientDomainStr))), dom.td(m.Success ? "Delivered" : "Failed", queueInfo("Attempts", "" + m.Attempts), queueError(m.Results)), dom.td(queueInfo("Submitted", age(m.Queued, false, nowSecs)), queueInfo("Last activity", age(m.LastActivity, false, nowSecs))), dom.td(dom.clickbutton("Details", /* @__PURE__ */ __name(function click() {
 				mailDetails(m);
 			}, "click"))))));
@@ -3544,7 +3610,14 @@
 						Asc: sortElem.value.endsWith("asc")
 					};
 					tbody.classList.add("loadstart");
-					retired = await check({ disabled: false }, queuePage(client.withOptions({ skipReturnCheck: true }).RetiredList(filter, sort), parser.MsgRetired, sort.Field)) || [];
+					const requestedSort = sort;
+					const results = await check({ disabled: false }, queuePage(client.withOptions({ skipReturnCheck: true }).RetiredList({ ...filter, Max: filter.Max + 1 }, sort), parser.MsgRetired, sort.Field)) || [];
+					if (sort !== requestedSort) {
+						return;
+					}
+					retired = results;
+					endReached = retired.length <= filter.Max;
+					retired = retired.slice(0, filter.Max);
 					render();
 				}, "submit")
 			),
@@ -3560,7 +3633,7 @@
 				filterForm.reset();
 				filterForm.requestSubmit();
 			}, "click")))),
-			dom.table(dom._class("hover", "queueTable"), dom.thead(dom.tr(dom.th("Message"), dom.th("Addresses"), dom.th("Status"), dom.th("Timing"), dom.th("Actions"))), tbody, dom.tfoot(dom.tr(dom.td(attr.colspan("5"), dom.clickbutton("Load more", attr.title("Try to load more entries. You can still try to load more entries when at the end of the list, new entries may have been appended since the previous call."), /* @__PURE__ */ __name(async function click(e) {
+			dom.table(dom._class("hover", "queueTable"), dom.thead(dom.tr(dom.th("Message"), dom.th("Addresses"), dom.th("Status"), dom.th("Timing"), dom.th("Actions"))), tbody, dom.tfoot(dom.tr(dom.td(attr.colspan("5"), loadMore = dom.clickbutton("Load more", prop({ hidden: endReached }), /* @__PURE__ */ __name(async function click(e) {
 				if (retired.length === 0) {
 					sort.LastID = 0;
 					sort.Last = null;
@@ -3570,9 +3643,18 @@
 					sort.Last = queueCursor(lm);
 				}
 				tbody.classList.add("loadstart");
-				const l = await check(e.target, queuePage(client.withOptions({ skipReturnCheck: true }).RetiredList(filter, sort), parser.MsgRetired, sort.Field)) || [];
-				retired.push(...l);
-				render();
+				const requestedSort = sort;
+				try {
+					const l = await check(e.currentTarget, queuePage(client.withOptions({ skipReturnCheck: true }).RetiredList({ ...filter, Max: filter.Max + 1 }, sort), parser.MsgRetired, sort.Field)) || [];
+					if (sort !== requestedSort) {
+						return;
+					}
+					endReached = l.length <= filter.Max;
+					retired.push(...l.slice(0, filter.Max));
+					render();
+				} finally {
+					tbody.classList.remove("loadstart");
+				}
 			}, "click"))))))
 		);
 	}, "retiredList");
@@ -3594,14 +3676,11 @@
 	var hooksList = /* @__PURE__ */ __name(async () => {
 		let filter = { Max: parseInt(localStorageGet("adminpaginationsize") || "") || 100, IDs: [], Account: "", Submitted: "", NextAttempt: "", Event: "" };
 		let sort = { Field: "NextAttempt", LastID: 0, Last: null, Asc: true };
-		let hooks = await queuePage(client.withOptions({ skipReturnCheck: true }).HookList(filter, sort), parser.Hook, sort.Field) || [];
-		let endReached = hooks.length < filter.Max;
+		let hooks = await queuePage(client.withOptions({ skipReturnCheck: true }).HookList({ ...filter, Max: filter.Max + 1 }, sort), parser.Hook, sort.Field) || [];
+		let endReached = hooks.length <= filter.Max;
+		hooks = hooks.slice(0, filter.Max);
 		const pageStatus = dom.span(dom._attrs({ "role": "status" }), style({ marginLeft: "12px" }));
 		let loadMore;
-		let loadMoreLabel = "Load more";
-		if (endReached) {
-			loadMoreLabel = "Check for more";
-		}
 		const updatePageStatus = /* @__PURE__ */ __name(() => {
 			let message = hooks.length + " webhooks shown";
 			if (endReached) {
@@ -3678,7 +3757,7 @@
 				for (const [_, toggle] of toggles) {
 					toggle.checked = elem.checked;
 				}
-			}, "change"))), dom.th("Event"), dom.th("Endpoint"), dom.th("Status"), dom.th("Timing"), dom.th("Actions"))), tbody, dom.tfoot(dom.tr(dom.td(attr.colspan("6"), loadMore = dom.clickbutton(loadMoreLabel, attr.title("Loads the next page of matching webhooks."), /* @__PURE__ */ __name(async function click(e) {
+			}, "change"))), dom.th("Event"), dom.th("Endpoint"), dom.th("Status"), dom.th("Timing"), dom.th("Actions"))), tbody, dom.tfoot(dom.tr(dom.td(attr.colspan("6"), loadMore = dom.clickbutton("Load more", prop({ hidden: endReached }), attr.title("Loads the next page of matching webhooks."), /* @__PURE__ */ __name(async function click(e) {
 				if (hooks.length === 0) {
 					sort.LastID = 0;
 					sort.Last = null;
@@ -3689,20 +3768,17 @@
 				}
 				const requestedSort = sort;
 				try {
-					const l = await check(e.currentTarget, queuePage(client.withOptions({ skipReturnCheck: true }).HookList(filter, sort), parser.Hook, sort.Field));
+					const l = await check(e.currentTarget, queuePage(client.withOptions({ skipReturnCheck: true }).HookList({ ...filter, Max: filter.Max + 1 }, sort), parser.Hook, sort.Field));
 					if (sort !== requestedSort) {
 						return;
 					}
-					endReached = l.length < filter.Max;
+					endReached = l.length <= filter.Max;
 					if (l.length > 0) {
-						hooks.push(...l);
+						hooks.push(...l.slice(0, filter.Max));
 						render();
 					}
 					updatePageStatus();
-					loadMore.textContent = "Load more";
-					if (endReached) {
-						loadMore.textContent = "Check for more";
-					}
+					loadMore.hidden = endReached;
 				} finally {
 					tbody.classList.remove("loadstart");
 				}
@@ -3729,13 +3805,16 @@
 						Asc: sortElem.value.endsWith("asc")
 					};
 					tbody.classList.add("loadstart");
-					hooks = await check({ disabled: false }, queuePage(client.withOptions({ skipReturnCheck: true }).HookList(filter, sort), parser.Hook, sort.Field)) || [];
-					endReached = hooks.length < filter.Max;
-					updatePageStatus();
-					loadMore.textContent = "Load more";
-					if (endReached) {
-						loadMore.textContent = "Check for more";
+					const requestedSort = sort;
+					const results = await check({ disabled: false }, queuePage(client.withOptions({ skipReturnCheck: true }).HookList({ ...filter, Max: filter.Max + 1 }, sort), parser.Hook, sort.Field)) || [];
+					if (sort !== requestedSort) {
+						return;
 					}
+					hooks = results;
+					endReached = hooks.length <= filter.Max;
+					hooks = hooks.slice(0, filter.Max);
+					updatePageStatus();
+					loadMore.hidden = endReached;
 					render();
 				}, "submit")
 			),
@@ -3757,14 +3836,11 @@
 	var hooksRetiredList = /* @__PURE__ */ __name(async () => {
 		let filter = { Max: parseInt(localStorageGet("adminpaginationsize") || "") || 100, IDs: [], Account: "", Submitted: "", LastActivity: "", Event: "" };
 		let sort = { Field: "LastActivity", LastID: 0, Last: null, Asc: false };
-		let hooks = await queuePage(client.withOptions({ skipReturnCheck: true }).HookRetiredList(filter, sort), parser.HookRetired, sort.Field) || [];
-		let endReached = hooks.length < filter.Max;
+		let hooks = await queuePage(client.withOptions({ skipReturnCheck: true }).HookRetiredList({ ...filter, Max: filter.Max + 1 }, sort), parser.HookRetired, sort.Field) || [];
+		let endReached = hooks.length <= filter.Max;
+		hooks = hooks.slice(0, filter.Max);
 		const pageStatus = dom.span(dom._attrs({ "role": "status" }), style({ marginLeft: "12px" }));
 		let loadMore;
-		let loadMoreLabel = "Load more";
-		if (endReached) {
-			loadMoreLabel = "Check for more";
-		}
 		const updatePageStatus = /* @__PURE__ */ __name(() => {
 			let message = hooks.length + " webhooks shown";
 			if (endReached) {
@@ -3806,7 +3882,7 @@
 				filterForm.reset();
 				filterForm.requestSubmit();
 			}, "click")))),
-			dom.table(dom._class("hover", "queueTable"), dom.thead(dom.tr(dom.th("Event"), dom.th("Endpoint"), dom.th("Status"), dom.th("Timing"), dom.th("Actions"))), tbody, dom.tfoot(dom.tr(dom.td(attr.colspan("5"), loadMore = dom.clickbutton(loadMoreLabel, attr.title("Loads the next page of matching webhooks."), /* @__PURE__ */ __name(async function click(e) {
+			dom.table(dom._class("hover", "queueTable"), dom.thead(dom.tr(dom.th("Event"), dom.th("Endpoint"), dom.th("Status"), dom.th("Timing"), dom.th("Actions"))), tbody, dom.tfoot(dom.tr(dom.td(attr.colspan("5"), loadMore = dom.clickbutton("Load more", prop({ hidden: endReached }), attr.title("Loads the next page of matching webhooks."), /* @__PURE__ */ __name(async function click(e) {
 				if (hooks.length === 0) {
 					sort.LastID = 0;
 					sort.Last = null;
@@ -3817,20 +3893,17 @@
 				}
 				const requestedSort = sort;
 				try {
-					const l = await check(e.currentTarget, queuePage(client.withOptions({ skipReturnCheck: true }).HookRetiredList(filter, sort), parser.HookRetired, sort.Field));
+					const l = await check(e.currentTarget, queuePage(client.withOptions({ skipReturnCheck: true }).HookRetiredList({ ...filter, Max: filter.Max + 1 }, sort), parser.HookRetired, sort.Field));
 					if (sort !== requestedSort) {
 						return;
 					}
-					endReached = l.length < filter.Max;
+					endReached = l.length <= filter.Max;
 					if (l.length > 0) {
-						hooks.push(...l);
+						hooks.push(...l.slice(0, filter.Max));
 						render();
 					}
 					updatePageStatus();
-					loadMore.textContent = "Load more";
-					if (endReached) {
-						loadMore.textContent = "Check for more";
-					}
+					loadMore.hidden = endReached;
 				} finally {
 					tbody.classList.remove("loadstart");
 				}
@@ -3857,13 +3930,16 @@
 						Asc: sortElem.value.endsWith("asc")
 					};
 					tbody.classList.add("loadstart");
-					hooks = await check({ disabled: false }, queuePage(client.withOptions({ skipReturnCheck: true }).HookRetiredList(filter, sort), parser.HookRetired, sort.Field)) || [];
-					endReached = hooks.length < filter.Max;
-					updatePageStatus();
-					loadMore.textContent = "Load more";
-					if (endReached) {
-						loadMore.textContent = "Check for more";
+					const requestedSort = sort;
+					const results = await check({ disabled: false }, queuePage(client.withOptions({ skipReturnCheck: true }).HookRetiredList({ ...filter, Max: filter.Max + 1 }, sort), parser.HookRetired, sort.Field)) || [];
+					if (sort !== requestedSort) {
+						return;
 					}
+					hooks = results;
+					endReached = hooks.length <= filter.Max;
+					hooks = hooks.slice(0, filter.Max);
+					updatePageStatus();
+					loadMore.hidden = endReached;
 					render();
 				}, "submit")
 			)

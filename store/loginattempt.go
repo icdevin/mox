@@ -1,9 +1,12 @@
 package store
 
 import (
+	"bytes"
 	"context"
 	"crypto/sha256"
 	"crypto/tls"
+	"encoding/base64"
+	"encoding/json"
 	"fmt"
 	"log/slog"
 	"runtime/debug"
@@ -342,6 +345,58 @@ func LoginAttemptList(ctx context.Context, accountName string, limit int) ([]Log
 		return err
 	})
 	return l, err
+}
+
+// LoginAttemptPage keeps the next cursor at full database timestamp precision.
+type LoginAttemptPage struct {
+	Attempts []LoginAttempt
+	Next     string
+}
+
+type loginAttemptCursor struct {
+	Last    time.Time
+	Key     []byte
+	Account string
+}
+
+// LoginAttemptListPage bounds each read and uses the key to break timestamp ties.
+func LoginAttemptListPage(ctx context.Context, accountName string, limit int, cursor string) (LoginAttemptPage, error) {
+	var page LoginAttemptPage
+	if limit < 1 || limit > 1000 {
+		return page, fmt.Errorf("page size must be between 1 and 1000")
+	}
+	var after loginAttemptCursor
+	if cursor != "" {
+		buf, err := base64.RawURLEncoding.DecodeString(cursor)
+		if err != nil || json.Unmarshal(buf, &after) != nil || after.Last.IsZero() || len(after.Key) != sha256.Size || after.Account != accountName {
+			return page, fmt.Errorf("invalid login attempt cursor")
+		}
+	}
+	q := bstore.QueryDB[LoginAttempt](ctx, AuthDB)
+	if accountName != "" {
+		q.FilterNonzero(LoginAttempt{AccountName: accountName})
+	}
+	if cursor != "" {
+		q.FilterLessEqual("Last", after.Last)
+		q.FilterFn(func(a LoginAttempt) bool {
+			return a.Last.Before(after.Last) || bytes.Compare(a.Key, after.Key) < 0
+		})
+	}
+	rows, err := q.SortDesc("Last", "Key").Limit(limit + 1).List()
+	if err != nil {
+		return page, err
+	}
+	if len(rows) > limit {
+		rows = rows[:limit]
+		last := rows[len(rows)-1]
+		buf, err := json.Marshal(loginAttemptCursor{last.Last, last.Key, accountName})
+		if err != nil {
+			return page, err
+		}
+		page.Next = base64.RawURLEncoding.EncodeToString(buf)
+	}
+	page.Attempts = rows
+	return page, nil
 }
 
 // LoginAttemptTLS returns a string for use as LoginAttempt.TLS. Returns an empty
