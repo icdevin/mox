@@ -149,7 +149,7 @@ webmail/msg.js: webmail/msg.ts webmail/api.ts webmail/lib.ts lib.ts
 webmail/text.js: webmail/text.ts webmail/api.ts webmail/lib.ts lib.ts
 	./tsc.sh $@ webmail/text.ts webmail/api.ts webmail/lib.ts lib.ts
 
-webadmin/admin.js: webadmin/admin.ts webadmin/api.ts lib.ts
+webadmin/admin.js: webadmin/admin.ts webadmin/pagination.ts webadmin/api.ts lib.ts
 	./tsc.sh $@ webadmin/admin.ts webadmin/api.ts lib.ts
 
 webaccount/account.js: webaccount/account.ts webaccount/api.ts lib.ts

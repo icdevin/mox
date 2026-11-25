@@ -369,6 +369,128 @@
 		"IP": { "Name": "IP", "Docs": "", "Values": [] },
 		"AuthResult": { "Name": "AuthResult", "Docs": "", "Values": [{ "Name": "AuthSuccess", "Value": "ok", "Docs": "" }, { "Name": "AuthBadUser", "Value": "baduser", "Docs": "" }, { "Name": "AuthBadPassword", "Value": "badpassword", "Docs": "" }, { "Name": "AuthBadCredentials", "Value": "badcreds", "Docs": "" }, { "Name": "AuthBadChannelBinding", "Value": "badchanbind", "Docs": "" }, { "Name": "AuthBadProtocol", "Value": "badprotocol", "Docs": "" }, { "Name": "AuthLoginDisabled", "Value": "logindisabled", "Docs": "" }, { "Name": "AuthError", "Value": "error", "Docs": "" }, { "Name": "AuthAborted", "Value": "aborted", "Docs": "" }] }
 	};
+	var parser = {
+		CheckResult: /* @__PURE__ */ __name((v) => parse("CheckResult", v), "CheckResult"),
+		DNSSECResult: /* @__PURE__ */ __name((v) => parse("DNSSECResult", v), "DNSSECResult"),
+		IPRevCheckResult: /* @__PURE__ */ __name((v) => parse("IPRevCheckResult", v), "IPRevCheckResult"),
+		Domain: /* @__PURE__ */ __name((v) => parse("Domain", v), "Domain"),
+		MXCheckResult: /* @__PURE__ */ __name((v) => parse("MXCheckResult", v), "MXCheckResult"),
+		MX: /* @__PURE__ */ __name((v) => parse("MX", v), "MX"),
+		TLSCheckResult: /* @__PURE__ */ __name((v) => parse("TLSCheckResult", v), "TLSCheckResult"),
+		DANECheckResult: /* @__PURE__ */ __name((v) => parse("DANECheckResult", v), "DANECheckResult"),
+		SPFCheckResult: /* @__PURE__ */ __name((v) => parse("SPFCheckResult", v), "SPFCheckResult"),
+		SPFRecord: /* @__PURE__ */ __name((v) => parse("SPFRecord", v), "SPFRecord"),
+		Directive: /* @__PURE__ */ __name((v) => parse("Directive", v), "Directive"),
+		Modifier: /* @__PURE__ */ __name((v) => parse("Modifier", v), "Modifier"),
+		DKIMCheckResult: /* @__PURE__ */ __name((v) => parse("DKIMCheckResult", v), "DKIMCheckResult"),
+		DKIMRecord: /* @__PURE__ */ __name((v) => parse("DKIMRecord", v), "DKIMRecord"),
+		Record: /* @__PURE__ */ __name((v) => parse("Record", v), "Record"),
+		DMARCCheckResult: /* @__PURE__ */ __name((v) => parse("DMARCCheckResult", v), "DMARCCheckResult"),
+		DMARCRecord: /* @__PURE__ */ __name((v) => parse("DMARCRecord", v), "DMARCRecord"),
+		URI: /* @__PURE__ */ __name((v) => parse("URI", v), "URI"),
+		TLSRPTCheckResult: /* @__PURE__ */ __name((v) => parse("TLSRPTCheckResult", v), "TLSRPTCheckResult"),
+		TLSRPTRecord: /* @__PURE__ */ __name((v) => parse("TLSRPTRecord", v), "TLSRPTRecord"),
+		Extension: /* @__PURE__ */ __name((v) => parse("Extension", v), "Extension"),
+		MTASTSCheckResult: /* @__PURE__ */ __name((v) => parse("MTASTSCheckResult", v), "MTASTSCheckResult"),
+		MTASTSRecord: /* @__PURE__ */ __name((v) => parse("MTASTSRecord", v), "MTASTSRecord"),
+		Pair: /* @__PURE__ */ __name((v) => parse("Pair", v), "Pair"),
+		Policy: /* @__PURE__ */ __name((v) => parse("Policy", v), "Policy"),
+		STSMX: /* @__PURE__ */ __name((v) => parse("STSMX", v), "STSMX"),
+		SRVConfCheckResult: /* @__PURE__ */ __name((v) => parse("SRVConfCheckResult", v), "SRVConfCheckResult"),
+		SRV: /* @__PURE__ */ __name((v) => parse("SRV", v), "SRV"),
+		AutoconfCheckResult: /* @__PURE__ */ __name((v) => parse("AutoconfCheckResult", v), "AutoconfCheckResult"),
+		AutodiscoverCheckResult: /* @__PURE__ */ __name((v) => parse("AutodiscoverCheckResult", v), "AutodiscoverCheckResult"),
+		AutodiscoverSRV: /* @__PURE__ */ __name((v) => parse("AutodiscoverSRV", v), "AutodiscoverSRV"),
+		ConfigDomain: /* @__PURE__ */ __name((v) => parse("ConfigDomain", v), "ConfigDomain"),
+		DKIM: /* @__PURE__ */ __name((v) => parse("DKIM", v), "DKIM"),
+		Selector: /* @__PURE__ */ __name((v) => parse("Selector", v), "Selector"),
+		Canonicalization: /* @__PURE__ */ __name((v) => parse("Canonicalization", v), "Canonicalization"),
+		DMARC: /* @__PURE__ */ __name((v) => parse("DMARC", v), "DMARC"),
+		MTASTS: /* @__PURE__ */ __name((v) => parse("MTASTS", v), "MTASTS"),
+		TLSRPT: /* @__PURE__ */ __name((v) => parse("TLSRPT", v), "TLSRPT"),
+		Route: /* @__PURE__ */ __name((v) => parse("Route", v), "Route"),
+		Alias: /* @__PURE__ */ __name((v) => parse("Alias", v), "Alias"),
+		AliasAddress: /* @__PURE__ */ __name((v) => parse("AliasAddress", v), "AliasAddress"),
+		Address: /* @__PURE__ */ __name((v) => parse("Address", v), "Address"),
+		Destination: /* @__PURE__ */ __name((v) => parse("Destination", v), "Destination"),
+		Ruleset: /* @__PURE__ */ __name((v) => parse("Ruleset", v), "Ruleset"),
+		Account: /* @__PURE__ */ __name((v) => parse("Account", v), "Account"),
+		OutgoingWebhook: /* @__PURE__ */ __name((v) => parse("OutgoingWebhook", v), "OutgoingWebhook"),
+		IncomingWebhook: /* @__PURE__ */ __name((v) => parse("IncomingWebhook", v), "IncomingWebhook"),
+		SubjectPass: /* @__PURE__ */ __name((v) => parse("SubjectPass", v), "SubjectPass"),
+		AutomaticJunkFlags: /* @__PURE__ */ __name((v) => parse("AutomaticJunkFlags", v), "AutomaticJunkFlags"),
+		JunkFilter: /* @__PURE__ */ __name((v) => parse("JunkFilter", v), "JunkFilter"),
+		AddressAlias: /* @__PURE__ */ __name((v) => parse("AddressAlias", v), "AddressAlias"),
+		PolicyRecord: /* @__PURE__ */ __name((v) => parse("PolicyRecord", v), "PolicyRecord"),
+		TLSReportRecord: /* @__PURE__ */ __name((v) => parse("TLSReportRecord", v), "TLSReportRecord"),
+		Report: /* @__PURE__ */ __name((v) => parse("Report", v), "Report"),
+		TLSRPTDateRange: /* @__PURE__ */ __name((v) => parse("TLSRPTDateRange", v), "TLSRPTDateRange"),
+		Result: /* @__PURE__ */ __name((v) => parse("Result", v), "Result"),
+		ResultPolicy: /* @__PURE__ */ __name((v) => parse("ResultPolicy", v), "ResultPolicy"),
+		Summary: /* @__PURE__ */ __name((v) => parse("Summary", v), "Summary"),
+		FailureDetails: /* @__PURE__ */ __name((v) => parse("FailureDetails", v), "FailureDetails"),
+		TLSRPTSummary: /* @__PURE__ */ __name((v) => parse("TLSRPTSummary", v), "TLSRPTSummary"),
+		DomainFeedback: /* @__PURE__ */ __name((v) => parse("DomainFeedback", v), "DomainFeedback"),
+		ReportMetadata: /* @__PURE__ */ __name((v) => parse("ReportMetadata", v), "ReportMetadata"),
+		DateRange: /* @__PURE__ */ __name((v) => parse("DateRange", v), "DateRange"),
+		PolicyPublished: /* @__PURE__ */ __name((v) => parse("PolicyPublished", v), "PolicyPublished"),
+		ReportRecord: /* @__PURE__ */ __name((v) => parse("ReportRecord", v), "ReportRecord"),
+		Row: /* @__PURE__ */ __name((v) => parse("Row", v), "Row"),
+		PolicyEvaluated: /* @__PURE__ */ __name((v) => parse("PolicyEvaluated", v), "PolicyEvaluated"),
+		PolicyOverrideReason: /* @__PURE__ */ __name((v) => parse("PolicyOverrideReason", v), "PolicyOverrideReason"),
+		Identifiers: /* @__PURE__ */ __name((v) => parse("Identifiers", v), "Identifiers"),
+		AuthResults: /* @__PURE__ */ __name((v) => parse("AuthResults", v), "AuthResults"),
+		DKIMAuthResult: /* @__PURE__ */ __name((v) => parse("DKIMAuthResult", v), "DKIMAuthResult"),
+		SPFAuthResult: /* @__PURE__ */ __name((v) => parse("SPFAuthResult", v), "SPFAuthResult"),
+		DMARCSummary: /* @__PURE__ */ __name((v) => parse("DMARCSummary", v), "DMARCSummary"),
+		Reverse: /* @__PURE__ */ __name((v) => parse("Reverse", v), "Reverse"),
+		ClientConfigs: /* @__PURE__ */ __name((v) => parse("ClientConfigs", v), "ClientConfigs"),
+		ClientConfigsEntry: /* @__PURE__ */ __name((v) => parse("ClientConfigsEntry", v), "ClientConfigsEntry"),
+		HoldRule: /* @__PURE__ */ __name((v) => parse("HoldRule", v), "HoldRule"),
+		Filter: /* @__PURE__ */ __name((v) => parse("Filter", v), "Filter"),
+		Sort: /* @__PURE__ */ __name((v) => parse("Sort", v), "Sort"),
+		Msg: /* @__PURE__ */ __name((v) => parse("Msg", v), "Msg"),
+		IPDomain: /* @__PURE__ */ __name((v) => parse("IPDomain", v), "IPDomain"),
+		MsgResult: /* @__PURE__ */ __name((v) => parse("MsgResult", v), "MsgResult"),
+		RetiredFilter: /* @__PURE__ */ __name((v) => parse("RetiredFilter", v), "RetiredFilter"),
+		RetiredSort: /* @__PURE__ */ __name((v) => parse("RetiredSort", v), "RetiredSort"),
+		MsgRetired: /* @__PURE__ */ __name((v) => parse("MsgRetired", v), "MsgRetired"),
+		HookFilter: /* @__PURE__ */ __name((v) => parse("HookFilter", v), "HookFilter"),
+		HookSort: /* @__PURE__ */ __name((v) => parse("HookSort", v), "HookSort"),
+		Hook: /* @__PURE__ */ __name((v) => parse("Hook", v), "Hook"),
+		HookResult: /* @__PURE__ */ __name((v) => parse("HookResult", v), "HookResult"),
+		HookRetiredFilter: /* @__PURE__ */ __name((v) => parse("HookRetiredFilter", v), "HookRetiredFilter"),
+		HookRetiredSort: /* @__PURE__ */ __name((v) => parse("HookRetiredSort", v), "HookRetiredSort"),
+		HookRetired: /* @__PURE__ */ __name((v) => parse("HookRetired", v), "HookRetired"),
+		WebserverConfig: /* @__PURE__ */ __name((v) => parse("WebserverConfig", v), "WebserverConfig"),
+		WebHandler: /* @__PURE__ */ __name((v) => parse("WebHandler", v), "WebHandler"),
+		WebStatic: /* @__PURE__ */ __name((v) => parse("WebStatic", v), "WebStatic"),
+		WebRedirect: /* @__PURE__ */ __name((v) => parse("WebRedirect", v), "WebRedirect"),
+		WebForward: /* @__PURE__ */ __name((v) => parse("WebForward", v), "WebForward"),
+		WebInternal: /* @__PURE__ */ __name((v) => parse("WebInternal", v), "WebInternal"),
+		Transport: /* @__PURE__ */ __name((v) => parse("Transport", v), "Transport"),
+		TransportSMTP: /* @__PURE__ */ __name((v) => parse("TransportSMTP", v), "TransportSMTP"),
+		SMTPAuth: /* @__PURE__ */ __name((v) => parse("SMTPAuth", v), "SMTPAuth"),
+		TransportSocks: /* @__PURE__ */ __name((v) => parse("TransportSocks", v), "TransportSocks"),
+		TransportDirect: /* @__PURE__ */ __name((v) => parse("TransportDirect", v), "TransportDirect"),
+		TransportFail: /* @__PURE__ */ __name((v) => parse("TransportFail", v), "TransportFail"),
+		EvaluationStat: /* @__PURE__ */ __name((v) => parse("EvaluationStat", v), "EvaluationStat"),
+		Evaluation: /* @__PURE__ */ __name((v) => parse("Evaluation", v), "Evaluation"),
+		SuppressAddress: /* @__PURE__ */ __name((v) => parse("SuppressAddress", v), "SuppressAddress"),
+		TLSResult: /* @__PURE__ */ __name((v) => parse("TLSResult", v), "TLSResult"),
+		TLSRPTSuppressAddress: /* @__PURE__ */ __name((v) => parse("TLSRPTSuppressAddress", v), "TLSRPTSuppressAddress"),
+		Dynamic: /* @__PURE__ */ __name((v) => parse("Dynamic", v), "Dynamic"),
+		TLSPublicKey: /* @__PURE__ */ __name((v) => parse("TLSPublicKey", v), "TLSPublicKey"),
+		LoginAttempt: /* @__PURE__ */ __name((v) => parse("LoginAttempt", v), "LoginAttempt"),
+		CSRFToken: /* @__PURE__ */ __name((v) => parse("CSRFToken", v), "CSRFToken"),
+		DMARCPolicy: /* @__PURE__ */ __name((v) => parse("DMARCPolicy", v), "DMARCPolicy"),
+		Align: /* @__PURE__ */ __name((v) => parse("Align", v), "Align"),
+		RUA: /* @__PURE__ */ __name((v) => parse("RUA", v), "RUA"),
+		Mode: /* @__PURE__ */ __name((v) => parse("Mode", v), "Mode"),
+		Localpart: /* @__PURE__ */ __name((v) => parse("Localpart", v), "Localpart"),
+		IP: /* @__PURE__ */ __name((v) => parse("IP", v), "IP"),
+		AuthResult: /* @__PURE__ */ __name((v) => parse("AuthResult", v), "AuthResult")
+	};
 	var defaultOptions = { slicesNullable: true, mapsNullable: true, nullableOptional: true };
 	var Client = class _Client {
 		static {
@@ -1224,6 +1346,7 @@
 	var verifyArg = /* @__PURE__ */ __name((path, v, typewords, toJS, allowUnknownKeys, types2, opts) => {
 		return new verifier(types2, toJS, allowUnknownKeys, opts).verify(path, v, typewords);
 	}, "verifyArg");
+	var parse = /* @__PURE__ */ __name((name, v) => verifyArg(name, v, [name], true, false, types, defaultOptions), "parse");
 	var verifier = class {
 		static {
 			__name(this, "verifier");
@@ -1544,6 +1667,34 @@
 		return await new Promise(fn);
 	}, "_sherpaCall");
 
+	// .js/webadmin/pagination.js
+	var cursors = /* @__PURE__ */ new WeakMap();
+	var queuePage = /* @__PURE__ */ __name(async (request, parse2, field) => {
+		const rows = await request;
+		if (rows === null) {
+			return [];
+		}
+		if (!Array.isArray(rows)) {
+			throw new Error("Invalid queue page");
+		}
+		return rows.map((raw) => {
+			const item = parse2(raw);
+			const cursor = raw[field];
+			if (typeof cursor !== "string" || !Number.isFinite(Date.parse(cursor))) {
+				throw new Error("Invalid queue cursor timestamp");
+			}
+			cursors.set(item, cursor);
+			return item;
+		});
+	}, "queuePage");
+	var queueCursor = /* @__PURE__ */ __name((item) => {
+		const cursor = cursors.get(item);
+		if (cursor === void 0) {
+			throw new Error("Missing queue cursor timestamp");
+		}
+		return cursor;
+	}, "queueCursor");
+
 	// .js/webadmin/admin.js
 	var moxversion;
 	var moxgoos;
@@ -1610,6 +1761,12 @@
 		content.focus();
 		return close;
 	}, "popup");
+	var detailsDialog = /* @__PURE__ */ __name((title, size, ...kids) => {
+		const close = popup(dom._class("detailsDialog", size + "Dialog"), dom._attrs({ "role": "dialog", "aria-label": title }), dom.div(dom._class("detailsDialogHeader"), dom.h1(title), dom.clickbutton("Close", /* @__PURE__ */ __name(function click() {
+			close();
+		}, "click"))), kids);
+		return close;
+	}, "detailsDialog");
 	var localStorageGet = /* @__PURE__ */ __name((k) => {
 		try {
 			return window.localStorage.getItem(k);
@@ -1652,20 +1809,6 @@
 		document.title = l.map((e) => crumbtext(e)).join(" / ") + " \xB7 devn Admin";
 		const crumblink2 = /* @__PURE__ */ __name((e) => typeof e === "string" ? prewrap(e) : dom.a(e.text, attr.href(e.path)), "crumblink");
 		return [
-			dom.div(style({ float: "right" }), dom.clickbutton("Logout", attr.title("Logout, invalidating this session."), /* @__PURE__ */ __name(async function click(e) {
-				const b = e.target;
-				try {
-					b.disabled = true;
-					await client.Logout();
-				} catch (err) {
-					console.log("logout", err);
-					window.alert("Error: " + errmsg(err));
-				} finally {
-					b.disabled = false;
-				}
-				localStorageRemove("webadmincsrftoken");
-				window.location.reload();
-			}, "click"))),
 			dom.h1(l.map((e, index2) => index2 === 0 ? crumblink2(e) : [" / ", crumblink2(e)])),
 			dom.br()
 		];
@@ -1867,7 +2010,7 @@
 				e.preventDefault();
 				await check(e.target, client.LogLevelSet(t[0], lvl.value));
 				window.location.reload();
-			}, "click")), " ", dom.clickbutton("Remove", attr.title("Remove this log level, the default log level will apply."), t[0] === "" ? attr.disabled("") : [], /* @__PURE__ */ __name(async function click(e) {
+			}, "click")), " ", dom.clickbutton("Remove", dom._class("dangerButton"), attr.title("Remove this log level, the default log level will apply."), t[0] === "" ? attr.disabled("") : [], /* @__PURE__ */ __name(async function click(e) {
 				e.preventDefault();
 				await check(e.target, client.LogLevelRemove(t[0]));
 				window.location.reload();
@@ -1963,16 +2106,12 @@
 				e.stopPropagation();
 				e.preventDefault();
 				await check(routesFieldset, save(routeRows.map((rr) => rr.gather())));
-			}, "submit"), routesFieldset = dom.fieldset(dom.table(dom.thead(dom.tr(dom.th("From domain"), dom.th("To domain"), dom.th("Minimum attempts"), dom.th("Transport"), dom.th(dom.clickbutton("Add", /* @__PURE__ */ __name(function click() {
-				routes = routeRows.map((rr) => rr.gather());
-				routes.push({ FromDomain: [], ToDomain: [], MinimumAttempts: 0, Transport: transportNames[0] });
-				render();
-			}, "click"))))), dom.tbody((routes || []).length === 0 ? dom.tr(dom.td(attr.colspan("5"), "No routes.")) : [], routeRows = (routes || []).map((r, index2) => {
+			}, "submit"), routesFieldset = dom.fieldset(dom.div(dom._class("routesTableScroll"), dom.table(dom._class("routesTable"), dom.thead(dom.tr(dom.th("From domain"), dom.th("To domain"), dom.th("Minimum attempts"), dom.th("Transport"), dom.th("Actions"))), dom.tbody((routes || []).length === 0 ? dom.tr(dom.td(attr.colspan("5"), "No routes.")) : [], routeRows = (routes || []).map((r, index2) => {
 				let fromDomain = dom.input(attr.value((r.FromDomain || []).join(",")));
 				let toDomain = dom.input(attr.value((r.ToDomain || []).join(",")));
 				let minimumAttempts = dom.input(attr.value("" + r.MinimumAttempts));
 				let transport = dom.select(attr.required(""), transportNames.map((s) => dom.option(s, s === r.Transport ? attr.selected("") : [])));
-				const tr = dom.tr(dom.td(fromDomain), dom.td(toDomain), dom.td(minimumAttempts), dom.td(transport), dom.td(dom.clickbutton("Remove", /* @__PURE__ */ __name(function click() {
+				const tr = dom.tr(dom.td(fromDomain), dom.td(toDomain), dom.td(minimumAttempts), dom.td(transport), dom.td(dom.clickbutton("Remove", dom._class("dangerButton"), /* @__PURE__ */ __name(function click() {
 					routeRows.splice(index2, 1);
 					routes = routeRows.map((rr) => rr.gather());
 					render();
@@ -1988,9 +2127,13 @@
 						};
 					}, "gather")
 				};
-			}))), dom.div(dom.submitbutton("Save"))));
+			})))), dom.div(dom._class("routeActions"), dom.submitbutton("Save"), dom.clickbutton("Add route", /* @__PURE__ */ __name(function click() {
+				routes = routeRows.map((rr) => rr.gather());
+				routes.push({ FromDomain: [], ToDomain: [], MinimumAttempts: 0, Transport: transportNames[0] });
+				render();
+			}, "click")))));
 			if (!routesElem && (routes || []).length === 0) {
-				elem = dom.div("No " + kind + " routes configured. ", dom.clickbutton("Add", /* @__PURE__ */ __name(function click() {
+				elem = dom.div(dom._class("routeActions"), dom.span("No " + kind + " routes configured."), dom.clickbutton("Add route", /* @__PURE__ */ __name(function click() {
 					routes = routeRows.map((rr) => rr.gather());
 					routes.push({ FromDomain: [], ToDomain: [], MinimumAttempts: 0, Transport: transportNames[0] });
 					render();
@@ -2063,7 +2206,7 @@
 					v.unshift("(catchall) ");
 				}
 			}
-			return dom.tr(dom.td(v), dom.td(dom.clickbutton("Remove", /* @__PURE__ */ __name(async function click(e) {
+			return dom.tr(dom.td(v), dom.td(dom.clickbutton("Remove", dom._class("dangerButton"), /* @__PURE__ */ __name(async function click(e) {
 				e.preventDefault();
 				const aliases = (config2.Aliases || []).filter((aa) => aa.SubscriptionAddress === k).map((aa) => aa.Alias.LocalpartStr + "@" + domainName(aa.Alias.Domain));
 				const aliasmsg = aliases.length > 0 ? " Address will be removed from alias(es): " + aliases.join(", ") : "";
@@ -2080,10 +2223,10 @@
 			await check(fieldset, client.AddressAdd(address, name));
 			form.reset();
 			window.location.reload();
-		}, "submit"), fieldset = dom.fieldset(dom.label(style({ display: "inline-block" }), dom.span("Localpart", attr.title('The localpart is the part before the "@"-sign of an email address. If empty, a catchall address is configured for the domain.')), dom.br(), localpart = dom.input()), dom.span(dom._class("addressSeparator"), "@"), dom.label(style({ display: "inline-block" }), dom.span("Domain"), dom.br(), domain2 = dom.select((domains || []).map((d) => dom.option(domainName(d.Domain), domainName(d.Domain) === config2.Domain ? attr.selected("") : [])))), " ", dom.submitbutton("Add address"))), dom.br(), dom.h2("Alias (list) membership"), dom.table(dom.thead(dom.tr(dom.th("Alias address", attr.title("Messages sent to this address will be delivered to all members of the alias/list. A member does not receive a message if their address is in the message From header.")), dom.th("Subscription address"), dom.th("Allowed senders", attr.title("Whether only members can send through the alias/list, or anyone.")), dom.th("Send as alias address", attr.title('If enabled, messages can be sent with the alias address in the message "From" header.')), dom.th("Members visible", attr.title("If enabled, members can see the addresses of other members.")))), (config2.Aliases || []).length === 0 ? dom.tr(dom.td(attr.colspan("6"), "None")) : [], (config2.Aliases || []).sort((a, b) => a.Alias.LocalpartStr < b.Alias.LocalpartStr ? -1 : domainName(a.Alias.Domain) < domainName(b.Alias.Domain) ? -1 : 1).map((a) => dom.tr(dom.td(dom.a(prewrap(a.Alias.LocalpartStr, "@", domainName(a.Alias.Domain)), attr.href("#domains/" + domainName(a.Alias.Domain) + "/alias/" + encodeURIComponent(a.Alias.LocalpartStr)))), dom.td(prewrap(a.SubscriptionAddress)), dom.td(a.Alias.PostPublic ? "Anyone" : "Members only"), dom.td(a.Alias.AllowMsgFrom ? "Yes" : "No"), dom.td(a.Alias.ListMembers ? "Yes" : "No"), dom.td(dom.clickbutton("Remove", /* @__PURE__ */ __name(async function click(e) {
+		}, "submit"), fieldset = dom.fieldset(dom.label(style({ display: "inline-block" }), dom.span("Localpart", attr.title('The localpart is the part before the "@"-sign of an email address. If empty, a catchall address is configured for the domain.')), dom.br(), localpart = dom.input()), dom.span(dom._class("addressSeparator"), "@"), dom.label(style({ display: "inline-block" }), dom.span("Domain"), dom.br(), domain2 = dom.select((domains || []).map((d) => dom.option(domainName(d.Domain), domainName(d.Domain) === config2.Domain ? attr.selected("") : [])))), " ", dom.submitbutton("Add address"))), dom.br(), dom.h2("Alias (list) membership"), dom.table(dom._class("accountAliases"), dom.thead(dom.tr(dom.th("Alias address", attr.title("Messages sent to this address will be delivered to all members of the alias/list. A member does not receive a message if their address is in the message From header.")), dom.th("Subscription address"), dom.th("Allowed senders", attr.title("Whether only members can send through the alias/list, or anyone.")), dom.th("Send as alias address", attr.title('If enabled, messages can be sent with the alias address in the message "From" header.')), dom.th("Members visible", attr.title("If enabled, members can see the addresses of other members.")), dom.th("Actions"))), (config2.Aliases || []).length === 0 ? dom.tr(dom.td(attr.colspan("6"), "None")) : [], (config2.Aliases || []).sort((a, b) => a.Alias.LocalpartStr < b.Alias.LocalpartStr ? -1 : domainName(a.Alias.Domain) < domainName(b.Alias.Domain) ? -1 : 1).map((a) => dom.tr(dom.td(dom.a(prewrap(a.Alias.LocalpartStr, "@", domainName(a.Alias.Domain)), attr.href("#domains/" + domainName(a.Alias.Domain) + "/alias/" + encodeURIComponent(a.Alias.LocalpartStr)))), dom.td(prewrap(a.SubscriptionAddress)), dom.td(a.Alias.PostPublic ? "Anyone" : "Members only"), dom.td(a.Alias.AllowMsgFrom ? "Yes" : "No"), dom.td(a.Alias.ListMembers ? "Yes" : "No"), dom.td(dom.clickbutton("Remove", dom._class("dangerButton"), /* @__PURE__ */ __name(async function click(e) {
 			await check(e.target, client.AliasAddressesRemove(a.Alias.LocalpartStr, domainName(a.Alias.Domain), [a.SubscriptionAddress]));
 			window.location.reload();
-		}, "click")))))), dom.br(), dom.h2("Settings"), dom.form(fieldsetSettings = dom.fieldset(dom.label(style({ display: "block", marginBottom: ".5ex" }), dom.span("Maximum outgoing messages per day", attr.title("Maximum number of outgoing messages for this account in a 24 hour window. This limits the damage to recipients and the reputation of this mail server in case of account compromise. Default 1000. MaxOutgoingMessagesPerDay in configuration file.")), dom.br(), maxOutgoingMessagesPerDay = dom.input(attr.type("number"), attr.required(""), attr.value("" + (config2.MaxOutgoingMessagesPerDay || 1e3)))), dom.label(style({ display: "block", marginBottom: ".5ex" }), dom.span("Maximum first-time recipients per day", attr.title("Maximum number of first-time recipients in outgoing messages for this account in a 24 hour window. This limits the damage to recipients and the reputation of this mail server in case of account compromise. Default 200. MaxFirstTimeRecipientsPerDay in configuration file.")), dom.br(), maxFirstTimeRecipientsPerDay = dom.input(attr.type("number"), attr.required(""), attr.value("" + (config2.MaxFirstTimeRecipientsPerDay || 200)))), dom.label(style({ display: "block", marginBottom: ".5ex" }), dom.span("Disk usage quota: Maximum total message size ", attr.title('Default maximum total message size in bytes for the account, overriding any globally configured default maximum size if non-zero. A negative value can be used to have no limit in case there is a limit by default. Attempting to add new messages to an account beyond its maximum total size will result in an error. Useful to prevent a single account from filling storage. Use units "k" for kilobytes, or "m", "g", "t".')), dom.br(), quotaMessageSize = dom.input(attr.value(formatQuotaSize(config2.QuotaMessageSize))), " Current usage is ", formatQuotaSize(Math.floor(diskUsage / (1024 * 1024)) * 1024 * 1024), "."), dom.div(style({ display: "block", marginBottom: ".5ex" }), dom.label(firstTimeSenderDelay = dom.input(attr.type("checkbox"), config2.NoFirstTimeSenderDelay ? [] : attr.checked("")), " ", dom.span("Delay deliveries from first-time senders", attr.title("To slow down potential spammers, when the message is misclassified as non-junk. Turning off the delay can be useful when the account processes messages automatically and needs fast responses.")))), dom.div(style({ display: "block", marginBottom: ".5ex" }), dom.label(noCustomPassword = dom.input(attr.type("checkbox"), config2.NoCustomPassword ? attr.checked("") : []), " ", dom.span("Don't allow account to set a password of their choice", attr.title("If set, this account cannot set a password of their own choice, but can only set a new randomly generated password, preventing password reuse across services and use of weak passwords.")))), dom.submitbutton("Save")), /* @__PURE__ */ __name(async function submit(e) {
+		}, "click")))))), dom.br(), dom.h2("Settings"), dom.form(fieldsetSettings = dom.fieldset(dom._class("accountSettings"), dom.label(dom.span("Maximum outgoing messages per day", attr.title("Maximum number of outgoing messages for this account in a 24 hour window. This limits the damage to recipients and the reputation of this mail server in case of account compromise. Default 1000. MaxOutgoingMessagesPerDay in configuration file.")), dom.br(), maxOutgoingMessagesPerDay = dom.input(attr.type("number"), attr.required(""), attr.value("" + (config2.MaxOutgoingMessagesPerDay || 1e3)))), dom.label(dom.span("Maximum first-time recipients per day", attr.title("Maximum number of first-time recipients in outgoing messages for this account in a 24 hour window. This limits the damage to recipients and the reputation of this mail server in case of account compromise. Default 200. MaxFirstTimeRecipientsPerDay in configuration file.")), dom.br(), maxFirstTimeRecipientsPerDay = dom.input(attr.type("number"), attr.required(""), attr.value("" + (config2.MaxFirstTimeRecipientsPerDay || 200)))), dom.label(dom.span("Disk usage quota: Maximum total message size ", attr.title('Default maximum total message size in bytes for the account, overriding any globally configured default maximum size if non-zero. A negative value can be used to have no limit in case there is a limit by default. Attempting to add new messages to an account beyond its maximum total size will result in an error. Useful to prevent a single account from filling storage. Use units "k" for kilobytes, or "m", "g", "t".')), dom.br(), quotaMessageSize = dom.input(attr.value(formatQuotaSize(config2.QuotaMessageSize))), " Current usage is ", formatQuotaSize(Math.floor(diskUsage / (1024 * 1024)) * 1024 * 1024), "."), dom.div(dom.label(firstTimeSenderDelay = dom.input(attr.type("checkbox"), config2.NoFirstTimeSenderDelay ? [] : attr.checked("")), " ", dom.span("Delay deliveries from first-time senders", attr.title("To slow down potential spammers, when the message is misclassified as non-junk. Turning off the delay can be useful when the account processes messages automatically and needs fast responses.")))), dom.div(dom.label(noCustomPassword = dom.input(attr.type("checkbox"), config2.NoCustomPassword ? attr.checked("") : []), " ", dom.span("Don't allow account to set a password of their choice", attr.title("If set, this account cannot set a password of their own choice, but can only set a new randomly generated password, preventing password reuse across services and use of weak passwords.")))), dom.div(dom._class("settingsActions"), dom.submitbutton("Save"))), /* @__PURE__ */ __name(async function submit(e) {
 			e.stopPropagation();
 			e.preventDefault();
 			await check(fieldsetSettings, (async () => await client.AccountSettingsSave(name, parseInt(maxOutgoingMessagesPerDay.value) || 0, parseInt(maxFirstTimeRecipientsPerDay.value) || 0, xparseSize(quotaMessageSize.value), firstTimeSenderDelay.checked, noCustomPassword.checked))());
@@ -2120,7 +2263,7 @@
 					window.location.reload();
 				}
 			}, "click"))
-		] : dom.clickbutton("Disable account login", /* @__PURE__ */ __name(function click() {
+		] : dom.clickbutton("Disable account login", dom._class("dangerButton"), /* @__PURE__ */ __name(function click() {
 			let fieldset2;
 			let loginDisabled;
 			const close = popup(dom.h1("Disable account login"), dom.form(/* @__PURE__ */ __name(async function submit(e) {
@@ -2129,8 +2272,8 @@
 				await check(fieldset2, client.AccountLoginDisabledSave(name, loginDisabled.value));
 				close();
 				window.location.reload();
-			}, "submit"), fieldset2 = dom.fieldset(dom.label(dom.div("Message to user"), loginDisabled = dom.input(attr.required(""), style({ width: "100%" })), dom.p(style({ fontStyle: "italic" }), "Will be shown to user on login attempts. Single line, no special and maximum 256 characters since message is used in IMAP/SMTP.")), dom.div(dom.submitbutton("Disable login")))));
-		}, "click"))), dom.br(), dom.h2("Recent login attempts", attr.title("Login attempts are stored for 30 days. At most 10000 failed login attempts are stored per account to prevent unlimited growth of the database.")), renderLoginAttempts(false, loginAttempts || []), dom.br(), loginAttempts && loginAttempts.length >= 10 ? dom.p("See ", dom.a(attr.href("#accounts/l/" + name + "/loginattempts"), "all login attempts"), " for this account.") : [], dom.br(), dom.clickbutton("Remove account", /* @__PURE__ */ __name(async function click(e) {
+			}, "submit"), fieldset2 = dom.fieldset(dom.label(dom.div("Message to user"), loginDisabled = dom.input(attr.required(""), style({ width: "100%" })), dom.p(style({ fontStyle: "italic" }), "Will be shown to user on login attempts. Single line, no special and maximum 256 characters since message is used in IMAP/SMTP.")), dom.div(dom.submitbutton("Disable login", dom._class("dangerButton"))))));
+		}, "click"))), dom.br(), dom.h2("Recent login attempts", attr.title("Login attempts are stored for 30 days. At most 10000 failed login attempts are stored per account to prevent unlimited growth of the database.")), renderLoginAttempts(false, loginAttempts || []), dom.br(), loginAttempts && loginAttempts.length >= 10 ? dom.p("See ", dom.a(attr.href("#accounts/l/" + name + "/loginattempts"), "all login attempts"), " for this account.") : [], dom.br(), dom.clickbutton("Remove account", dom._class("dangerButton", "accountRemove"), /* @__PURE__ */ __name(async function click(e) {
 			e.preventDefault();
 			if (!window.confirm("Are you sure you want to remove this account? All account data, including messages will be removed.")) {
 				return;
@@ -2274,7 +2417,7 @@
 				window.location.reload();
 			}, "submit"), fieldset = dom.fieldset(dom.div(style({ display: "flex", gap: "1em" }), dom.div(dom.label(style({ display: "block", marginBottom: "1ex" }), "Selector", attr.title("Used in the DKIM-Signature header, and used to form a DNS record under ._domainkey.<domain>."), dom.div(selector = dom.input(attr.required(""), attr.value(defaultSelector())))), dom.label(style({ display: "block", marginBottom: "1ex" }), "Algorithm", attr.title("For signing messages. RSA is common at the time of writing, not all mail servers recognize ed25519 signature."), dom.div(algorithm = dom.select(dom.option("rsa"), dom.option("ed25519")))), dom.label(style({ display: "block", marginBottom: "1ex" }), "Hash", attr.title("Used in signing messages. Don't use sha1 unless you understand the consequences."), dom.div(hash = dom.select(dom.option("sha256")))), dom.label(style({ display: "block", marginBottom: "1ex" }), "Canonicalization - header", attr.title("Canonicalization processes the message headers before signing. Relaxed allows more whitespace changes, making it more likely for DKIM signatures to validate after transit through servers that make whitespace modifications. Simple is more strict."), dom.div(canonHeader = dom.select(dom.option("relaxed"), dom.option("simple")))), dom.label(style({ display: "block", marginBottom: "1ex" }), "Canonicalization - body", attr.title("Like canonicalization for headers, but for the bodies."), dom.div(canonBody = dom.select(dom.option("relaxed"), dom.option("simple")))), dom.label(style({ display: "block", marginBottom: "1ex" }), "Signature lifetime", attr.title("How long a signature remains valid. Should be as long as a message may take to be delivered. The signature must be valid at the time a message is being delivered to the final destination."), dom.div(lifetime = dom.input(attr.value("3d"), attr.required("")))), dom.label(style({ display: "block", marginBottom: "1ex" }), "Seal headers", attr.title("DKIM-signatures cover headers. If headers are not sealed, additional message headers can be added with the same key without invalidating the signature. This may confuse software about which headers are trustworthy. Sealing is the safer option."), dom.div(seal = dom.input(attr.type("checkbox"), attr.checked(""))))), dom.div(dom.label(style({ display: "block", marginBottom: "1ex" }), "Headers (optional)", attr.title("Headers to sign. If left empty, a set of standard headers are signed. The (standard set of) headers are most easily edited after creating the selector/key."), dom.div(headers = dom.textarea(attr.rows("15")))))), dom.div(dom.submitbutton("Add")))));
 		}, "popupDKIMAdd");
-		return dom.div(crumbs(crumblink("Overview", "#"), "Domain " + domainString(dnsdomain)), domainConfig.Disabled ? dom.p(box(yellow, "Warning: Domain is disabled. Incoming/outgoing messages involving this domain are rejected and ACME for new TLS certificates is disabled.")) : [], dom.ul(dom.li(dom.a("Required DNS records", attr.href("#domains/" + d + "/dnsrecords"))), dom.li(dom.a("Check current actual DNS records and domain configuration", attr.href("#domains/" + d + "/dnscheck")))), dom.br(), dom.h2("Client configuration"), dom.p("If autoconfig/autodiscover does not work with an email client, use the settings below for this domain. Authenticate with email address and password. ", dom.span("Explicitly configure", attr.title("To prevent authentication mechanism downgrade attempts that may result in clients sending plain text passwords to a MitM.")), " the first supported authentication mechanism: SCRAM-SHA-256-PLUS, SCRAM-SHA-1-PLUS, SCRAM-SHA-256, SCRAM-SHA-1, CRAM-MD5."), dom.table(dom.thead(dom.tr(dom.th("Protocol"), dom.th("Host"), dom.th("Port"), dom.th("Listener"), dom.th("Note"))), dom.tbody((clientConfigs.Entries || []).map((e) => dom.tr(dom.td(e.Protocol), dom.td(domainString(e.Host)), dom.td("" + e.Port), dom.td("" + e.Listener), dom.td("" + e.Note))))), dom.br(), dom.h2("DMARC aggregate reports summary"), renderDMARCSummaries(dmarcSummaries || []), dom.br(), dom.h2("TLS reports summary"), renderTLSRPTSummaries(tlsrptSummaries || []), dom.br(), dom.h2("Addresses"), dom.table(dom.thead(dom.tr(dom.th("Address"), dom.th("Account"), dom.th("Action"))), dom.tbody(Object.entries(localpartAccounts).map((t) => dom.tr(dom.td(prewrap(t[0]) || "(catchall)"), dom.td(dom.a(t[1], attr.href("#accounts/l/" + t[1]))), dom.td(dom.clickbutton("Remove", /* @__PURE__ */ __name(async function click(e) {
+		return dom.div(crumbs(crumblink("Overview", "#"), "Domain " + domainString(dnsdomain)), domainConfig.Disabled ? dom.p(box(yellow, "Warning: Domain is disabled. Incoming/outgoing messages involving this domain are rejected and ACME for new TLS certificates is disabled.")) : [], dom.ul(dom.li(dom.a("Required DNS records", attr.href("#domains/" + d + "/dnsrecords"))), dom.li(dom.a("Check current actual DNS records and domain configuration", attr.href("#domains/" + d + "/dnscheck")))), dom.br(), dom.h2("Client configuration"), dom.p("If autoconfig/autodiscover does not work with an email client, use the settings below for this domain. Authenticate with email address and password. ", dom.span("Explicitly configure", attr.title("To prevent authentication mechanism downgrade attempts that may result in clients sending plain text passwords to a MitM.")), " the first supported authentication mechanism: SCRAM-SHA-256-PLUS, SCRAM-SHA-1-PLUS, SCRAM-SHA-256, SCRAM-SHA-1, CRAM-MD5."), dom.table(dom.thead(dom.tr(dom.th("Protocol"), dom.th("Host"), dom.th("Port"), dom.th("Listener"), dom.th("Note"))), dom.tbody((clientConfigs.Entries || []).map((e) => dom.tr(dom.td(e.Protocol), dom.td(domainString(e.Host)), dom.td("" + e.Port), dom.td("" + e.Listener), dom.td("" + e.Note))))), dom.br(), dom.h2("DMARC aggregate reports summary"), renderDMARCSummaries(dmarcSummaries || []), dom.br(), dom.h2("TLS reports summary"), renderTLSRPTSummaries(tlsrptSummaries || []), dom.br(), dom.h2("Addresses"), dom.table(dom.thead(dom.tr(dom.th("Address"), dom.th("Account"), dom.th("Action"))), dom.tbody(Object.entries(localpartAccounts).map((t) => dom.tr(dom.td(prewrap(t[0]) || "(catchall)"), dom.td(dom.a(t[1], attr.href("#accounts/l/" + t[1]))), dom.td(dom.clickbutton("Remove", dom._class("dangerButton"), /* @__PURE__ */ __name(async function click(e) {
 			e.preventDefault();
 			if (!window.confirm("Are you sure you want to remove this address? If it is a member of an alias, it will be removed from the alias.")) {
 				return;
@@ -2318,10 +2461,10 @@
 			let separatorViews = [];
 			let separatorsBox;
 			const addSeparatorView = /* @__PURE__ */ __name((s) => {
-				const separator = dom.input(attr.required(""), attr.value(s), style({ width: "2em" }));
+				const separator = dom.input(attr.required(""), attr.value(s), dom._class("localpartSeparatorInput"), dom._attrs({ "aria-label": "Catchall separator" }));
 				const v = {
 					separator,
-					root: dom.div(separator, " ", dom.clickbutton("Remove", /* @__PURE__ */ __name(function click() {
+					root: dom.div(dom._class("localpartSeparatorRow"), separator, dom.clickbutton("Remove", dom._class("dangerButton"), /* @__PURE__ */ __name(function click() {
 						separatorViews.splice(separatorViews.indexOf(v), 1);
 						v.root.remove();
 						if (separatorViews.length === 0) {
@@ -2339,9 +2482,9 @@
 				e.preventDefault();
 				e.stopPropagation();
 				await check(localpartFieldset, client.DomainLocalpartConfigSave(d, separatorViews.map((v) => v.separator.value), localpartCaseSensitive.checked));
-			}, "submit"), localpartFieldset = dom.fieldset(style({ display: "flex", gap: "1em" }), dom.label(attr.title("If set, upper/lower case is relevant for email delivery."), dom.div("Localpart case sensitive"), localpartCaseSensitive = dom.input(attr.type("checkbox"), domainConfig.LocalpartCaseSensitive ? attr.checked("") : [])), dom.div(dom.label(attr.title('If not empty, only the string before the separator is used for email delivery decisions. For example, if set to "+", you+anything@example.com will be delivered to you@example.com.'), "Localpart catchall separators"), " ", dom.clickbutton("Add", /* @__PURE__ */ __name(function click() {
+			}, "submit"), localpartFieldset = dom.fieldset(dom._class("domainLocalpartSettings"), dom.label(attr.title("If set, upper/lower case is relevant for email delivery."), localpartCaseSensitive = dom.input(attr.type("checkbox"), domainConfig.LocalpartCaseSensitive ? attr.checked("") : []), "Case-sensitive localparts"), dom.div(dom._class("localpartSeparators"), dom.div("Localpart catchall separators"), dom.p("Only the part before a separator is used for delivery. For example, \u201C+\u201D delivers you+anything@example.com to you@example.com."), separatorsBox = dom.div(dom._class("localpartSeparatorList"), dom.div("(None)")), dom.clickbutton("Add separator", /* @__PURE__ */ __name(function click() {
 				addSeparatorView("");
-			}, "click")), separatorsBox = dom.div(style({ display: "flex", flexDirection: "column", gap: ".25em" }), dom.div("(None)"))), dom.div(dom.span("\xA0"), dom.div(dom.submitbutton("Save")))));
+			}, "click"))), dom.div(dom._class("localpartSettingsActions"), dom.submitbutton("Save"))));
 			for (const sep of domainConfig.LocalpartCatchallSeparatorsEffective || []) {
 				addSeparatorView(sep);
 			}
@@ -2459,7 +2602,7 @@
 				const tr = dom.tr(dom.td(selName), dom.td(enabled = dom.input(attr.type("checkbox"), (domainConfig.DKIM.Sign || []).includes(selName) ? attr.checked("") : [])), dom.td(sel.Algorithm), dom.td(hash = dom.select(dom.option("sha256", sel.HashEffective === "sha256" ? attr.selected("") : []), dom.option("sha1", sel.HashEffective === "sha1" ? attr.selected("") : []))), dom.td(canonHeader = dom.select(dom.option("relaxed"), dom.option("simple", sel.Canonicalization.HeaderRelaxed ? [] : attr.selected("")))), dom.td(canonBody = dom.select(dom.option("relaxed"), dom.option("simple", sel.Canonicalization.BodyRelaxed ? [] : attr.selected("")))), dom.td(seal = dom.input(attr.type("checkbox"), sel.DontSealHeaders ? [] : attr.checked(""))), dom.td(headersElem = dom.span((sel.HeadersEffective || []).join("; ")), " ", dom.a(attr.href(""), "Edit", /* @__PURE__ */ __name(function click(e) {
 					e.preventDefault();
 					popupDKIMHeaders(sel, headersElem);
-				}, "click"))), dom.td(lifetime = dom.input(attr.value(sel.Expiration))), dom.td(dom.clickbutton("Remove", /* @__PURE__ */ __name(async function click(e) {
+				}, "click"))), dom.td(lifetime = dom.input(attr.value(sel.Expiration))), dom.td(dom.clickbutton("Remove", dom._class("dangerButton"), /* @__PURE__ */ __name(async function click(e) {
 					if (!window.confirm("Are you sure you want to remove this selector? It is removed immediately, after which the page is reloaded, losing unsaved changes.")) {
 						return;
 					}
@@ -2490,25 +2633,25 @@
 			})), dom.tfoot(dom.tr(dom.td(attr.colspan("9"), dom.submitbutton("Save"), " ", dom.clickbutton("Add key/selector", /* @__PURE__ */ __name(function click() {
 				popupDKIMAdd();
 			}, "click"))))))));
-		})(), dom.br(), dom.h2("External checks"), dom.ul(dom.li(link("https://internet.nl/mail/" + dnsdomain.ASCII + "/", "Check configuration at internet.nl"))), dom.br(), dom.h2("Danger"), dom.div(domainConfig.Disabled ? [
-			box(yellow, "Domain is currently disabled."),
+		})(), dom.br(), dom.h2("External checks"), dom.ul(dom.li(link("https://internet.nl/mail/" + dnsdomain.ASCII + "/", "Check configuration at internet.nl"))), dom.br(), dom.h2("Danger"), dom.div(dom._class("domainDanger"), domainConfig.Disabled ? [
+			inlineBox(yellow, "Domain is currently disabled."),
 			dom.clickbutton("Enable domain", /* @__PURE__ */ __name(async function click(e) {
 				if (window.confirm("Are you sure you want to enable this domain? Incoming/outgoing messages involving this domain will be accepted, and ACME for new TLS certificates will be enabled.")) {
 					check(e.target, client.DomainDisabledSave(d, false));
 				}
 			}, "click"))
-		] : dom.clickbutton("Disable domain", /* @__PURE__ */ __name(async function click(e) {
+		] : dom.clickbutton("Disable domain", dom._class("dangerButton"), /* @__PURE__ */ __name(async function click(e) {
 			if (window.confirm("Are you sure you want to disable this domain? Incoming/outgoing messages involving this domain will be rejected with a temporary error code, and ACME for new TLS certificates will be disabled.")) {
 				check(e.target, client.DomainDisabledSave(d, true));
 			}
-		}, "click"))), dom.br(), dom.clickbutton("Remove domain", /* @__PURE__ */ __name(async function click(e) {
+		}, "click")), dom.clickbutton("Remove domain", dom._class("dangerButton"), /* @__PURE__ */ __name(async function click(e) {
 			e.preventDefault();
 			if (!window.confirm("Are you sure you want to remove this domain?")) {
 				return;
 			}
 			await check(e.target, client.DomainRemove(d));
 			window.location.hash = "#";
-		}, "click")));
+		}, "click"))));
 	}, "domain");
 	var domainAlias = /* @__PURE__ */ __name(async (d, aliasLocalpart) => {
 		const domain2 = await client.DomainConfig(d);
@@ -2529,7 +2672,7 @@
 			check(aliasFieldset, client.AliasUpdate(aliasLocalpart, d, postPublic.checked, listMembers.checked, allowMsgFrom.checked));
 		}, "submit"), aliasFieldset = dom.fieldset(style({ display: "flex", flexDirection: "column", gap: ".5ex" }), dom.label(postPublic = dom.input(attr.type("checkbox"), alias.PostPublic ? attr.checked("") : []), " Public, anyone is allowed to send to the alias, instead of only members of the alias", attr.title("Based on address in message From header, which is assumed to be DMARC-like verified. If this setting is disabled and a non-member sends a message to the alias, the message is rejected.")), dom.label(listMembers = dom.input(attr.type("checkbox"), alias.ListMembers ? attr.checked("") : []), " Members can list other members"), dom.label(allowMsgFrom = dom.input(attr.type("checkbox"), alias.AllowMsgFrom ? attr.checked("") : []), " Allow messages to use the alias address in the message From header"), dom.div(style({ marginTop: "1ex" }), dom.submitbutton("Save")))), dom.br(), dom.h2("Members"), dom.p("Members receive messages sent to the alias. If a member address is in the message From header, the member will not receive the message."), dom.table(dom.thead(dom.tr(dom.th("Address"), dom.th("Account"), dom.th())), dom.tbody((alias.Addresses || []).map((address, index2) => {
 			const pa = (alias.ParsedAddresses || [])[index2];
-			return dom.tr(dom.td(prewrap(address)), dom.td(dom.a(pa.AccountName, attr.href("#accounts/l/" + pa.AccountName))), dom.td(dom.clickbutton("Remove", /* @__PURE__ */ __name(async function click(e) {
+			return dom.tr(dom.td(prewrap(address)), dom.td(dom.a(pa.AccountName, attr.href("#accounts/l/" + pa.AccountName))), dom.td(dom.clickbutton("Remove", dom._class("dangerButton"), /* @__PURE__ */ __name(async function click(e) {
 				await check(e.target, client.AliasAddressesRemove(aliasLocalpart, d, [address]));
 				window.location.reload();
 			}, "click"))));
@@ -2548,7 +2691,7 @@
 			}
 			await check(delFieldset, client.AliasRemove(aliasLocalpart, d));
 			window.location.hash = "#domains/" + d;
-		}, "submit"), delFieldset = dom.fieldset(dom.div(dom.submitbutton("Remove alias")))));
+		}, "submit"), delFieldset = dom.fieldset(dom.div(dom.submitbutton("Remove alias", dom._class("dangerButton"))))));
 	}, "domainAlias");
 	var domainDNSRecords = /* @__PURE__ */ __name(async (d) => {
 		const [records, dnsdomain] = await Promise.all([
@@ -2680,7 +2823,7 @@
 			e.preventDefault();
 			await check(fieldset, client.DMARCSuppressAdd(reportingAddress.value, new Date(until.value), comment.value));
 			window.location.reload();
-		}, "submit"), fieldset = dom.fieldset(dom.label(style({ display: "inline-block" }), "Reporting address", dom.br(), reportingAddress = dom.input(attr.required(""))), " ", dom.label(style({ display: "inline-block" }), "Until", dom.br(), until = dom.input(attr.type("date"), attr.required(""), attr.value(nextmonth.getFullYear() + "-" + (1 + nextmonth.getMonth()) + "-" + nextmonth.getDate()))), " ", dom.label(style({ display: "inline-block" }), dom.span("Comment (optional)"), dom.br(), comment = dom.input()), " ", dom.submitbutton("Add", attr.title("Outgoing reports to this reporting address will be suppressed until the end time.")))), dom.br(), dom.table(dom._class("hover"), dom.thead(dom.tr(dom.th("Reporting address"), dom.th("Until"), dom.th("Comment"), dom.th("Action"))), dom.tbody((suppressAddresses || []).length === 0 ? dom.tr(dom.td(attr.colspan("4"), "No suppressed reporting addresses.")) : [], (suppressAddresses || []).map((ba) => dom.tr(dom.td(prewrap(ba.ReportingAddress)), dom.td(ba.Until.toISOString()), dom.td(ba.Comment), dom.td(dom.clickbutton("Remove", /* @__PURE__ */ __name(async function click(e) {
+		}, "submit"), fieldset = dom.fieldset(dom.label(style({ display: "inline-block" }), "Reporting address", dom.br(), reportingAddress = dom.input(attr.required(""))), " ", dom.label(style({ display: "inline-block" }), "Until", dom.br(), until = dom.input(attr.type("date"), attr.required(""), attr.value(nextmonth.getFullYear() + "-" + (1 + nextmonth.getMonth()) + "-" + nextmonth.getDate()))), " ", dom.label(style({ display: "inline-block" }), dom.span("Comment (optional)"), dom.br(), comment = dom.input()), " ", dom.submitbutton("Add", attr.title("Outgoing reports to this reporting address will be suppressed until the end time.")))), dom.br(), dom.table(dom._class("hover"), dom.thead(dom.tr(dom.th("Reporting address"), dom.th("Until"), dom.th("Comment"), dom.th("Action"))), dom.tbody((suppressAddresses || []).length === 0 ? dom.tr(dom.td(attr.colspan("4"), "No suppressed reporting addresses.")) : [], (suppressAddresses || []).map((ba) => dom.tr(dom.td(prewrap(ba.ReportingAddress)), dom.td(ba.Until.toISOString()), dom.td(ba.Comment), dom.td(dom.clickbutton("Remove", dom._class("dangerButton"), /* @__PURE__ */ __name(async function click(e) {
 			await check(e.target, client.DMARCSuppressRemove(ba.ID));
 			window.location.reload();
 		}, "click")), " ", dom.clickbutton("Extend for 1 month", /* @__PURE__ */ __name(async function click(e) {
@@ -2724,10 +2867,10 @@
 			}, "click"));
 			return r;
 		}, "sourceIP");
-		return dom.div(crumbs(crumblink("Overview", "#"), crumblink("DMARC", "#dmarc"), crumblink("Evaluations", "#dmarc/evaluations"), "Domain " + domainString(d)), dom.div(dom.clickbutton("Remove evaluations", /* @__PURE__ */ __name(async function click(e) {
+		return dom.div(crumbs(crumblink("Overview", "#"), crumblink("DMARC", "#dmarc"), crumblink("Evaluations", "#dmarc/evaluations"), "Domain " + domainString(d)), dom.div(dom._class("reportDetailActions"), dom.clickbutton("Remove evaluations", dom._class("dangerButton"), /* @__PURE__ */ __name(async function click(e) {
 			await check(e.target, client.DMARCRemoveEvaluations(domain2));
 			window.location.reload();
-		}, "click"))), dom.br(), dom.p("The evaluations below will be sent in a DMARC aggregate report to the addresses found in the published DMARC DNS record, which is fetched again before sending the report. The fields Interval hours, Addresses and Policy are only filled for the first row and whenever a new value in the published DMARC record is encountered."), dom.table(dom._class("hover"), dom.thead(dom.tr(dom.th("ID"), dom.th("Evaluated"), dom.th("Optional", attr.title("Some evaluations will not cause a DMARC aggregate report to be sent. But if a report is sent, optional records are included.")), dom.th("Interval hours", attr.title("DMARC policies published by a domain can specify how often they would like to receive reports. The default is 24 hours, but can be as often as each hour. To keep reports comparable between different mail servers that send reports, reports are sent at rounded up intervals of whole hours that can divide a 24 hour day, and are aligned with the start of a day at UTC.")), dom.th("Addresses", attr.title("Addresses that will receive the report. An address can have a maximum report size configured. If there is no address, no report will be sent.")), dom.th("Policy", attr.title("Summary of the policy as encountered in the DMARC DNS record of the domain, and used for evaluation.")), dom.th("IP", attr.title("IP address of delivery attempt that was evaluated, relevant for SPF.")), dom.th("Disposition", attr.title("Our decision to accept/reject this message. It may be different than requested by the published policy. For example, when overriding due to delivery from a mailing list or forwarded address.")), dom.th("Aligned DKIM/SPF", attr.title("Whether DKIM and SPF had an aligned pass, where strict/relaxed alignment means whether the domain of an SPF pass and DKIM pass matches the exact domain (strict) or optionally a subdomain (relaxed). A DMARC pass requires at least one pass.")), dom.th("Envelope to", attr.title("Domain used in SMTP RCPT TO during delivery.")), dom.th("Envelope from", attr.title("Domain used in SMTP MAIL FROM during delivery.")), dom.th("Message from", attr.title('Domain in "From" message header.')), dom.th("DKIM details", attr.title("Results of verifying DKIM-Signature headers in message. Only signatures with matching organizational domain are included, regardless of strict/relaxed DKIM alignment in DMARC policy.")), dom.th("SPF details", attr.title('Results of SPF check used in DMARC evaluation. "mfrom" indicates the "SMTP MAIL FROM" domain was used, "helo" indicates the SMTP EHLO domain was used.')))), dom.tbody((evaluations || []).map((e) => {
+		}, "click"))), dom.p("The evaluations below will be sent in a DMARC aggregate report to the addresses found in the published DMARC DNS record, which is fetched again before sending the report. The fields Interval hours, Addresses and Policy are only filled for the first row and whenever a new value in the published DMARC record is encountered."), dom.table(dom._class("hover"), dom.thead(dom.tr(dom.th("ID"), dom.th("Evaluated"), dom.th("Optional", attr.title("Some evaluations will not cause a DMARC aggregate report to be sent. But if a report is sent, optional records are included.")), dom.th("Interval hours", attr.title("DMARC policies published by a domain can specify how often they would like to receive reports. The default is 24 hours, but can be as often as each hour. To keep reports comparable between different mail servers that send reports, reports are sent at rounded up intervals of whole hours that can divide a 24 hour day, and are aligned with the start of a day at UTC.")), dom.th("Addresses", attr.title("Addresses that will receive the report. An address can have a maximum report size configured. If there is no address, no report will be sent.")), dom.th("Policy", attr.title("Summary of the policy as encountered in the DMARC DNS record of the domain, and used for evaluation.")), dom.th("IP", attr.title("IP address of delivery attempt that was evaluated, relevant for SPF.")), dom.th("Disposition", attr.title("Our decision to accept/reject this message. It may be different than requested by the published policy. For example, when overriding due to delivery from a mailing list or forwarded address.")), dom.th("Aligned DKIM/SPF", attr.title("Whether DKIM and SPF had an aligned pass, where strict/relaxed alignment means whether the domain of an SPF pass and DKIM pass matches the exact domain (strict) or optionally a subdomain (relaxed). A DMARC pass requires at least one pass.")), dom.th("Envelope to", attr.title("Domain used in SMTP RCPT TO during delivery.")), dom.th("Envelope from", attr.title("Domain used in SMTP MAIL FROM during delivery.")), dom.th("Message from", attr.title('Domain in "From" message header.')), dom.th("DKIM details", attr.title("Results of verifying DKIM-Signature headers in message. Only signatures with matching organizational domain are included, regardless of strict/relaxed DKIM alignment in DMARC policy.")), dom.th("SPF details", attr.title('Results of SPF check used in DMARC evaluation. "mfrom" indicates the "SMTP MAIL FROM" domain was used, "helo" indicates the SMTP EHLO domain was used.')))), dom.tbody((evaluations || []).map((e) => {
 			const ival = e.IntervalHours + "h";
 			const interval = ival === lastInterval ? "" : ival;
 			lastInterval = ival;
@@ -2854,7 +2997,7 @@
 						temperror: "Message could not be verified. E.g. because of DNS resolve error. A later attempt may succeed. A missing DNS record is treated as temporary error, a new key may not have propagated through DNS shortly after it was taken into use.",
 						permerror: "Message cannot be verified. E.g. when a required header field is absent or for invalid (combination of) parameters. We typically set this if a DNS record does not allow the signature, e.g. due to algorithm mismatch or expiry."
 					};
-					addRow("dkim: ", dom.span(dkim.Result === "none" || dkim.Result === "pass" ? dkim.Result : box(yellow, dkim.Result), attr.title((dkim.HumanResult ? "additional information: " + dkim.HumanResult + ";\n" : "") + dkim.Result + ": " + (statuses[dkim.Result] || "invalid status"))), !dkim.Selector ? [] : [
+					addRow("dkim: ", dom.span(dkim.Result === "none" || dkim.Result === "pass" ? dkim.Result : inlineBox(yellow, dkim.Result), attr.title((dkim.HumanResult ? "additional information: " + dkim.HumanResult + ";\n" : "") + dkim.Result + ": " + (statuses[dkim.Result] || "invalid status"))), !dkim.Selector ? [] : [
 						", ",
 						dom.span(dkim.Selector, attr.title('Selector, the DKIM record is at "<selector>._domainkey.<domain>".' + (dkim.Domain === d ? "" : ";\ndomain: " + dkim.Domain)))
 					]);
@@ -2870,7 +3013,7 @@
 						temperror: "Trying again later may succeed, e.g. for temporary DNS lookup error.",
 						permerror: "Error requiring some intervention to correct. E.g. invalid DNS record."
 					};
-					addRow("spf: ", dom.span(spf.Result === "none" || spf.Result === "neutral" || spf.Result === "pass" ? spf.Result : box(yellow, spf.Result), attr.title(spf.Result + ": " + (statuses[spf.Result] || "invalid status"))), ", ", dom.span(spf.Scope, attr.title('scopes:\nhelo: "SMTP HELO"\nmfrom: SMTP "MAIL FROM"')), " ", dom.span(spf.Domain));
+					addRow("spf: ", dom.span(spf.Result === "none" || spf.Result === "neutral" || spf.Result === "pass" ? spf.Result : inlineBox(yellow, spf.Result), attr.title(spf.Result + ": " + (statuses[spf.Result] || "invalid status"))), ", ", dom.span(spf.Scope, attr.title('scopes:\nhelo: "SMTP HELO"\nmfrom: SMTP "MAIL FROM"')), " ", dom.span(spf.Domain));
 				}
 				return rows;
 			});
@@ -2926,7 +3069,7 @@
 			e.preventDefault();
 			await check(fieldset, client.TLSRPTSuppressAdd(reportingAddress.value, new Date(until.value), comment.value));
 			window.location.reload();
-		}, "submit"), fieldset = dom.fieldset(dom.label(style({ display: "inline-block" }), "Reporting address", dom.br(), reportingAddress = dom.input(attr.required(""))), " ", dom.label(style({ display: "inline-block" }), "Until", dom.br(), until = dom.input(attr.type("date"), attr.required(""), attr.value(nextmonth.getFullYear() + "-" + (1 + nextmonth.getMonth()) + "-" + nextmonth.getDate()))), " ", dom.label(style({ display: "inline-block" }), dom.span("Comment (optional)"), dom.br(), comment = dom.input()), " ", dom.submitbutton("Add", attr.title("Outgoing reports to this reporting address will be suppressed until the end time.")))), dom.br(), dom.table(dom._class("hover"), dom.thead(dom.tr(dom.th("Reporting address"), dom.th("Until"), dom.th("Comment"), dom.th("Action"))), dom.tbody((suppressAddresses || []).length === 0 ? dom.tr(dom.td(attr.colspan("4"), "No suppressed reporting addresses.")) : [], (suppressAddresses || []).map((ba) => dom.tr(dom.td(prewrap(ba.ReportingAddress)), dom.td(ba.Until.toISOString()), dom.td(ba.Comment), dom.td(dom.clickbutton("Remove", /* @__PURE__ */ __name(async function click(e) {
+		}, "submit"), fieldset = dom.fieldset(dom.label(style({ display: "inline-block" }), "Reporting address", dom.br(), reportingAddress = dom.input(attr.required(""))), " ", dom.label(style({ display: "inline-block" }), "Until", dom.br(), until = dom.input(attr.type("date"), attr.required(""), attr.value(nextmonth.getFullYear() + "-" + (1 + nextmonth.getMonth()) + "-" + nextmonth.getDate()))), " ", dom.label(style({ display: "inline-block" }), dom.span("Comment (optional)"), dom.br(), comment = dom.input()), " ", dom.submitbutton("Add", attr.title("Outgoing reports to this reporting address will be suppressed until the end time.")))), dom.br(), dom.table(dom._class("hover"), dom.thead(dom.tr(dom.th("Reporting address"), dom.th("Until"), dom.th("Comment"), dom.th("Action"))), dom.tbody((suppressAddresses || []).length === 0 ? dom.tr(dom.td(attr.colspan("4"), "No suppressed reporting addresses.")) : [], (suppressAddresses || []).map((ba) => dom.tr(dom.td(prewrap(ba.ReportingAddress)), dom.td(ba.Until.toISOString()), dom.td(ba.Comment), dom.td(dom.clickbutton("Remove", dom._class("dangerButton"), /* @__PURE__ */ __name(async function click(e) {
 			await check(e.target, client.TLSRPTSuppressRemove(ba.ID));
 			window.location.reload();
 		}, "click")), " ", dom.clickbutton("Extend for 1 month", /* @__PURE__ */ __name(async function click(e) {
@@ -2938,15 +3081,11 @@
 		const [d, tlsresults] = await client.TLSRPTResultsDomain(isrcptdom, domain2);
 		const recordPromise = client.LookupTLSRPTRecord(domain2);
 		let recordBox;
-		const root = dom.div(crumbs(crumblink("Overview", "#"), crumblink("TLSRPT", "#tlsrpt"), crumblink("Results", "#tlsrpt/results"), (isrcptdom ? "Recipient domain " : "Host ") + domainString(d)), dom.div(dom.clickbutton("Remove results", /* @__PURE__ */ __name(async function click(e) {
+		const root = dom.div(crumbs(crumblink("Overview", "#"), crumblink("TLSRPT", "#tlsrpt"), crumblink("Results", "#tlsrpt/results"), (isrcptdom ? "Recipient domain " : "Host ") + domainString(d)), dom.div(dom._class("reportDetailActions"), dom.clickbutton("Remove results", dom._class("dangerButton"), /* @__PURE__ */ __name(async function click(e) {
 			e.preventDefault();
 			await check(e.target, client.TLSRPTRemoveResults(isrcptdom, domain2, ""));
 			window.location.reload();
-		}, "click"))), dom.br(), dom.div("Fetching TLSRPT DNS record..."), recordBox = dom.div(), dom.br(), dom.p("Below are the results per day and " + (isrcptdom ? "policy" : "recipient") + " domain that may be sent in a report."), (tlsresults || []).map((tlsresult) => [
-			dom.h2(tlsresult.DayUTC, " - ", dom.span(attr.title("Recipient domain, as used in SMTP MAIL TO, usually based on message To/Cc/Bcc."), isrcptdom ? tlsresult.PolicyDomain : tlsresult.RecipientDomain)),
-			dom.p("Send report (if TLSRPT policy exists and has address): " + (tlsresult.SendReport ? "Yes" : "No"), dom.br(), "Report about (MX) host (instead of recipient domain): " + (tlsresult.IsHost ? "Yes" : "No")),
-			dom.div(dom._class("literal"), JSON.stringify(tlsresult.Results, null, "	"))
-		]));
+		}, "click"))), dom.div(dom._class("tlsDNSRecord"), dom.h2("TLSRPT DNS record"), recordBox = dom.div(dom._attrs({ "aria-live": "polite" }), "Fetching TLSRPT DNS record\u2026")), dom.p("Below are the results per day and " + (isrcptdom ? "policy" : "recipient") + " domain that may be sent in a report."), (tlsresults || []).map((tlsresult) => dom.div(dom._class("tlsResultDetail"), dom.h2(tlsresult.DayUTC, " - ", dom.span(attr.title("Recipient domain, as used in SMTP MAIL TO, usually based on message To/Cc/Bcc."), isrcptdom ? tlsresult.PolicyDomain : tlsresult.RecipientDomain)), dom.p("Send report (if TLSRPT policy exists and has address): " + (tlsresult.SendReport ? "Yes" : "No"), dom.br(), "Report about (MX) host (instead of recipient domain): " + (tlsresult.IsHost ? "Yes" : "No")), dom.div(dom._class("literal"), JSON.stringify(tlsresult.Results, null, "	")))));
 		(async () => {
 			let txt = "";
 			let error;
@@ -2964,6 +3103,7 @@
 			if (error) {
 				l.push(box(red, error));
 			}
+			recordBox.replaceChildren();
 			dom._kids(recordBox, l);
 		})();
 		return root;
@@ -3106,12 +3246,26 @@
 			dnsbl();
 		}, "submit"), fieldset = dom.fieldset(dom.div("One per line"), dom.div(style({ marginBottom: ".5ex" }), monitorTextarea = dom.textarea(style({ width: "20rem" }), attr.rows("" + Math.max(5, 1 + (monitorZones || []).length)), new String((monitorZones || []).map((zone) => domainName(zone)).join("\n"))), dom.div("Examples: sbl.spamhaus.org or bl.spamcop.net")), dom.div(dom.submitbutton("Save")))));
 	}, "dnsbl");
+	var mailDetails = /* @__PURE__ */ __name((m) => {
+		const nowSecs = (/* @__PURE__ */ new Date()).getTime() / 1e3;
+		let results = dom.p("No delivery attempts yet.");
+		if (m.Results && m.Results.length > 0) {
+			results = dom.table(dom.thead(dom.tr(dom.th("Start"), dom.th("Duration"), dom.th("Result"), dom.th("Code"), dom.th("Enhanced code"), dom.th("Error"))), dom.tbody(m.Results.map((r) => {
+				let outcome = "Failed";
+				if (r.Success) {
+					outcome = "Delivered";
+				}
+				return dom.tr(dom.td(age(r.Start, false, nowSecs)), dom.td(Math.round(r.Duration / 1e6) + "ms"), dom.td(outcome), dom.td("" + (r.Code || "\u2014")), dom.td(r.Secode || "\u2014"), dom.td(r.Error || "\u2014"));
+			})));
+		}
+		detailsDialog("Message #" + m.ID, "mail", dom.div(dom._class("detailsSummary"), dom.div(dom.b("Subject"), " ", m.Subject || "(no subject)"), dom.div(dom.b("Account"), " ", m.SenderAccount || "\u2014")), dom.div(dom._class("detailsSections"), dom.div(dom._class("detailsSection"), dom.h2("Delivery attempts (" + (m.Results || []).length + ")"), dom.div(dom._class("detailsResults"), attr.tabindex("0"), dom._attrs({ "role": "region", "aria-label": "Delivery attempts" }), results))));
+	}, "mailDetails");
 	var queueList = /* @__PURE__ */ __name(async () => {
 		let filter = { Max: parseInt(localStorageGet("adminpaginationsize") || "") || 100, IDs: [], Account: "", From: "", To: "", Hold: null, Submitted: "", NextAttempt: "", Transport: null };
 		let sort = { Field: "NextAttempt", LastID: 0, Last: null, Asc: true };
 		let [holdRules, msgs0, transports] = await Promise.all([
 			client.QueueHoldRuleList(),
-			client.QueueList(filter, sort),
+			queuePage(client.withOptions({ skipReturnCheck: true }).QueueList(filter, sort), parser.Msg, sort.Field),
 			client.Transports()
 		]);
 		let msgs = msgs0 || [];
@@ -3150,10 +3304,6 @@
 			}
 			return f;
 		}, "gatherIDs");
-		const popupDetails = /* @__PURE__ */ __name((m) => {
-			const nowSecs2 = (/* @__PURE__ */ new Date()).getTime() / 1e3;
-			popup(dom.h1("Details"), dom.table(dom.tr(dom.td("Message subject"), dom.td(m.Subject))), dom.br(), dom.h2("Results"), dom.table(dom.thead(dom.tr(dom.th("Start"), dom.th("Duration"), dom.th("Success"), dom.th("Code"), dom.th("Secode"), dom.th("Error"))), dom.tbody((m.Results || []).length === 0 ? dom.tr(dom.td(attr.colspan("6"), "No results.")) : [], (m.Results || []).map((r) => dom.tr(dom.td(age(r.Start, false, nowSecs2)), dom.td(Math.round(r.Duration / 1e6) + "ms"), dom.td(r.Success ? "\u2713" : ""), dom.td("" + (r.Code || "")), dom.td(r.Secode), dom.td(r.Error))))));
-		}, "popupDetails");
 		let tbody = dom.tbody();
 		const render = /* @__PURE__ */ __name(() => {
 			toggles = /* @__PURE__ */ new Map();
@@ -3179,7 +3329,7 @@
 					dom.td(m.Transport || "(default)"),
 					dom.td(m.RequireTLS === true ? "Yes" : m.RequireTLS === false ? "No" : ""),
 					dom.td(dom.clickbutton("Details", /* @__PURE__ */ __name(function click() {
-						popupDetails(m);
+						mailDetails(m);
 					}, "click")))
 				);
 			}));
@@ -3229,7 +3379,7 @@
 							dom.td(pr.Account),
 							dom.td(domainString(pr.SenderDomain)),
 							dom.td(domainString(pr.RecipientDomain))
-						], dom.td(dom.clickbutton("Remove", attr.title('Removing a hold rule does not modify the "on hold" status of messages in the queue.'), /* @__PURE__ */ __name(async function click(e) {
+						], dom.td(dom.clickbutton("Remove", dom._class("dangerButton"), attr.title('Removing a hold rule does not modify the "on hold" status of messages in the queue.'), /* @__PURE__ */ __name(async function click(e) {
 							await check(e.target, client.QueueHoldRuleRemove(pr.ID));
 							window.location.reload();
 						}, "click"))))), dom.tr(dom.td(holdRuleAccount = dom.input(attr.form("holdRuleForm"))), dom.td(holdRuleSenderDomain = dom.input(attr.form("holdRuleForm"))), dom.td(holdRuleRecipientDomain = dom.input(attr.form("holdRuleForm"))), dom.td(holdRuleSubmit = dom.submitbutton("Add hold rule", attr.form("holdRuleForm"), attr.title("When adding a new hold rule, existing messages in queue matching the new rule will be marked as on hold."))))))
@@ -3242,7 +3392,7 @@
 			// Filtering.
 			filterForm = dom.form(
 				attr.id("queuefilter"),
-				// Referenced by input elements in table row.
+				// Connects filter controls and table selection to this form.
 				/* @__PURE__ */ __name(async function submit(e) {
 					e.preventDefault();
 					e.stopPropagation();
@@ -3264,47 +3414,22 @@
 						Asc: sortElem.value.endsWith("asc")
 					};
 					tbody.classList.add("loadstart");
-					msgs = await check({ disabled: false }, client.QueueList(filter, sort)) || [];
+					msgs = await check({ disabled: false }, queuePage(client.withOptions({ skipReturnCheck: true }).QueueList(filter, sort), parser.Msg, sort.Field)) || [];
 					render();
 				}, "submit")
 			),
 			dom.h2("Messages"),
-			dom.table(dom._class("hover"), style({ width: "100%" }), dom.thead(dom.tr(
-				dom.td(attr.colspan("2"), "Filter"),
-				dom.td(filterSubmitted = dom.input(attr.form("queuefilter"), style({ width: "7em" }), attr.title('Example: "<-1h" for filtering messages submitted more than 1 hour ago.'))),
-				dom.td(filterAccount = dom.input(attr.form("queuefilter"))),
-				dom.td(filterFrom = dom.input(attr.form("queuefilter")), attr.title('Example: "@sender.example" to filter by domain of sender.')),
-				dom.td(filterTo = dom.input(attr.form("queuefilter")), attr.title('Example: "@recipient.example" to filter by domain of recipient.')),
-				dom.td(),
-				// todo: add filter by size?
-				dom.td(),
-				// todo: add filter by attempts?
-				dom.td(filterHold = dom.select(attr.form("queuefilter"), /* @__PURE__ */ __name(function change() {
-					filterForm.requestSubmit();
-				}, "change"), dom.option("", attr.value("")), dom.option("Yes"), dom.option("No"))),
-				dom.td(filterNextAttempt = dom.input(attr.form("queuefilter"), style({ width: "7em" }), attr.title('Example: ">1h" for filtering messages to be delivered in more than 1 hour, or "<now" for messages to be delivered as soon as possible.'))),
-				dom.td(),
-				dom.td(),
-				dom.td(filterTransport = dom.select(Object.keys(transports || {}).length === 0 ? style({ display: "none" }) : [], attr.form("queuefilter"), /* @__PURE__ */ __name(function change() {
-					filterForm.requestSubmit();
-				}, "change"), dom.option(""), dom.option("(default)"), Object.keys(transports || {}).sort().map((t) => dom.option(t)))),
-				dom.td(
-					attr.colspan("2"),
-					style({ textAlign: "right" }),
-					// Less content shifting while rendering.
-					"Sort ",
-					sortElem = dom.select(attr.form("queuefilter"), /* @__PURE__ */ __name(function change() {
-						filterForm.requestSubmit();
-					}, "change"), dom.option("Next attempt \u2191", attr.value("nextattempt-asc")), dom.option("Next attempt \u2193", attr.value("nextattempt-desc")), dom.option("Submitted \u2191", attr.value("submitted-asc")), dom.option("Submitted \u2193", attr.value("submitted-desc"))),
-					" ",
-					dom.submitbutton("Apply", attr.form("queuefilter")),
-					" ",
-					dom.clickbutton("Reset", attr.form("queuefilter"), /* @__PURE__ */ __name(function click() {
-						filterForm.reset();
-						filterForm.requestSubmit();
-					}, "click"))
-				)
-			), dom.tr(dom.td(dom.input(attr.type("checkbox"), msgs.length === 1 ? attr.checked("") : [], attr.form("queuefilter"), /* @__PURE__ */ __name(function change(e) {
+			dom.div(dom._class("queueFilters"), dom.label("Submitted", filterSubmitted = dom.input(attr.form("queuefilter"), style({ width: "7em" }), attr.title('Example: "<-1h" for filtering messages submitted more than 1 hour ago.'))), dom.label("Account", filterAccount = dom.input(attr.form("queuefilter"))), dom.label("From", filterFrom = dom.input(attr.form("queuefilter")), attr.title('Example: "@sender.example" to filter by domain of sender.')), dom.label("To", filterTo = dom.input(attr.form("queuefilter")), attr.title('Example: "@recipient.example" to filter by domain of recipient.')), dom.label("On hold", filterHold = dom.select(attr.form("queuefilter"), /* @__PURE__ */ __name(function change() {
+				filterForm.requestSubmit();
+			}, "change"), dom.option("All", attr.value("")), dom.option("Yes"), dom.option("No"))), dom.label("Next attempt", filterNextAttempt = dom.input(attr.form("queuefilter"), style({ width: "7em" }), attr.title('Example: ">1h" for filtering messages to be delivered in more than 1 hour, or "<now" for messages to be delivered as soon as possible.'))), dom.label("Transport", filterTransport = dom.select(attr.form("queuefilter"), /* @__PURE__ */ __name(function change() {
+				filterForm.requestSubmit();
+			}, "change"), dom.option("All", attr.value("")), dom.option("(default)"), Object.keys(transports || {}).sort().map((t) => dom.option(t)))), dom.div(dom._class("filterActions"), dom.label("Sort", sortElem = dom.select(attr.form("queuefilter"), /* @__PURE__ */ __name(function change() {
+				filterForm.requestSubmit();
+			}, "change"), dom.option("Next attempt \u2191", attr.value("nextattempt-asc")), dom.option("Next attempt \u2193", attr.value("nextattempt-desc")), dom.option("Submitted \u2191", attr.value("submitted-asc")), dom.option("Submitted \u2193", attr.value("submitted-desc")))), dom.submitbutton("Apply", attr.form("queuefilter")), " ", dom.clickbutton("Reset", attr.form("queuefilter"), /* @__PURE__ */ __name(function click() {
+				filterForm.reset();
+				filterForm.requestSubmit();
+			}, "click")))),
+			dom.table(dom._class("hover"), style({ width: "100%" }), dom.thead(dom.tr(dom.td(dom.input(attr.type("checkbox"), msgs.length === 1 ? attr.checked("") : [], attr.form("queuefilter"), /* @__PURE__ */ __name(function change(e) {
 				const elem = e.target;
 				for (const [_, toggle] of toggles) {
 					toggle.checked = elem.checked;
@@ -3319,14 +3444,10 @@
 					} else {
 						const lm = msgs[msgs.length - 1];
 						sort.LastID = lm.ID;
-						if (sort.Field === "Queued") {
-							sort.Last = lm.Queued;
-						} else {
-							sort.Last = lm.NextAttempt;
-						}
+						sort.Last = queueCursor(lm);
 					}
 					tbody.classList.add("loadstart");
-					const l = await check(e.target, client.QueueList(filter, sort)) || [];
+					const l = await check(e.target, queuePage(client.withOptions({ skipReturnCheck: true }).QueueList(filter, sort), parser.Msg, sort.Field)) || [];
 					msgs.push(...l);
 					render();
 				}, "click"))
@@ -3355,7 +3476,7 @@
 				const n = await check(e.target, (async () => await client.QueueTransportSet(gatherIDs(), transport.value))());
 				window.alert("" + n + " message(s) updated");
 				window.location.reload();
-			}, "submit"))), dom.div(dom.div("Delivery"), dom.clickbutton("Fail delivery", attr.title("Cause delivery to fail, sending a DSN to the sender."), /* @__PURE__ */ __name(async function click(e) {
+			}, "submit"))), dom.div(dom.div("Delivery"), dom.clickbutton("Fail delivery", dom._class("dangerButton"), attr.title("Cause delivery to fail, sending a DSN to the sender."), /* @__PURE__ */ __name(async function click(e) {
 				e.preventDefault();
 				if (!window.confirm("Are you sure you want to fail delivery for the selected message(s)? Notifications of delivery failure will be sent (DSNs).")) {
 					return;
@@ -3363,7 +3484,7 @@
 				const n = await check(e.target, (async () => await client.QueueFail(gatherIDs()))());
 				window.alert("" + n + " message(s) updated");
 				window.location.reload();
-			}, "click"))), dom.div(dom.div("Messages"), dom.clickbutton("Remove", attr.title("Completely remove messages from queue, not sending a DSN."), /* @__PURE__ */ __name(async function click(e) {
+			}, "click"))), dom.div(dom.div("Messages"), dom.clickbutton("Remove", dom._class("dangerButton"), attr.title("Completely remove messages from queue, not sending a DSN."), /* @__PURE__ */ __name(async function click(e) {
 				e.preventDefault();
 				if (!window.confirm("Are you sure you want to fail delivery for the selected message(s)? It will be removed completely, no DSN about failure to deliver will be sent.")) {
 					return;
@@ -3378,7 +3499,7 @@
 		let filter = { Max: parseInt(localStorageGet("adminpaginationsize") || "") || 100, IDs: [], Account: "", From: "", To: "", Submitted: "", LastActivity: "", Transport: null };
 		let sort = { Field: "LastActivity", LastID: 0, Last: null, Asc: false };
 		const [retired0, transports0] = await Promise.all([
-			client.RetiredList(filter, sort),
+			queuePage(client.withOptions({ skipReturnCheck: true }).RetiredList(filter, sort), parser.MsgRetired, sort.Field),
 			client.Transports()
 		]);
 		let retired = retired0 || [];
@@ -3393,10 +3514,6 @@
 		let filterLastActivity;
 		let filterTransport;
 		let filterSuccess;
-		const popupDetails = /* @__PURE__ */ __name((m) => {
-			const nowSecs2 = (/* @__PURE__ */ new Date()).getTime() / 1e3;
-			popup(dom.h1("Details"), dom.table(dom.tr(dom.td("Message subject"), dom.td(m.Subject))), dom.br(), dom.h2("Results"), dom.table(dom.thead(dom.tr(dom.th("Start"), dom.th("Duration"), dom.th("Success"), dom.th("Code"), dom.th("Secode"), dom.th("Error"))), dom.tbody((m.Results || []).length === 0 ? dom.tr(dom.td(attr.colspan("6"), "No results.")) : [], (m.Results || []).map((r) => dom.tr(dom.td(age(r.Start, false, nowSecs2)), dom.td(Math.round(r.Duration / 1e6) + "ms"), dom.td(r.Success ? "\u2713" : ""), dom.td("" + (r.Code || "")), dom.td(r.Secode), dom.td(r.Error))))));
-		}, "popupDetails");
 		let tbody = dom.tbody();
 		const render = /* @__PURE__ */ __name(() => {
 			const ntbody = dom.tbody(dom._class("loadend"), retired.length === 0 ? dom.tr(dom.td(attr.colspan("14"), "No retired messages.")) : [], retired.map((m) => dom.tr(
@@ -3416,7 +3533,7 @@
 				dom.td(m.Transport || ""),
 				dom.td(m.RequireTLS === true ? "Yes" : m.RequireTLS === false ? "No" : ""),
 				dom.td(dom.clickbutton("Details", /* @__PURE__ */ __name(function click() {
-					popupDetails(m);
+					mailDetails(m);
 				}, "click")))
 			)));
 			tbody.replaceWith(ntbody);
@@ -3428,7 +3545,7 @@
 			// Filtering.
 			filterForm = dom.form(
 				attr.id("queuefilter"),
-				// Referenced by input elements in table row.
+				// Connects filter controls and table selection to this form.
 				/* @__PURE__ */ __name(async function submit(e) {
 					e.preventDefault();
 					e.stopPropagation();
@@ -3450,62 +3567,33 @@
 						Asc: sortElem.value.endsWith("asc")
 					};
 					tbody.classList.add("loadstart");
-					retired = await check({ disabled: false }, client.RetiredList(filter, sort)) || [];
+					retired = await check({ disabled: false }, queuePage(client.withOptions({ skipReturnCheck: true }).RetiredList(filter, sort), parser.MsgRetired, sort.Field)) || [];
 					render();
 				}, "submit")
 			),
 			dom.h2("Retired messages"),
 			dom.p("Meta information about queued messages may be kept after successful and/or failed delivery, configurable per account."),
-			dom.table(dom._class("hover"), style({ width: "100%" }), dom.thead(dom.tr(
-				dom.td("Filter"),
-				dom.td(filterSuccess = dom.select(attr.form("queuefilter"), /* @__PURE__ */ __name(function change() {
-					filterForm.requestSubmit();
-				}, "change"), dom.option(""), dom.option("Yes"), dom.option("No"))),
-				dom.td(filterLastActivity = dom.input(attr.form("queuefilter"), style({ width: "7em" }), attr.title('Example: ">-1h" for filtering messages with last activity less than 1 hour ago.'))),
-				dom.td(filterSubmitted = dom.input(attr.form("queuefilter"), style({ width: "7em" }), attr.title('Example: "<-1h" for filtering messages submitted more than 1 hour ago.'))),
-				dom.td(filterAccount = dom.input(attr.form("queuefilter"))),
-				dom.td(filterFrom = dom.input(attr.form("queuefilter")), attr.title('Example: "@sender.example" to filter by domain of sender.')),
-				dom.td(filterTo = dom.input(attr.form("queuefilter")), attr.title('Example: "@recipient.example" to filter by domain of recipient.')),
-				dom.td(),
-				// todo: add filter by size?
-				dom.td(),
-				// todo: add filter by attempts?
-				dom.td(),
-				dom.td(),
-				dom.td(filterTransport = dom.select(Object.keys(transports).length === 0 ? style({ display: "none" }) : [], attr.form("queuefilter"), /* @__PURE__ */ __name(function change() {
-					filterForm.requestSubmit();
-				}, "change"), dom.option(""), dom.option("(default)"), Object.keys(transports).sort().map((t) => dom.option(t)))),
-				dom.td(
-					attr.colspan("2"),
-					style({ textAlign: "right" }),
-					// Less content shifting while rendering.
-					"Sort ",
-					sortElem = dom.select(attr.form("queuefilter"), /* @__PURE__ */ __name(function change() {
-						filterForm.requestSubmit();
-					}, "change"), dom.option("Last activity \u2193", attr.value("lastactivity-desc")), dom.option("Last activity \u2191", attr.value("lastactivity-asc")), dom.option("Submitted \u2193", attr.value("submitted-desc")), dom.option("Submitted \u2191", attr.value("submitted-asc"))),
-					" ",
-					dom.submitbutton("Apply", attr.form("queuefilter")),
-					" ",
-					dom.clickbutton("Reset", attr.form("queuefilter"), /* @__PURE__ */ __name(function click() {
-						filterForm.reset();
-						filterForm.requestSubmit();
-					}, "click"))
-				)
-			), dom.tr(dom.th("ID"), dom.th("Success"), dom.th("Last activity"), dom.th("Submitted"), dom.th("Account"), dom.th("From"), dom.th("To"), dom.th("Size"), dom.th("Attempts"), dom.th("Last attempt"), dom.th("Last error"), dom.th("Require TLS"), dom.th("Transport"), dom.th("Actions"))), tbody, dom.tfoot(dom.tr(dom.td(attr.colspan("14"), dom.clickbutton("Load more", attr.title("Try to load more entries. You can still try to load more entries when at the end of the list, new entries may have been appended since the previous call."), /* @__PURE__ */ __name(async function click(e) {
+			dom.div(dom._class("queueFilters"), dom.label("Delivered", filterSuccess = dom.select(attr.form("queuefilter"), /* @__PURE__ */ __name(function change() {
+				filterForm.requestSubmit();
+			}, "change"), dom.option("All", attr.value("")), dom.option("Yes"), dom.option("No"))), dom.label("Last activity", filterLastActivity = dom.input(attr.form("queuefilter"), style({ width: "7em" }), attr.title('Example: ">-1h" for filtering messages with last activity less than 1 hour ago.'))), dom.label("Submitted", filterSubmitted = dom.input(attr.form("queuefilter"), style({ width: "7em" }), attr.title('Example: "<-1h" for filtering messages submitted more than 1 hour ago.'))), dom.label("Account", filterAccount = dom.input(attr.form("queuefilter"))), dom.label("From", filterFrom = dom.input(attr.form("queuefilter")), attr.title('Example: "@sender.example" to filter by domain of sender.')), dom.label("To", filterTo = dom.input(attr.form("queuefilter")), attr.title('Example: "@recipient.example" to filter by domain of recipient.')), dom.label("Transport", filterTransport = dom.select(attr.form("queuefilter"), /* @__PURE__ */ __name(function change() {
+				filterForm.requestSubmit();
+			}, "change"), dom.option("All", attr.value("")), dom.option("(default)"), Object.keys(transports).sort().map((t) => dom.option(t)))), dom.div(dom._class("filterActions"), dom.label("Sort", sortElem = dom.select(attr.form("queuefilter"), /* @__PURE__ */ __name(function change() {
+				filterForm.requestSubmit();
+			}, "change"), dom.option("Last activity \u2193", attr.value("lastactivity-desc")), dom.option("Last activity \u2191", attr.value("lastactivity-asc")), dom.option("Submitted \u2193", attr.value("submitted-desc")), dom.option("Submitted \u2191", attr.value("submitted-asc")))), dom.submitbutton("Apply", attr.form("queuefilter")), " ", dom.clickbutton("Reset", attr.form("queuefilter"), /* @__PURE__ */ __name(function click() {
+				filterForm.reset();
+				filterForm.requestSubmit();
+			}, "click")))),
+			dom.table(dom._class("hover"), style({ width: "100%" }), dom.thead(dom.tr(dom.th("ID"), dom.th("Success"), dom.th("Last activity"), dom.th("Submitted"), dom.th("Account"), dom.th("From"), dom.th("To"), dom.th("Size"), dom.th("Attempts"), dom.th("Last attempt"), dom.th("Last error"), dom.th("Require TLS"), dom.th("Transport"), dom.th("Actions"))), tbody, dom.tfoot(dom.tr(dom.td(attr.colspan("14"), dom.clickbutton("Load more", attr.title("Try to load more entries. You can still try to load more entries when at the end of the list, new entries may have been appended since the previous call."), /* @__PURE__ */ __name(async function click(e) {
 				if (retired.length === 0) {
 					sort.LastID = 0;
 					sort.Last = null;
 				} else {
 					const lm = retired[retired.length - 1];
 					sort.LastID = lm.ID;
-					if (sort.Field === "Queued") {
-						sort.Last = lm.Queued;
-					} else {
-						sort.Last = lm.LastActivity;
-					}
+					sort.Last = queueCursor(lm);
 				}
 				tbody.classList.add("loadstart");
-				const l = await check(e.target, client.RetiredList(filter, sort)) || [];
+				const l = await check(e.target, queuePage(client.withOptions({ skipReturnCheck: true }).RetiredList(filter, sort), parser.MsgRetired, sort.Field)) || [];
 				retired.push(...l);
 				render();
 			}, "click"))))))
@@ -3517,10 +3605,34 @@
 		}
 		return Object.entries(extra).sort((a, b) => a[0] < b[0] ? -1 : 1).map((t) => t[0] + ": " + t[1]).join("; ");
 	}, "formatExtra");
+	var webhookDetails = /* @__PURE__ */ __name((h) => {
+		const nowSecs = (/* @__PURE__ */ new Date()).getTime() / 1e3;
+		let payload = h.Payload;
+		try {
+			payload = JSON.stringify(JSON.parse(payload), void 0, "	");
+		} catch (err) {
+		}
+		detailsDialog("Webhook #" + h.ID, "webhook", dom.div(dom._class("detailsSummary"), dom.div(dom.b("Subject"), " ", h.Subject || "(no subject)"), dom.div(dom.b("Account"), " ", h.Account, " \xB7 ", h.OutgoingEvent || "incoming"), "SupersededByID" in h && h.SupersededByID !== 0 ? dom.div("Superseded by webhook #" + h.SupersededByID) : []), dom.div(dom._class("detailsSections"), dom.div(dom._class("detailsSection"), dom.h2("Delivery attempts (" + (h.Results || []).length + ")"), dom.div(dom._class("detailsResults"), attr.tabindex("0"), dom._attrs({ "role": "region", "aria-label": "Delivery attempts" }), (h.Results || []).length === 0 ? dom.p("No delivery attempts yet.") : dom.table(dom.thead(dom.tr(dom.th("Start"), dom.th("Duration"), dom.th("Result"), dom.th("Code"), dom.th("Error"), dom.th("URL"), dom.th("Response"))), dom.tbody((h.Results || []).map((r) => dom.tr(dom.td(age(r.Start, false, nowSecs)), dom.td(Math.round(r.Duration / 1e6) + "ms"), dom.td(r.Success ? "Delivered" : "Failed"), dom.td("" + (r.Code || "\u2014")), dom.td(r.Error || "\u2014"), dom.td(r.URL), dom.td(r.Response || "\u2014"))))))), dom.div(dom._class("detailsSection"), dom.h2("JSON payload"), dom.pre(dom._class("literal", "detailsPayload"), attr.tabindex("0"), payload))));
+	}, "webhookDetails");
 	var hooksList = /* @__PURE__ */ __name(async () => {
 		let filter = { Max: parseInt(localStorageGet("adminpaginationsize") || "") || 100, IDs: [], Account: "", Submitted: "", NextAttempt: "", Event: "" };
 		let sort = { Field: "NextAttempt", LastID: 0, Last: null, Asc: true };
-		let hooks = await client.HookList(filter, sort) || [];
+		let hooks = await queuePage(client.withOptions({ skipReturnCheck: true }).HookList(filter, sort), parser.Hook, sort.Field) || [];
+		let endReached = hooks.length < filter.Max;
+		const pageStatus = dom.span(dom._attrs({ "role": "status" }), style({ marginLeft: "12px" }));
+		let loadMore;
+		let loadMoreLabel = "Load more";
+		if (endReached) {
+			loadMoreLabel = "Check for more";
+		}
+		const updatePageStatus = /* @__PURE__ */ __name(() => {
+			let message = hooks.length + " webhooks shown";
+			if (endReached) {
+				message += " \xB7 No more results";
+			}
+			dom._kids(pageStatus, message);
+		}, "updatePageStatus");
+		updatePageStatus();
 		const nowSecs = (/* @__PURE__ */ new Date()).getTime() / 1e3;
 		let sortElem;
 		let filterForm;
@@ -3543,10 +3655,6 @@
 			}
 			return f;
 		}, "gatherIDs");
-		const popupDetails = /* @__PURE__ */ __name((h) => {
-			const nowSecs2 = (/* @__PURE__ */ new Date()).getTime() / 1e3;
-			popup(dom.h1("Details"), dom.div(dom._class("twocols"), dom.div(dom.table(dom.tr(dom.td("Message subject"), dom.td(h.Subject))), dom.br(), dom.h2("Results"), dom.table(dom.thead(dom.tr(dom.th("Start"), dom.th("Duration"), dom.th("Success"), dom.th("Code"), dom.th("Error"), dom.th("URL"), dom.th("Response"))), dom.tbody((h.Results || []).length === 0 ? dom.tr(dom.td(attr.colspan("7"), "No results.")) : [], (h.Results || []).map((r) => dom.tr(dom.td(age(r.Start, false, nowSecs2)), dom.td(Math.round(r.Duration / 1e6) + "ms"), dom.td(r.Success ? "\u2713" : ""), dom.td("" + (r.Code || "")), dom.td(r.Error), dom.td(r.URL), dom.td(r.Response))))), dom.br()), dom.div(dom.h2("Webhook JSON body"), dom.pre(dom._class("literal"), JSON.stringify(JSON.parse(h.Payload), void 0, "	")))));
-		}, "popupDetails");
 		let tbody = dom.tbody();
 		const render = /* @__PURE__ */ __name(() => {
 			toggles = /* @__PURE__ */ new Map();
@@ -3570,7 +3678,7 @@
 				dom.td(h.Results && h.Results.length > 0 ? h.Results[h.Results.length - 1].Error : []),
 				dom.td(h.URL),
 				dom.td(dom.clickbutton("Details", /* @__PURE__ */ __name(function click() {
-					popupDetails(h);
+					webhookDetails(h);
 				}, "click")))
 			)));
 			tbody.replaceWith(ntbody);
@@ -3610,24 +3718,35 @@
 				for (const [_, toggle] of toggles) {
 					toggle.checked = elem.checked;
 				}
-			}, "change"))), dom.th("ID"), dom.th("Submitted"), dom.th("Queue Msg ID", attr.title("ID of queued message this event is about.")), dom.th("FromID"), dom.th("MessageID"), dom.th("Account"), dom.th("Event"), dom.th("Extra"), dom.th("Attempts"), dom.th("Next"), dom.th("Last"), dom.th("Error"), dom.th("URL"), dom.th("Actions"))), tbody, dom.tfoot(dom.tr(dom.td(attr.colspan("15"), dom.clickbutton("Load more", attr.title("Try to load more entries. You can still try to load more entries when at the end of the list, new entries may have been appended since the previous call."), /* @__PURE__ */ __name(async function click(e) {
+			}, "change"))), dom.th("ID"), dom.th("Submitted"), dom.th("Queue Msg ID", attr.title("ID of queued message this event is about.")), dom.th("FromID"), dom.th("MessageID"), dom.th("Account"), dom.th("Event"), dom.th("Extra"), dom.th("Attempts"), dom.th("Next"), dom.th("Last"), dom.th("Error"), dom.th("URL"), dom.th("Actions"))), tbody, dom.tfoot(dom.tr(dom.td(attr.colspan("15"), loadMore = dom.clickbutton(loadMoreLabel, attr.title("Loads the next page of matching webhooks."), /* @__PURE__ */ __name(async function click(e) {
 				if (hooks.length === 0) {
 					sort.LastID = 0;
 					sort.Last = null;
 				} else {
 					const last = hooks[hooks.length - 1];
 					sort.LastID = last.ID;
-					if (sort.Field === "Submitted") {
-						sort.Last = last.Submitted;
-					} else {
-						sort.Last = last.NextAttempt;
-					}
+					sort.Last = queueCursor(last);
 				}
-				tbody.classList.add("loadstart");
-				const l = await check(e.target, client.HookList(filter, sort)) || [];
-				hooks.push(...l);
-				render();
-			}, "click")))))),
+				const requestedSort = sort;
+				try {
+					const l = await check(e.currentTarget, queuePage(client.withOptions({ skipReturnCheck: true }).HookList(filter, sort), parser.Hook, sort.Field));
+					if (sort !== requestedSort) {
+						return;
+					}
+					endReached = l.length < filter.Max;
+					if (l.length > 0) {
+						hooks.push(...l);
+						render();
+					}
+					updatePageStatus();
+					loadMore.textContent = "Load more";
+					if (endReached) {
+						loadMore.textContent = "Check for more";
+					}
+				} finally {
+					tbody.classList.remove("loadstart");
+				}
+			}, "click")), pageStatus)))),
 			// Filtering.
 			filterForm = dom.form(
 				attr.id("hooksfilter"),
@@ -3650,7 +3769,13 @@
 						Asc: sortElem.value.endsWith("asc")
 					};
 					tbody.classList.add("loadstart");
-					hooks = await check({ disabled: false }, client.HookList(filter, sort)) || [];
+					hooks = await check({ disabled: false }, queuePage(client.withOptions({ skipReturnCheck: true }).HookList(filter, sort), parser.Hook, sort.Field)) || [];
+					endReached = hooks.length < filter.Max;
+					updatePageStatus();
+					loadMore.textContent = "Load more";
+					if (endReached) {
+						loadMore.textContent = "Check for more";
+					}
 					render();
 				}, "submit")
 			),
@@ -3658,7 +3783,7 @@
 			dom.br(),
 			dom.div(dom._class("unclutter"), dom.h2("Change selected webhooks"), dom.div(style({ display: "flex", gap: "2em" }), dom.div(dom.div("Schedule next delivery attempt"), buttonNextAttemptSet("Now", 0), " ", dom.clickbutton("More...", /* @__PURE__ */ __name(function click(e) {
 				e.target.replaceWith(dom.div(dom.br(), dom.div("Scheduled time plus"), dom.div(buttonNextAttemptAdd("1m", 1), " ", buttonNextAttemptAdd("5m", 5), " ", buttonNextAttemptAdd("30m", 30), " ", buttonNextAttemptAdd("1h", 60), " ", buttonNextAttemptAdd("2h", 2 * 60), " ", buttonNextAttemptAdd("4h", 4 * 60), " ", buttonNextAttemptAdd("8h", 8 * 60), " ", buttonNextAttemptAdd("16h", 16 * 60), " "), dom.br(), dom.div("Now plus"), dom.div(buttonNextAttemptSet("1m", 1), " ", buttonNextAttemptSet("5m", 5), " ", buttonNextAttemptSet("30m", 30), " ", buttonNextAttemptSet("1h", 60), " ", buttonNextAttemptSet("2h", 2 * 60), " ", buttonNextAttemptSet("4h", 4 * 60), " ", buttonNextAttemptSet("8h", 8 * 60), " ", buttonNextAttemptSet("16h", 16 * 60), " ")));
-			}, "click"))), dom.div(dom.div("Delivery"), dom.clickbutton("Cancel", attr.title("Retires webhooks, preventing further delivery attempts."), /* @__PURE__ */ __name(async function click(e) {
+			}, "click"))), dom.div(dom.div("Delivery"), dom.clickbutton("Cancel", dom._class("dangerButton"), attr.title("Retires webhooks, preventing further delivery attempts."), /* @__PURE__ */ __name(async function click(e) {
 				e.preventDefault();
 				if (!window.confirm("Are you sure you want to cancel these webhooks?")) {
 					return;
@@ -3672,7 +3797,22 @@
 	var hooksRetiredList = /* @__PURE__ */ __name(async () => {
 		let filter = { Max: parseInt(localStorageGet("adminpaginationsize") || "") || 100, IDs: [], Account: "", Submitted: "", LastActivity: "", Event: "" };
 		let sort = { Field: "LastActivity", LastID: 0, Last: null, Asc: false };
-		let hooks = await client.HookRetiredList(filter, sort) || [];
+		let hooks = await queuePage(client.withOptions({ skipReturnCheck: true }).HookRetiredList(filter, sort), parser.HookRetired, sort.Field) || [];
+		let endReached = hooks.length < filter.Max;
+		const pageStatus = dom.span(dom._attrs({ "role": "status" }), style({ marginLeft: "12px" }));
+		let loadMore;
+		let loadMoreLabel = "Load more";
+		if (endReached) {
+			loadMoreLabel = "Check for more";
+		}
+		const updatePageStatus = /* @__PURE__ */ __name(() => {
+			let message = hooks.length + " webhooks shown";
+			if (endReached) {
+				message += " \xB7 No more results";
+			}
+			dom._kids(pageStatus, message);
+		}, "updatePageStatus");
+		updatePageStatus();
 		const nowSecs = (/* @__PURE__ */ new Date()).getTime() / 1e3;
 		let sortElem;
 		let filterForm;
@@ -3680,14 +3820,10 @@
 		let filterAccount;
 		let filterEvent;
 		let filterLastActivity;
-		const popupDetails = /* @__PURE__ */ __name((h) => {
-			const nowSecs2 = (/* @__PURE__ */ new Date()).getTime() / 1e3;
-			popup(dom.h1("Details"), dom.div(dom._class("twocols"), dom.div(dom.table(dom.tr(dom.td("Message subject"), dom.td(h.Subject)), h.SupersededByID != 0 ? dom.tr(dom.td("Superseded by webhook ID"), dom.td("" + h.SupersededByID)) : []), dom.br(), dom.h2("Results"), dom.table(dom.thead(dom.tr(dom.th("Start"), dom.th("Duration"), dom.th("Success"), dom.th("Code"), dom.th("Error"), dom.th("URL"), dom.th("Response"))), dom.tbody((h.Results || []).length === 0 ? dom.tr(dom.td(attr.colspan("7"), "No results.")) : [], (h.Results || []).map((r) => dom.tr(dom.td(age(r.Start, false, nowSecs2)), dom.td(Math.round(r.Duration / 1e6) + "ms"), dom.td(r.Success ? "\u2713" : ""), dom.td("" + (r.Code || "")), dom.td(r.Error), dom.td(r.URL), dom.td(r.Response))))), dom.br()), dom.div(dom.h2("Webhook JSON body"), dom.pre(dom._class("literal"), JSON.stringify(JSON.parse(h.Payload), void 0, "	")))));
-		}, "popupDetails");
 		let tbody = dom.tbody();
 		const render = /* @__PURE__ */ __name(() => {
 			const ntbody = dom.tbody(dom._class("loadend"), hooks.length === 0 ? dom.tr(dom.td(attr.colspan("14"), "No retired webhooks.")) : [], hooks.map((h) => dom.tr(dom.td("" + h.ID), dom.td(h.Success ? "\u2713" : ""), dom.td(age(h.LastActivity, false, nowSecs)), dom.td(age(new Date(h.Submitted), false, nowSecs)), dom.td("" + (h.QueueMsgID || "")), dom.td("" + h.FromID), dom.td("" + h.MessageID), dom.td(h.Account || "-"), dom.td(h.IsIncoming ? "incoming" : h.OutgoingEvent), dom.td(formatExtra(h.Extra)), dom.td("" + h.Attempts), dom.td(h.Results && h.Results.length > 0 ? h.Results[h.Results.length - 1].Error : []), dom.td(h.URL), dom.td(dom.clickbutton("Details", /* @__PURE__ */ __name(function click() {
-				popupDetails(h);
+				webhookDetails(h);
 			}, "click"))))));
 			tbody.replaceWith(ntbody);
 			tbody = ntbody;
@@ -3706,28 +3842,39 @@
 				["incoming", "delivered", "suppressed", "delayed", "failed", "relayed", "expanded", "canceled", "unrecognized"].map((s) => dom.option(s))
 			)), dom.div(dom._class("filterActions"), dom.label("Sort", sortElem = dom.select(attr.form("hooksfilter"), /* @__PURE__ */ __name(function change() {
 				filterForm.requestSubmit();
-			}, "change"), dom.option("Last activity \u2193", attr.value("nextattempt-desc")), dom.option("Last activity \u2191", attr.value("nextattempt-asc")), dom.option("Submitted \u2193", attr.value("submitted-desc")), dom.option("Submitted \u2191", attr.value("submitted-asc")))), dom.submitbutton("Apply", attr.form("hooksfilter")), " ", dom.clickbutton("Reset", attr.form("hooksfilter"), /* @__PURE__ */ __name(function click() {
+			}, "change"), dom.option("Last activity \u2193", attr.value("lastactivity-desc")), dom.option("Last activity \u2191", attr.value("lastactivity-asc")), dom.option("Submitted \u2193", attr.value("submitted-desc")), dom.option("Submitted \u2191", attr.value("submitted-asc")))), dom.submitbutton("Apply", attr.form("hooksfilter")), " ", dom.clickbutton("Reset", attr.form("hooksfilter"), /* @__PURE__ */ __name(function click() {
 				filterForm.reset();
 				filterForm.requestSubmit();
 			}, "click")))),
-			dom.table(dom._class("hover"), style({ width: "100%" }), dom.thead(dom.tr(dom.th("ID"), dom.th("Success"), dom.th("Last"), dom.th("Submitted"), dom.th("Queue Msg ID", attr.title("ID of queued message this event is about.")), dom.th("FromID"), dom.th("MessageID"), dom.th("Account"), dom.th("Event"), dom.th("Extra"), dom.th("Attempts"), dom.th("Error"), dom.th("URL"), dom.th("Actions"))), tbody, dom.tfoot(dom.tr(dom.td(attr.colspan("14"), dom.clickbutton("Load more", attr.title("Try to load more entries. You can still try to load more entries when at the end of the list, new entries may have been appended since the previous call."), /* @__PURE__ */ __name(async function click(e) {
+			dom.table(dom._class("hover"), style({ width: "100%" }), dom.thead(dom.tr(dom.th("ID"), dom.th("Success"), dom.th("Last"), dom.th("Submitted"), dom.th("Queue Msg ID", attr.title("ID of queued message this event is about.")), dom.th("FromID"), dom.th("MessageID"), dom.th("Account"), dom.th("Event"), dom.th("Extra"), dom.th("Attempts"), dom.th("Error"), dom.th("URL"), dom.th("Actions"))), tbody, dom.tfoot(dom.tr(dom.td(attr.colspan("14"), loadMore = dom.clickbutton(loadMoreLabel, attr.title("Loads the next page of matching webhooks."), /* @__PURE__ */ __name(async function click(e) {
 				if (hooks.length === 0) {
 					sort.LastID = 0;
 					sort.Last = null;
 				} else {
 					const last = hooks[hooks.length - 1];
 					sort.LastID = last.ID;
-					if (sort.Field === "Submitted") {
-						sort.Last = last.Submitted;
-					} else {
-						sort.Last = last.LastActivity;
-					}
+					sort.Last = queueCursor(last);
 				}
-				tbody.classList.add("loadstart");
-				const l = await check(e.target, client.HookRetiredList(filter, sort)) || [];
-				hooks.push(...l);
-				render();
-			}, "click")))))),
+				const requestedSort = sort;
+				try {
+					const l = await check(e.currentTarget, queuePage(client.withOptions({ skipReturnCheck: true }).HookRetiredList(filter, sort), parser.HookRetired, sort.Field));
+					if (sort !== requestedSort) {
+						return;
+					}
+					endReached = l.length < filter.Max;
+					if (l.length > 0) {
+						hooks.push(...l);
+						render();
+					}
+					updatePageStatus();
+					loadMore.textContent = "Load more";
+					if (endReached) {
+						loadMore.textContent = "Check for more";
+					}
+				} finally {
+					tbody.classList.remove("loadstart");
+				}
+			}, "click")), pageStatus)))),
 			// Filtering.
 			filterForm = dom.form(
 				attr.id("hooksfilter"),
@@ -3750,7 +3897,13 @@
 						Asc: sortElem.value.endsWith("asc")
 					};
 					tbody.classList.add("loadstart");
-					hooks = await check({ disabled: false }, client.HookRetiredList(filter, sort)) || [];
+					hooks = await check({ disabled: false }, queuePage(client.withOptions({ skipReturnCheck: true }).HookRetiredList(filter, sort), parser.HookRetired, sort.Field)) || [];
+					endReached = hooks.length < filter.Max;
+					updatePageStatus();
+					loadMore.textContent = "Load more";
+					if (endReached) {
+						loadMore.textContent = "Check for more";
+					}
 					render();
 				}, "submit")
 			)
@@ -3766,7 +3919,7 @@
 			let row;
 			let from;
 			let to;
-			const root = dom.tr(dom.td(from = dom.input(attr.required(""), attr.value(domainName(t[0])))), dom.td(to = dom.input(attr.required(""), attr.value(domainName(t[1])))), dom.td(dom.clickbutton("Remove", /* @__PURE__ */ __name(function click() {
+			const root = dom.tr(dom.td(from = dom.input(attr.required(""), attr.value(domainName(t[0])))), dom.td(to = dom.input(attr.required(""), attr.value(domainName(t[1])))), dom.td(dom.clickbutton("Remove", dom._class("dangerButton"), /* @__PURE__ */ __name(function click() {
 				redirectRows = redirectRows.filter((r) => r !== row);
 				row.root.remove();
 				noredirect.style.display = redirectRows.length ? "none" : "";
@@ -3785,7 +3938,7 @@
 				let row;
 				let key;
 				let value;
-				const root2 = dom.tr(dom.td(key = dom.input(attr.required(""), attr.value(k))), dom.td(value = dom.input(attr.required(""), attr.value(v))), dom.td(dom.clickbutton("Remove", /* @__PURE__ */ __name(function click() {
+				const root2 = dom.tr(dom.td(key = dom.input(attr.required(""), attr.value(k))), dom.td(value = dom.input(attr.required(""), attr.value(v))), dom.td(dom.clickbutton("Remove", dom._class("dangerButton"), /* @__PURE__ */ __name(function click() {
 					rows = rows.filter((x) => x !== row);
 					row.root.remove();
 					norow.style.display = rows.length ? "none" : "";
@@ -3950,7 +4103,7 @@
 				// Replaced with a call to makeType, below (and later when switching types).
 				details = dom.table()
 			), dom.td(dom.td(
-				dom.clickbutton("Remove", /* @__PURE__ */ __name(function click() {
+				dom.clickbutton("Remove", dom._class("dangerButton"), /* @__PURE__ */ __name(function click() {
 					handlerRows = handlerRows.filter((r) => r !== row);
 					row.root.remove();
 					nohandler.style.display = handlerRows.length ? "none" : "";
@@ -4093,6 +4246,20 @@
 		applyTheme();
 		let curhash;
 		[moxversion, moxgoos, moxgoarch] = await client.Version();
+		document.getElementById("adminWebmail").before(dom.clickbutton("Logout", attr.title("Logout, invalidating this session."), /* @__PURE__ */ __name(async function click(e) {
+			const b = e.target;
+			try {
+				b.disabled = true;
+				await client.Logout();
+			} catch (err) {
+				console.log("logout", err);
+				window.alert("Error: " + errmsg(err));
+			} finally {
+				b.disabled = false;
+			}
+			localStorageRemove("webadmincsrftoken");
+			window.location.reload();
+		}, "click")));
 		const hashChange = /* @__PURE__ */ __name(async () => {
 			if (curhash === window.location.hash) {
 				return;

@@ -1,6 +1,7 @@
 /* Javascript is generated from typescript, do not modify generated javascript because changes will be overwritten. */
 import {dom, style, attr, prop, ElemArg} from '../lib'
 import * as api from './api'
+import {queuePage, queueCursor} from './pagination'
 
 // From HTML.
 declare let page: HTMLElement
@@ -116,6 +117,20 @@ const popup = (...kids: ElemArg[]) => {
 	return close
 }
 
+const detailsDialog = (title: string, size: 'mail' | 'webhook', ...kids: ElemArg[]) => {
+	const close = popup(
+		dom._class('detailsDialog', size + 'Dialog'),
+		dom._attrs({'role': 'dialog', 'aria-label': title}),
+		dom.div(
+			dom._class('detailsDialogHeader'),
+			dom.h1(title),
+			dom.clickbutton('Close', function click() { close() }),
+		),
+		kids,
+	)
+	return close
+}
+
 const localStorageGet = (k: string): string | null => {
 	try {
 		return window.localStorage.getItem(k)
@@ -169,25 +184,6 @@ const crumbs = (...l: ({text: string, path: string} | string)[]) => {
 	const crumblink = (e: {text: string, path: string} | string) =>
 		typeof e === 'string' ? prewrap(e) : dom.a(e.text, attr.href(e.path))
 	return [
-		dom.div(
-			style({float: 'right'}),
-			dom.clickbutton('Logout', attr.title('Logout, invalidating this session.'), async function click(e: MouseEvent) {
-				const b = e.target! as HTMLButtonElement
-				try {
-					b.disabled = true
-					await client.Logout()
-				} catch (err) {
-					console.log('logout', err)
-					window.alert('Error: ' + errmsg(err))
-				} finally {
-					b.disabled = false
-				}
-
-				localStorageRemove('webadmincsrftoken')
-				// Reload so all state is cleared from memory.
-				window.location.reload()
-			}),
-		),
 		dom.h1(l.map((e, index) => index === 0 ? crumblink(e) : [' / ', crumblink(e)])),
 		dom.br()
 	]
@@ -518,7 +514,7 @@ const loglevels = async () => {
 								window.location.reload() // todo: reload just the current loglevels
 							}),
 							' ',
-							dom.clickbutton('Remove', attr.title('Remove this log level, the default log level will apply.'), t[0] === '' ? attr.disabled('') : [], async function click(e: MouseEvent) {
+							dom.clickbutton('Remove', dom._class('dangerButton'), attr.title('Remove this log level, the default log level will apply.'), t[0] === '' ? attr.disabled('') : [], async function click(e: MouseEvent) {
 								e.preventDefault()
 								await check(e.target! as HTMLButtonElement, client.LogLevelRemove(t[0]))
 								window.location.reload() // todo: reload just the current loglevels
@@ -779,20 +775,14 @@ const RoutesEditor = (kind: string, transports: { [key: string]: api.Transport }
 				await check(routesFieldset, save(routeRows.map(rr => rr.gather())))
 			},
 			routesFieldset=dom.fieldset(
-				dom.table(
+				dom.div(dom._class('routesTableScroll'), dom.table(dom._class('routesTable'),
 					dom.thead(
 						dom.tr(
 							dom.th('From domain'),
 							dom.th('To domain'),
 							dom.th('Minimum attempts'),
 							dom.th('Transport'),
-							dom.th(
-								dom.clickbutton('Add', function click() {
-									routes = routeRows.map(rr => rr.gather())
-									routes.push({FromDomain: [], ToDomain: [], MinimumAttempts: 0, Transport: transportNames[0]})
-									render()
-								}),
-							),
+							dom.th('Actions'),
 						),
 					),
 					dom.tbody(
@@ -809,7 +799,7 @@ const RoutesEditor = (kind: string, transports: { [key: string]: api.Transport }
 								dom.td(minimumAttempts),
 								dom.td(transport),
 								dom.td(
-									dom.clickbutton('Remove', function click() {
+									dom.clickbutton('Remove', dom._class('dangerButton'), function click() {
 										routeRows.splice(index, 1)
 										routes = routeRows.map(rr => rr.gather())
 										render()
@@ -829,15 +819,24 @@ const RoutesEditor = (kind: string, transports: { [key: string]: api.Transport }
 							}
 						}),
 					),
+				)),
+				dom.div(
+					dom._class('routeActions'),
+					dom.submitbutton('Save'),
+					dom.clickbutton('Add route', function click() {
+						routes = routeRows.map(rr => rr.gather())
+						routes.push({FromDomain: [], ToDomain: [], MinimumAttempts: 0, Transport: transportNames[0]})
+						render()
+					}),
 				),
-				dom.div(dom.submitbutton('Save')),
 			),
 		)
 		if (!routesElem && (routes || []).length === 0) {
 			// Keep it short.
 			elem = dom.div(
-				'No '+kind+' routes configured. ',
-				dom.clickbutton('Add', function click() {
+				dom._class('routeActions'),
+				dom.span('No '+kind+' routes configured.'),
+				dom.clickbutton('Add route', function click() {
 					routes = routeRows.map(rr => rr.gather())
 					routes.push({FromDomain: [], ToDomain: [], MinimumAttempts: 0, Transport: transportNames[0]})
 					render()
@@ -937,7 +936,7 @@ const account = async (name: string) => {
 					return dom.tr(
 						dom.td(v),
 						dom.td(
-							dom.clickbutton('Remove', async function click(e: MouseEvent) {
+							dom.clickbutton('Remove', dom._class('dangerButton'), async function click(e: MouseEvent) {
 								e.preventDefault()
 								const aliases = (config.Aliases || []).filter(aa => aa.SubscriptionAddress === k).map(aa => aa.Alias.LocalpartStr+"@"+domainName(aa.Alias.Domain))
 								const aliasmsg = aliases.length > 0 ? ' Address will be removed from alias(es): '+aliases.join(', ') : ''
@@ -984,7 +983,7 @@ const account = async (name: string) => {
 		dom.br(),
 
 		dom.h2('Alias (list) membership'),
-		dom.table(
+		dom.table(dom._class('accountAliases'),
 			dom.thead(
 				dom.tr(
 					dom.th('Alias address', attr.title('Messages sent to this address will be delivered to all members of the alias/list. A member does not receive a message if their address is in the message From header.')),
@@ -992,6 +991,7 @@ const account = async (name: string) => {
 					dom.th('Allowed senders', attr.title('Whether only members can send through the alias/list, or anyone.')),
 					dom.th('Send as alias address', attr.title('If enabled, messages can be sent with the alias address in the message "From" header.')),
 					dom.th('Members visible', attr.title('If enabled, members can see the addresses of other members.')),
+				dom.th('Actions'),
 				),
 			),
 			(config.Aliases || []).length === 0 ? dom.tr(dom.td(attr.colspan('6'), 'None')) : [],
@@ -1003,7 +1003,7 @@ const account = async (name: string) => {
 					dom.td(a.Alias.AllowMsgFrom ? 'Yes' : 'No'),
 					dom.td(a.Alias.ListMembers ? 'Yes' : 'No'),
 					dom.td(
-						dom.clickbutton('Remove', async function click(e: MouseEvent) {
+						dom.clickbutton('Remove', dom._class('dangerButton'), async function click(e: MouseEvent) {
 							await check(e.target! as HTMLButtonElement, client.AliasAddressesRemove(a.Alias.LocalpartStr, domainName(a.Alias.Domain), [a.SubscriptionAddress]))
 							window.location.reload() // todo: reload less
 						}),
@@ -1016,40 +1016,36 @@ const account = async (name: string) => {
 		dom.h2('Settings'),
 		dom.form(
 			fieldsetSettings=dom.fieldset(
+			dom._class('accountSettings'),
 				dom.label(
-					style({display: 'block', marginBottom: '.5ex'}),
 					dom.span('Maximum outgoing messages per day', attr.title('Maximum number of outgoing messages for this account in a 24 hour window. This limits the damage to recipients and the reputation of this mail server in case of account compromise. Default 1000. MaxOutgoingMessagesPerDay in configuration file.')),
 					dom.br(),
 					maxOutgoingMessagesPerDay=dom.input(attr.type('number'), attr.required(''), attr.value(''+(config.MaxOutgoingMessagesPerDay || 1000))),
 				),
 				dom.label(
-					style({display: 'block', marginBottom: '.5ex'}),
 					dom.span('Maximum first-time recipients per day', attr.title('Maximum number of first-time recipients in outgoing messages for this account in a 24 hour window. This limits the damage to recipients and the reputation of this mail server in case of account compromise. Default 200. MaxFirstTimeRecipientsPerDay in configuration file.')),
 					dom.br(),
 					maxFirstTimeRecipientsPerDay=dom.input(attr.type('number'), attr.required(''), attr.value(''+(config.MaxFirstTimeRecipientsPerDay || 200))),
 				),
 				dom.label(
-					style({display: 'block', marginBottom: '.5ex'}),
 					dom.span('Disk usage quota: Maximum total message size ', attr.title('Default maximum total message size in bytes for the account, overriding any globally configured default maximum size if non-zero. A negative value can be used to have no limit in case there is a limit by default. Attempting to add new messages to an account beyond its maximum total size will result in an error. Useful to prevent a single account from filling storage. Use units "k" for kilobytes, or "m", "g", "t".')),
 					dom.br(),
 					quotaMessageSize=dom.input(attr.value(formatQuotaSize(config.QuotaMessageSize))),
 					' Current usage is ', formatQuotaSize(Math.floor(diskUsage/(1024*1024))*1024*1024), '.',
 				),
 				dom.div(
-					style({display: 'block', marginBottom: '.5ex'}),
 					dom.label(
 						firstTimeSenderDelay=dom.input(attr.type('checkbox'), config.NoFirstTimeSenderDelay ? [] : attr.checked('')), ' ',
 						dom.span('Delay deliveries from first-time senders', attr.title('To slow down potential spammers, when the message is misclassified as non-junk. Turning off the delay can be useful when the account processes messages automatically and needs fast responses.')),
 					),
 				),
 				dom.div(
-					style({display: 'block', marginBottom: '.5ex'}),
 					dom.label(
 						noCustomPassword=dom.input(attr.type('checkbox'), config.NoCustomPassword ? attr.checked('') : []), ' ',
 						dom.span("Don't allow account to set a password of their choice", attr.title('If set, this account cannot set a password of their own choice, but can only set a new randomly generated password, preventing password reuse across services and use of weak passwords.')),
 					),
 				),
-				dom.submitbutton('Save'),
+				dom.div(dom._class('settingsActions'), dom.submitbutton('Save')),
 			),
 			async function submit(e: SubmitEvent) {
 				e.stopPropagation()
@@ -1142,7 +1138,7 @@ const account = async (name: string) => {
 						window.location.reload() // todo: update account and rerender.
 					}
 				})
-			] : dom.clickbutton('Disable account login', function click() {
+			] : dom.clickbutton('Disable account login', dom._class('dangerButton'), function click() {
 				let fieldset: HTMLFieldSetElement
 				let loginDisabled: HTMLInputElement
 
@@ -1162,7 +1158,7 @@ const account = async (name: string) => {
 								loginDisabled=dom.input(attr.required(''), style({width: '100%'})),
 								dom.p(style({fontStyle: 'italic'}), 'Will be shown to user on login attempts. Single line, no special and maximum 256 characters since message is used in IMAP/SMTP.'),
 							),
-							dom.div(dom.submitbutton('Disable login')),
+							dom.div(dom.submitbutton('Disable login', dom._class('dangerButton'))),
 						),
 					),
 				)
@@ -1174,7 +1170,7 @@ const account = async (name: string) => {
 		dom.br(),
 		loginAttempts && loginAttempts.length >= 10 ? dom.p('See ', dom.a(attr.href('#accounts/l/'+name+'/loginattempts'), 'all login attempts'), ' for this account.') : [],
 		dom.br(),
-		dom.clickbutton('Remove account', async function click(e: MouseEvent) {
+		dom.clickbutton('Remove account', dom._class('dangerButton', 'accountRemove'), async function click(e: MouseEvent) {
 			e.preventDefault()
 			if (!window.confirm('Are you sure you want to remove this account? All account data, including messages will be removed.')) {
 				return
@@ -1451,7 +1447,7 @@ const domain = async (d: string) => {
 						dom.td(prewrap(t[0]) || '(catchall)'),
 						dom.td(dom.a(t[1], attr.href('#accounts/l/'+t[1]))),
 						dom.td(
-							dom.clickbutton('Remove', async function click(e: MouseEvent) {
+							dom.clickbutton('Remove', dom._class('dangerButton'), async function click(e: MouseEvent) {
 								e.preventDefault()
 								if (!window.confirm('Are you sure you want to remove this address? If it is a member of an alias, it will be removed from the alias.')) {
 									return
@@ -1603,12 +1599,13 @@ const domain = async (d: string) => {
 			let separatorsBox: HTMLDivElement
 
 			const addSeparatorView = (s: string) => {
-				const separator = dom.input(attr.required(''), attr.value(s), style({width: '2em'}))
+				const separator = dom.input(attr.required(''), attr.value(s), dom._class('localpartSeparatorInput'), dom._attrs({'aria-label': 'Catchall separator'}))
 				const v = {
 					separator: separator,
 					root: dom.div(
-						separator, ' ',
-						dom.clickbutton('Remove', function click() {
+						dom._class('localpartSeparatorRow'),
+						separator,
+						dom.clickbutton('Remove', dom._class('dangerButton'), function click() {
 							separatorViews.splice(separatorViews.indexOf(v), 1)
 							v.root.remove()
 							if (separatorViews.length === 0) {
@@ -1632,23 +1629,22 @@ const domain = async (d: string) => {
 					await check(localpartFieldset, client.DomainLocalpartConfigSave(d, separatorViews.map(v => v.separator.value), localpartCaseSensitive.checked))
 				},
 				localpartFieldset=dom.fieldset(
-					style({display: 'flex', gap: '1em'}),
+					dom._class('domainLocalpartSettings'),
 					dom.label(
 						attr.title('If set, upper/lower case is relevant for email delivery.'),
-						dom.div('Localpart case sensitive'),
 						localpartCaseSensitive=dom.input(attr.type('checkbox'), domainConfig.LocalpartCaseSensitive ? attr.checked('') : []),
+						'Case-sensitive localparts',
 					),
 					dom.div(
-						dom.label(
-							attr.title('If not empty, only the string before the separator is used for email delivery decisions. For example, if set to \"+\", you+anything@example.com will be delivered to you@example.com.'),
-							'Localpart catchall separators',
-						), ' ',
-						dom.clickbutton('Add', function click() {
+						dom._class('localpartSeparators'),
+						dom.div('Localpart catchall separators'),
+						dom.p('Only the part before a separator is used for delivery. For example, “+” delivers you+anything@example.com to you@example.com.'),
+						separatorsBox=dom.div(dom._class('localpartSeparatorList'), dom.div('(None)')),
+						dom.clickbutton('Add separator', function click() {
 							addSeparatorView('')
 						}),
-						separatorsBox=dom.div(style({display: 'flex', flexDirection: 'column', gap: '.25em'}), dom.div('(None)')),
 					),
-					dom.div(dom.span('\u00a0'), dom.div(dom.submitbutton('Save'))),
+					dom.div(dom._class('localpartSettingsActions'), dom.submitbutton('Save')),
 				),
 			)
 			for (const sep of (domainConfig.LocalpartCatchallSeparatorsEffective || [])) {
@@ -1931,7 +1927,7 @@ const domain = async (d: string) => {
 										}),
 									),
 									dom.td(lifetime=dom.input(attr.value(sel.Expiration))),
-									dom.td(dom.clickbutton('Remove', async function click(e: MouseEvent) {
+									dom.td(dom.clickbutton('Remove', dom._class('dangerButton'), async function click(e: MouseEvent) {
 										if (!window.confirm('Are you sure you want to remove this selector? It is removed immediately, after which the page is reloaded, losing unsaved changes.')) {
 											return
 										}
@@ -1989,28 +1985,28 @@ const domain = async (d: string) => {
 
 		dom.h2('Danger'),
 		dom.div(
+			dom._class('domainDanger'),
 			domainConfig.Disabled ? [
-				box(yellow, 'Domain is currently disabled.'),
+				inlineBox(yellow, 'Domain is currently disabled.'),
 				dom.clickbutton('Enable domain', async function click(e: {target: HTMLButtonElement}) {
 					if (window.confirm('Are you sure you want to enable this domain? Incoming/outgoing messages involving this domain will be accepted, and ACME for new TLS certificates will be enabled.')) {
 						check(e.target, client.DomainDisabledSave(d, false))
 					}
 				})
-			] : dom.clickbutton('Disable domain', async function click(e: {target: HTMLButtonElement}) {
+			] : dom.clickbutton('Disable domain', dom._class('dangerButton'), async function click(e: {target: HTMLButtonElement}) {
 				if (window.confirm('Are you sure you want to disable this domain? Incoming/outgoing messages involving this domain will be rejected with a temporary error code, and ACME for new TLS certificates will be disabled.')) {
 					check(e.target, client.DomainDisabledSave(d, true))
 				}
 			}),
+			dom.clickbutton('Remove domain', dom._class('dangerButton'), async function click(e: MouseEvent) {
+				e.preventDefault()
+				if (!window.confirm('Are you sure you want to remove this domain?')) {
+					return
+				}
+				await check(e.target! as HTMLButtonElement, client.DomainRemove(d))
+				window.location.hash = '#'
+			}),
 		),
-		dom.br(),
-		dom.clickbutton('Remove domain', async function click(e: MouseEvent) {
-			e.preventDefault()
-			if (!window.confirm('Are you sure you want to remove this domain?')) {
-				return
-			}
-			await check(e.target! as HTMLButtonElement, client.DomainRemove(d))
-			window.location.hash = '#'
-		}),
 	)
 }
 
@@ -2082,7 +2078,7 @@ const domainAlias = async (d: string, aliasLocalpart: string) => {
 						dom.td(prewrap(address)),
 						dom.td(dom.a(pa.AccountName, attr.href('#accounts/l/'+pa.AccountName))),
 						dom.td(
-							dom.clickbutton('Remove', async function click(e: MouseEvent) {
+							dom.clickbutton('Remove', dom._class('dangerButton'), async function click(e: MouseEvent) {
 								await check(e.target! as HTMLButtonElement, client.AliasAddressesRemove(aliasLocalpart, d, [address]))
 								window.location.reload() // todo: reload less
 							}),
@@ -2126,7 +2122,7 @@ const domainAlias = async (d: string, aliasLocalpart: string) => {
 				window.location.hash = '#domains/'+d
 			},
 			delFieldset=dom.fieldset(
-				dom.div(dom.submitbutton('Remove alias')),
+				dom.div(dom.submitbutton('Remove alias', dom._class('dangerButton'))),
 			),
 		),
 	)
@@ -2484,7 +2480,7 @@ const dmarcEvaluations = async () => {
 						dom.td(ba.Until.toISOString()),
 						dom.td(ba.Comment),
 						dom.td(
-							dom.clickbutton('Remove', async function click(e: MouseEvent) {
+							dom.clickbutton('Remove', dom._class('dangerButton'), async function click(e: MouseEvent) {
 								await check(e.target! as HTMLButtonElement, client.DMARCSuppressRemove(ba.ID))
 								window.location.reload() // todo: only reload the list
 							}),
@@ -2550,12 +2546,12 @@ const dmarcEvaluationsDomain = async (domain: string) => {
 			'Domain '+domainString(d),
 		),
 		dom.div(
-			dom.clickbutton('Remove evaluations', async function click(e: MouseEvent) {
+			dom._class('reportDetailActions'),
+			dom.clickbutton('Remove evaluations', dom._class('dangerButton'), async function click(e: MouseEvent) {
 				await check(e.target! as HTMLButtonElement, client.DMARCRemoveEvaluations(domain))
 				window.location.reload() // todo: only clear the table?
 			}),
 		),
-		dom.br(),
 		dom.p('The evaluations below will be sent in a DMARC aggregate report to the addresses found in the published DMARC DNS record, which is fetched again before sending the report. The fields Interval hours, Addresses and Policy are only filled for the first row and whenever a new value in the published DMARC record is encountered.'),
 		dom.table(dom._class('hover'),
 			dom.thead(
@@ -2774,7 +2770,7 @@ const domainDMARC = async (d: string) => {
 							}
 							addRow(
 								'dkim: ',
-								dom.span((dkim.Result === 'none' || dkim.Result === 'pass') ? dkim.Result : box(yellow, dkim.Result), attr.title((dkim.HumanResult ? 'additional information: ' + dkim.HumanResult + ';\n' : '') + dkim.Result + ': ' + (statuses[dkim.Result] || 'invalid status'))),
+								dom.span((dkim.Result === 'none' || dkim.Result === 'pass') ? dkim.Result : inlineBox(yellow, dkim.Result), attr.title((dkim.HumanResult ? 'additional information: ' + dkim.HumanResult + ';\n' : '') + dkim.Result + ': ' + (statuses[dkim.Result] || 'invalid status'))),
 								!dkim.Selector ? [] : [
 									', ',
 									dom.span(dkim.Selector, attr.title('Selector, the DKIM record is at "<selector>._domainkey.<domain>".' + (dkim.Domain === d ? '' : ';\ndomain: ' + dkim.Domain))),
@@ -2794,7 +2790,7 @@ const domainDMARC = async (d: string) => {
 							}
 							addRow(
 								'spf: ',
-								dom.span((spf.Result === 'none' || spf.Result === 'neutral' || spf.Result === 'pass') ? spf.Result : box(yellow, spf.Result), attr.title(spf.Result + ': ' + (statuses[spf.Result] || 'invalid status'))),
+								dom.span((spf.Result === 'none' || spf.Result === 'neutral' || spf.Result === 'pass') ? spf.Result : inlineBox(yellow, spf.Result), attr.title(spf.Result + ': ' + (statuses[spf.Result] || 'invalid status'))),
 								', ',
 								dom.span(spf.Scope, attr.title('scopes:\nhelo: "SMTP HELO"\nmfrom: SMTP "MAIL FROM"')),
 								' ',
@@ -2973,7 +2969,7 @@ const tlsrptResults = async () => {
 						dom.td(ba.Until.toISOString()),
 						dom.td(ba.Comment),
 						dom.td(
-							dom.clickbutton('Remove', async function click(e: MouseEvent) {
+							dom.clickbutton('Remove', dom._class('dangerButton'), async function click(e: MouseEvent) {
 								await check(e.target! as HTMLButtonElement, client.TLSRPTSuppressRemove(ba.ID))
 								window.location.reload() // todo: only reload the list
 							}),
@@ -3003,18 +2999,21 @@ const tlsrptResultsPolicyDomain = async (isrcptdom: boolean, domain: string) => 
 			(isrcptdom ? 'Recipient domain ' : 'Host ') + domainString(d),
 		),
 		dom.div(
-			dom.clickbutton('Remove results', async function click(e: MouseEvent) {
+			dom._class('reportDetailActions'),
+			dom.clickbutton('Remove results', dom._class('dangerButton'), async function click(e: MouseEvent) {
 				e.preventDefault()
 				await check(e.target! as HTMLButtonElement, client.TLSRPTRemoveResults(isrcptdom, domain, ''))
 				window.location.reload() // todo: only clear the table?
 			}),
 		),
-		dom.br(),
-		dom.div('Fetching TLSRPT DNS record...'),
-		recordBox=dom.div(),
-		dom.br(),
+		dom.div(
+			dom._class('tlsDNSRecord'),
+			dom.h2('TLSRPT DNS record'),
+			recordBox=dom.div(dom._attrs({'aria-live': 'polite'}), 'Fetching TLSRPT DNS record…'),
+		),
 		dom.p('Below are the results per day and ' + (isrcptdom ? 'policy' : 'recipient') + ' domain that may be sent in a report.'),
-		(tlsresults || []).map(tlsresult => [
+		(tlsresults || []).map(tlsresult => dom.div(
+			dom._class('tlsResultDetail'),
 			dom.h2(tlsresult.DayUTC, ' - ', dom.span(attr.title('Recipient domain, as used in SMTP MAIL TO, usually based on message To/Cc/Bcc.'), isrcptdom ? tlsresult.PolicyDomain : tlsresult.RecipientDomain)),
 			dom.p(
 				'Send report (if TLSRPT policy exists and has address): '+(tlsresult.SendReport ? 'Yes' : 'No'),
@@ -3022,7 +3021,7 @@ const tlsrptResultsPolicyDomain = async (isrcptdom: boolean, domain: string) => 
 				'Report about (MX) host (instead of recipient domain): '+(tlsresult.IsHost ? 'Yes' : 'No'),
 			),
 			dom.div(dom._class('literal'), JSON.stringify(tlsresult.Results, null, '\t')),
-		])
+		))
 	)
 
 	// In background so page load fade doesn't look weird.
@@ -3043,6 +3042,7 @@ const tlsrptResultsPolicyDomain = async (isrcptdom: boolean, domain: string) => 
 		if (error) {
 			l.push(box(red, error))
 		}
+		recordBox.replaceChildren()
 		dom._kids(recordBox, l)
 	})()
 
@@ -3349,12 +3349,51 @@ const dnsbl = async () => {
 	)
 }
 
+const mailDetails = (m: api.Msg | api.MsgRetired) => {
+	const nowSecs = new Date().getTime()/1000
+	let results: HTMLElement = dom.p('No delivery attempts yet.')
+	if (m.Results && m.Results.length > 0) {
+		results = dom.table(
+			dom.thead(dom.tr(dom.th('Start'), dom.th('Duration'), dom.th('Result'), dom.th('Code'), dom.th('Enhanced code'), dom.th('Error'))),
+			dom.tbody(m.Results.map(r => {
+				let outcome = 'Failed'
+				if (r.Success) {
+					outcome = 'Delivered'
+				}
+				return dom.tr(
+					dom.td(age(r.Start, false, nowSecs)),
+					dom.td(Math.round(r.Duration/1000000) + 'ms'),
+					dom.td(outcome),
+					dom.td('' + (r.Code || '—')),
+					dom.td(r.Secode || '—'),
+					dom.td(r.Error || '—'),
+				)
+			})),
+		)
+	}
+	detailsDialog('Message #' + m.ID, 'mail',
+		dom.div(
+			dom._class('detailsSummary'),
+			dom.div(dom.b('Subject'), ' ', m.Subject || '(no subject)'),
+			dom.div(dom.b('Account'), ' ', m.SenderAccount || '—'),
+		),
+		dom.div(
+			dom._class('detailsSections'),
+			dom.div(
+				dom._class('detailsSection'),
+				dom.h2('Delivery attempts (' + (m.Results || []).length + ')'),
+				dom.div(dom._class('detailsResults'), attr.tabindex('0'), dom._attrs({'role': 'region', 'aria-label': 'Delivery attempts'}), results),
+			),
+		),
+	)
+}
+
 const queueList = async () => {
 	let filter: api.Filter = {Max: parseInt(localStorageGet('adminpaginationsize') || '') || 100, IDs: [], Account: '', From: '', To: '', Hold: null, Submitted: '', NextAttempt: '', Transport: null}
 	let sort: api.Sort = {Field: "NextAttempt", LastID: 0, Last: null, Asc: true}
 	let [holdRules, msgs0, transports] = await Promise.all([
 		client.QueueHoldRuleList(),
-		client.QueueList(filter, sort),
+		queuePage(client.withOptions({skipReturnCheck: true}).QueueList(filter, sort), api.parser.Msg, sort.Field),
 		client.Transports(),
 	])
 	let msgs: api.Msg[] = msgs0 || []
@@ -3411,37 +3450,6 @@ const queueList = async () => {
 		return f
 	}
 
-	const popupDetails = (m: api.Msg) => {
-		const nowSecs = new Date().getTime()/1000
-		popup(
-			dom.h1('Details'),
-			dom.table(
-				dom.tr(dom.td('Message subject'), dom.td(m.Subject)),
-			),
-			dom.br(),
-			dom.h2('Results'),
-			dom.table(
-				dom.thead(
-					dom.tr(
-						dom.th('Start'), dom.th('Duration'), dom.th('Success'), dom.th('Code'), dom.th('Secode'), dom.th('Error'),
-					),
-				),
-				dom.tbody(
-					(m.Results || []).length === 0 ? dom.tr(dom.td(attr.colspan('6'), 'No results.')) : [],
-					(m.Results || []).map(r =>
-						dom.tr(
-							dom.td(age(r.Start, false, nowSecs)),
-							dom.td(Math.round(r.Duration/1000000)+'ms'),
-							dom.td(r.Success ? '✓' : ''),
-							dom.td(''+ (r.Code || '')),
-							dom.td(r.Secode),
-							dom.td(r.Error),
-						)
-					),
-				),
-			),
-		)
-	}
 
 	let tbody = dom.tbody()
 
@@ -3472,7 +3480,7 @@ const queueList = async () => {
 					dom.td(m.RequireTLS === true ? 'Yes' : (m.RequireTLS === false ? 'No' : '')),
 					dom.td(
 						dom.clickbutton('Details', function click() {
-							popupDetails(m)
+							mailDetails(m)
 						}),
 					),
 				)
@@ -3554,7 +3562,7 @@ const queueList = async () => {
 												dom.td(domainString(pr.RecipientDomain)),
 											],
 										dom.td(
-											dom.clickbutton('Remove', attr.title('Removing a hold rule does not modify the "on hold" status of messages in the queue.'), async function click(e: MouseEvent) {
+											dom.clickbutton('Remove', dom._class('dangerButton'), attr.title('Removing a hold rule does not modify the "on hold" status of messages in the queue.'), async function click(e: MouseEvent) {
 												await check(e.target! as HTMLButtonElement, client.QueueHoldRuleRemove(pr.ID))
 												window.location.reload() // todo: reload less
 											})
@@ -3579,7 +3587,7 @@ const queueList = async () => {
 
 		// Filtering.
 		filterForm=dom.form(
-			attr.id('queuefilter'), // Referenced by input elements in table row.
+			attr.id('queuefilter'), // Connects filter controls and table selection to this form.
 			async function submit(e: SubmitEvent) {
 				e.preventDefault()
 				e.stopPropagation()
@@ -3602,70 +3610,66 @@ const queueList = async () => {
 					Asc: sortElem.value.endsWith('asc'),
 				}
 				tbody.classList.add('loadstart')
-				msgs = await check({disabled: false}, client.QueueList(filter, sort)) || []
+				msgs = await check({disabled: false}, queuePage(client.withOptions({skipReturnCheck: true}).QueueList(filter, sort), api.parser.Msg, sort.Field)) || []
 				render()
 			},
 		),
 
 		dom.h2('Messages'),
+		dom.div(
+			dom._class('queueFilters'),
+			dom.label('Submitted', filterSubmitted=dom.input(attr.form('queuefilter'), style({width: '7em'}), attr.title('Example: "<-1h" for filtering messages submitted more than 1 hour ago.'))),
+			dom.label('Account', filterAccount=dom.input(attr.form('queuefilter'))),
+			dom.label('From', filterFrom=dom.input(attr.form('queuefilter')), attr.title('Example: "@sender.example" to filter by domain of sender.')),
+			dom.label('To', filterTo=dom.input(attr.form('queuefilter')), attr.title('Example: "@recipient.example" to filter by domain of recipient.')),
+			dom.label(
+				'On hold',
+				filterHold=dom.select(
+					attr.form('queuefilter'),
+					function change() {
+						filterForm.requestSubmit()
+					},
+					dom.option('All', attr.value('')),
+					dom.option('Yes'),
+					dom.option('No'),
+				),
+			),
+			dom.label('Next attempt', filterNextAttempt=dom.input(attr.form('queuefilter'), style({width: '7em'}), attr.title('Example: ">1h" for filtering messages to be delivered in more than 1 hour, or "<now" for messages to be delivered as soon as possible.'))),
+			dom.label(
+				'Transport',
+				filterTransport=dom.select(
+					attr.form('queuefilter'),
+					function change() {
+						filterForm.requestSubmit()
+					},
+					dom.option('All', attr.value('')),
+					dom.option('(default)'),
+					Object.keys(transports || {}).sort().map(t => dom.option(t))
+				),
+			),
+			dom.div(
+				dom._class('filterActions'),
+				dom.label('Sort',
+				sortElem=dom.select(
+					attr.form('queuefilter'),
+					function change() {
+						filterForm.requestSubmit()
+					},
+					dom.option('Next attempt ↑', attr.value('nextattempt-asc')),
+					dom.option('Next attempt ↓', attr.value('nextattempt-desc')),
+					dom.option('Submitted ↑', attr.value('submitted-asc')),
+					dom.option('Submitted ↓', attr.value('submitted-desc')),
+				)),
+				dom.submitbutton('Apply', attr.form('queuefilter')), ' ',
+				dom.clickbutton('Reset', attr.form('queuefilter'), function click() {
+					filterForm.reset()
+					filterForm.requestSubmit()
+				}),
+			),
+		),
 		dom.table(dom._class('hover'),
 			style({width: '100%'}),
 			dom.thead(
-				dom.tr(
-					dom.td(attr.colspan('2'), 'Filter'),
-					dom.td(filterSubmitted=dom.input(attr.form('queuefilter'), style({width: '7em'}), attr.title('Example: "<-1h" for filtering messages submitted more than 1 hour ago.'))),
-					dom.td(filterAccount=dom.input(attr.form('queuefilter'))),
-					dom.td(filterFrom=dom.input(attr.form('queuefilter')), attr.title('Example: "@sender.example" to filter by domain of sender.')),
-					dom.td(filterTo=dom.input(attr.form('queuefilter')), attr.title('Example: "@recipient.example" to filter by domain of recipient.')),
-					dom.td(), // todo: add filter by size?
-					dom.td(), // todo: add filter by attempts?
-					dom.td(
-						filterHold=dom.select(
-							attr.form('queuefilter'),
-							function change() {
-								filterForm.requestSubmit()
-							},
-							dom.option('', attr.value('')),
-							dom.option('Yes'),
-							dom.option('No'),
-						),
-					),
-					dom.td(filterNextAttempt=dom.input(attr.form('queuefilter'), style({width: '7em'}), attr.title('Example: ">1h" for filtering messages to be delivered in more than 1 hour, or "<now" for messages to be delivered as soon as possible.'))),
-					dom.td(),
-					dom.td(),
-					dom.td(
-						filterTransport=dom.select(
-							Object.keys(transports || {}).length === 0 ? style({display: 'none'}) : [],
-							attr.form('queuefilter'),
-							function change() {
-								filterForm.requestSubmit()
-							},
-							dom.option(''),
-							dom.option('(default)'),
-							Object.keys(transports || {}).sort().map(t => dom.option(t))
-						),
-					),
-					dom.td(
-						attr.colspan('2'),
-						style({textAlign: 'right'}), // Less content shifting while rendering.
-						'Sort ',
-						sortElem=dom.select(
-							attr.form('queuefilter'),
-							function change() {
-								filterForm.requestSubmit()
-							},
-							dom.option('Next attempt ↑', attr.value('nextattempt-asc')),
-							dom.option('Next attempt ↓', attr.value('nextattempt-desc')),
-							dom.option('Submitted ↑', attr.value('submitted-asc')),
-							dom.option('Submitted ↓', attr.value('submitted-desc')),
-						), ' ',
-						dom.submitbutton('Apply', attr.form('queuefilter')), ' ',
-						dom.clickbutton('Reset', attr.form('queuefilter'), function click() {
-							filterForm.reset()
-							filterForm.requestSubmit()
-						}),
-					),
-				),
 				dom.tr(
 					dom.td(
 						dom.input(attr.type('checkbox'), msgs.length === 1 ? attr.checked('') : [], attr.form('queuefilter'), function change(e: MouseEvent) {
@@ -3704,14 +3708,10 @@ const queueList = async () => {
 							} else {
 								const lm = msgs[msgs.length-1]
 								sort.LastID = lm.ID
-								if (sort.Field === "Queued") {
-									sort.Last = lm.Queued
-								} else {
-									sort.Last = lm.NextAttempt
-								}
+								sort.Last = queueCursor(lm)
 							}
 							tbody.classList.add('loadstart')
-							const l = await check(e.target! as HTMLButtonElement, client.QueueList(filter, sort)) || []
+							const l = await check(e.target! as HTMLButtonElement, queuePage(client.withOptions({skipReturnCheck: true}).QueueList(filter, sort), api.parser.Msg, sort.Field)) || []
 							msgs.push(...l)
 							render()
 						}),
@@ -3820,7 +3820,7 @@ const queueList = async () => {
 				),
 				dom.div(
 					dom.div('Delivery'),
-					dom.clickbutton('Fail delivery', attr.title('Cause delivery to fail, sending a DSN to the sender.'), async function click(e: MouseEvent) {
+					dom.clickbutton('Fail delivery', dom._class('dangerButton'), attr.title('Cause delivery to fail, sending a DSN to the sender.'), async function click(e: MouseEvent) {
 						e.preventDefault()
 						if (!window.confirm('Are you sure you want to fail delivery for the selected message(s)? Notifications of delivery failure will be sent (DSNs).')) {
 							return
@@ -3832,7 +3832,7 @@ const queueList = async () => {
 				),
 				dom.div(
 					dom.div('Messages'),
-					dom.clickbutton('Remove', attr.title('Completely remove messages from queue, not sending a DSN.'), async function click(e: MouseEvent) {
+					dom.clickbutton('Remove', dom._class('dangerButton'), attr.title('Completely remove messages from queue, not sending a DSN.'), async function click(e: MouseEvent) {
 						e.preventDefault()
 						if (!window.confirm('Are you sure you want to fail delivery for the selected message(s)? It will be removed completely, no DSN about failure to deliver will be sent.')) {
 							return
@@ -3851,7 +3851,7 @@ const retiredList = async () => {
 	let filter: api.RetiredFilter = {Max: parseInt(localStorageGet('adminpaginationsize') || '') || 100, IDs: [], Account: '', From: '', To: '', Submitted: '', LastActivity: '', Transport: null}
 	let sort: api.RetiredSort = {Field: "LastActivity", LastID: 0, Last: null, Asc: false}
 	const [retired0, transports0] = await Promise.all([
-		client.RetiredList(filter, sort),
+		queuePage(client.withOptions({skipReturnCheck: true}).RetiredList(filter, sort), api.parser.MsgRetired, sort.Field),
 		client.Transports(),
 	])
 	let retired: api.MsgRetired[] = retired0 || []
@@ -3869,37 +3869,6 @@ const retiredList = async () => {
 	let filterTransport: HTMLSelectElement
 	let filterSuccess: HTMLSelectElement
 
-	const popupDetails = (m: api.MsgRetired) => {
-		const nowSecs = new Date().getTime()/1000
-		popup(
-			dom.h1('Details'),
-			dom.table(
-				dom.tr(dom.td('Message subject'), dom.td(m.Subject)),
-			),
-			dom.br(),
-			dom.h2('Results'),
-			dom.table(
-				dom.thead(
-					dom.tr(
-						dom.th('Start'), dom.th('Duration'), dom.th('Success'), dom.th('Code'), dom.th('Secode'), dom.th('Error'),
-					),
-				),
-				dom.tbody(
-					(m.Results || []).length === 0 ? dom.tr(dom.td(attr.colspan('6'), 'No results.')) : [],
-					(m.Results || []).map(r =>
-						dom.tr(
-							dom.td(age(r.Start, false, nowSecs)),
-							dom.td(Math.round(r.Duration/1000000)+'ms'),
-							dom.td(r.Success ? '✓' : ''),
-							dom.td(''+ (r.Code || '')),
-							dom.td(r.Secode),
-							dom.td(r.Error),
-						)
-					),
-				),
-			),
-		)
-	}
 
 	let tbody = dom.tbody()
 
@@ -3924,7 +3893,7 @@ const retiredList = async () => {
 					dom.td(m.RequireTLS === true ? 'Yes' : (m.RequireTLS === false ? 'No' : '')),
 					dom.td(
 						dom.clickbutton('Details', function click() {
-							popupDetails(m)
+							mailDetails(m)
 						}),
 					),
 				)
@@ -3944,7 +3913,7 @@ const retiredList = async () => {
 
 		// Filtering.
 		filterForm=dom.form(
-			attr.id('queuefilter'), // Referenced by input elements in table row.
+			attr.id('queuefilter'), // Connects filter controls and table selection to this form.
 			async function submit(e: SubmitEvent) {
 				e.preventDefault()
 				e.stopPropagation()
@@ -3967,71 +3936,67 @@ const retiredList = async () => {
 					Asc: sortElem.value.endsWith('asc'),
 				}
 				tbody.classList.add('loadstart')
-				retired = await check({disabled: false}, client.RetiredList(filter, sort)) || []
+				retired = await check({disabled: false}, queuePage(client.withOptions({skipReturnCheck: true}).RetiredList(filter, sort), api.parser.MsgRetired, sort.Field)) || []
 				render()
 			},
 		),
 
 		dom.h2('Retired messages'),
 		dom.p('Meta information about queued messages may be kept after successful and/or failed delivery, configurable per account.'),
+		dom.div(
+			dom._class('queueFilters'),
+			dom.label(
+				'Delivered',
+				filterSuccess=dom.select(
+					attr.form('queuefilter'),
+					function change() {
+						filterForm.requestSubmit()
+					},
+					dom.option('All', attr.value('')),
+					dom.option('Yes'),
+					dom.option('No'),
+				),
+			),
+			dom.label('Last activity', filterLastActivity=dom.input(attr.form('queuefilter'), style({width: '7em'}), attr.title('Example: ">-1h" for filtering messages with last activity less than 1 hour ago.'))),
+			dom.label('Submitted', filterSubmitted=dom.input(attr.form('queuefilter'), style({width: '7em'}), attr.title('Example: "<-1h" for filtering messages submitted more than 1 hour ago.'))),
+			dom.label('Account', filterAccount=dom.input(attr.form('queuefilter'))),
+			dom.label('From', filterFrom=dom.input(attr.form('queuefilter')), attr.title('Example: "@sender.example" to filter by domain of sender.')),
+			dom.label('To', filterTo=dom.input(attr.form('queuefilter')), attr.title('Example: "@recipient.example" to filter by domain of recipient.')),
+			dom.label(
+				'Transport',
+				filterTransport=dom.select(
+					attr.form('queuefilter'),
+					function change() {
+						filterForm.requestSubmit()
+					},
+					dom.option('All', attr.value('')),
+					dom.option('(default)'),
+					Object.keys(transports).sort().map(t => dom.option(t))
+				),
+			),
+			dom.div(
+				dom._class('filterActions'),
+				dom.label('Sort',
+				sortElem=dom.select(
+					attr.form('queuefilter'),
+					function change() {
+						filterForm.requestSubmit()
+					},
+					dom.option('Last activity ↓', attr.value('lastactivity-desc')),
+					dom.option('Last activity ↑', attr.value('lastactivity-asc')),
+					dom.option('Submitted ↓', attr.value('submitted-desc')),
+					dom.option('Submitted ↑', attr.value('submitted-asc')),
+				)),
+				dom.submitbutton('Apply', attr.form('queuefilter')), ' ',
+				dom.clickbutton('Reset', attr.form('queuefilter'), function click() {
+					filterForm.reset()
+					filterForm.requestSubmit()
+				}),
+			),
+		),
 		dom.table(dom._class('hover'),
 			style({width: '100%'}),
 			dom.thead(
-				dom.tr(
-					dom.td('Filter'),
-					dom.td(
-						filterSuccess=dom.select(
-							attr.form('queuefilter'),
-							function change() {
-								filterForm.requestSubmit()
-							},
-							dom.option(''),
-							dom.option('Yes'),
-							dom.option('No'),
-						),
-					),
-					dom.td(filterLastActivity=dom.input(attr.form('queuefilter'), style({width: '7em'}), attr.title('Example: ">-1h" for filtering messages with last activity less than 1 hour ago.'))),
-					dom.td(filterSubmitted=dom.input(attr.form('queuefilter'), style({width: '7em'}), attr.title('Example: "<-1h" for filtering messages submitted more than 1 hour ago.'))),
-					dom.td(filterAccount=dom.input(attr.form('queuefilter'))),
-					dom.td(filterFrom=dom.input(attr.form('queuefilter')), attr.title('Example: "@sender.example" to filter by domain of sender.')),
-					dom.td(filterTo=dom.input(attr.form('queuefilter')), attr.title('Example: "@recipient.example" to filter by domain of recipient.')),
-					dom.td(), // todo: add filter by size?
-					dom.td(), // todo: add filter by attempts?
-					dom.td(),
-					dom.td(),
-					dom.td(
-						filterTransport=dom.select(
-							Object.keys(transports).length === 0 ? style({display: 'none'}) : [],
-							attr.form('queuefilter'),
-							function change() {
-								filterForm.requestSubmit()
-							},
-							dom.option(''),
-							dom.option('(default)'),
-							Object.keys(transports).sort().map(t => dom.option(t))
-						),
-					),
-					dom.td(
-						attr.colspan('2'),
-						style({textAlign: 'right'}), // Less content shifting while rendering.
-						'Sort ',
-						sortElem=dom.select(
-							attr.form('queuefilter'),
-							function change() {
-								filterForm.requestSubmit()
-							},
-							dom.option('Last activity ↓', attr.value('lastactivity-desc')),
-							dom.option('Last activity ↑', attr.value('lastactivity-asc')),
-							dom.option('Submitted ↓', attr.value('submitted-desc')),
-							dom.option('Submitted ↑', attr.value('submitted-asc')),
-						), ' ',
-						dom.submitbutton('Apply', attr.form('queuefilter')), ' ',
-						dom.clickbutton('Reset', attr.form('queuefilter'), function click() {
-							filterForm.reset()
-							filterForm.requestSubmit()
-						}),
-					),
-				),
 				dom.tr(
 					dom.th('ID'),
 					dom.th('Success'),
@@ -4061,14 +4026,10 @@ const retiredList = async () => {
 							} else {
 								const lm = retired[retired.length-1]
 								sort.LastID = lm.ID
-								if (sort.Field === "Queued") {
-									sort.Last = lm.Queued
-								} else {
-									sort.Last = lm.LastActivity
-								}
+								sort.Last = queueCursor(lm)
 							}
 							tbody.classList.add('loadstart')
-							const l = await check(e.target! as HTMLButtonElement, client.RetiredList(filter, sort)) || []
+							const l = await check(e.target! as HTMLButtonElement, queuePage(client.withOptions({skipReturnCheck: true}).RetiredList(filter, sort), api.parser.MsgRetired, sort.Field)) || []
 							retired.push(...l)
 							render()
 						}),
@@ -4086,10 +4047,75 @@ const formatExtra = (extra: { [key: string]: string; } | undefined) => {
 	return Object.entries(extra).sort((a, b) => a[0] < b[0] ? -1 : 1).map(t => t[0]+': '+t[1]).join('; ')
 }
 
+const webhookDetails = (h: api.Hook | api.HookRetired) => {
+	const nowSecs = new Date().getTime()/1000
+	let payload = h.Payload
+	try {
+		payload = JSON.stringify(JSON.parse(payload), undefined, '\t')
+	} catch (err) {
+		// Keeps malformed payloads available for diagnosis.
+	}
+	detailsDialog('Webhook #' + h.ID, 'webhook',
+		dom.div(
+			dom._class('detailsSummary'),
+			dom.div(dom.b('Subject'), ' ', h.Subject || '(no subject)'),
+			dom.div(dom.b('Account'), ' ', h.Account, ' · ', h.OutgoingEvent || 'incoming'),
+			'SupersededByID' in h && h.SupersededByID !== 0 ? dom.div('Superseded by webhook #' + h.SupersededByID) : [],
+		),
+		dom.div(
+			dom._class('detailsSections'),
+			dom.div(
+				dom._class('detailsSection'),
+				dom.h2('Delivery attempts (' + (h.Results || []).length + ')'),
+				dom.div(
+					dom._class('detailsResults'),
+					attr.tabindex('0'),
+					dom._attrs({'role': 'region', 'aria-label': 'Delivery attempts'}),
+					(h.Results || []).length === 0 ? dom.p('No delivery attempts yet.') : dom.table(
+						dom.thead(dom.tr(
+							dom.th('Start'), dom.th('Duration'), dom.th('Result'), dom.th('Code'), dom.th('Error'), dom.th('URL'), dom.th('Response'),
+						)),
+						dom.tbody((h.Results || []).map(r => dom.tr(
+							dom.td(age(r.Start, false, nowSecs)),
+							dom.td(Math.round(r.Duration/1000000) + 'ms'),
+							dom.td(r.Success ? 'Delivered' : 'Failed'),
+							dom.td('' + (r.Code || '—')),
+							dom.td(r.Error || '—'),
+							dom.td(r.URL),
+							dom.td(r.Response || '—'),
+						))),
+					),
+				),
+			),
+			dom.div(
+				dom._class('detailsSection'),
+				dom.h2('JSON payload'),
+				dom.pre(dom._class('literal', 'detailsPayload'), attr.tabindex('0'), payload),
+			),
+		),
+	)
+}
+
 const hooksList = async () => {
 	let filter: api.HookFilter = {Max: parseInt(localStorageGet('adminpaginationsize') || '') || 100, IDs: [], Account: '', Submitted: '', NextAttempt: '', Event: ''}
 	let sort: api.HookSort = {Field: "NextAttempt", LastID: 0, Last: null, Asc: true}
-	let hooks: api.Hook[] = await client.HookList(filter, sort) || []
+	let hooks: api.Hook[] = await queuePage(client.withOptions({skipReturnCheck: true}).HookList(filter, sort), api.parser.Hook, sort.Field) || []
+
+	let endReached = hooks.length < filter.Max
+	const pageStatus = dom.span(dom._attrs({'role': 'status'}), style({marginLeft: '12px'}))
+	let loadMore: HTMLButtonElement
+	let loadMoreLabel = 'Load more'
+	if (endReached) {
+		loadMoreLabel = 'Check for more'
+	}
+	const updatePageStatus = () => {
+		let message = hooks.length + ' webhooks shown'
+		if (endReached) {
+			message += ' · No more results'
+		}
+		dom._kids(pageStatus, message)
+	}
+	updatePageStatus()
 
 	const nowSecs = new Date().getTime()/1000
 
@@ -4122,48 +4148,6 @@ const hooksList = async () => {
 		return f
 	}
 
-	const popupDetails = (h: api.Hook) => {
-		const nowSecs = new Date().getTime()/1000
-		popup(
-			dom.h1('Details'),
-			dom.div(
-				dom._class('twocols'),
-				dom.div(
-					dom.table(
-						dom.tr(dom.td('Message subject'), dom.td(h.Subject)),
-					),
-					dom.br(),
-					dom.h2('Results'),
-					dom.table(
-						dom.thead(
-							dom.tr(
-								dom.th('Start'), dom.th('Duration'), dom.th('Success'), dom.th('Code'), dom.th('Error'), dom.th('URL'), dom.th('Response'),
-							),
-						),
-						dom.tbody(
-							(h.Results || []).length === 0 ? dom.tr(dom.td(attr.colspan('7'), 'No results.')) : [],
-							(h.Results || []).map(r =>
-								dom.tr(
-									dom.td(age(r.Start, false, nowSecs)),
-									dom.td(Math.round(r.Duration/1000000)+'ms'),
-									dom.td(r.Success ? '✓' : ''),
-									dom.td(''+ (r.Code || '')),
-									dom.td(r.Error),
-									dom.td(r.URL),
-									dom.td(r.Response),
-								)
-							),
-						),
-					),
-					dom.br(),
-				),
-				dom.div(
-					dom.h2('Webhook JSON body'),
-					dom.pre(dom._class('literal'), JSON.stringify(JSON.parse(h.Payload), undefined, '\t')),
-				),
-			),
-		)
-	}
 
 	let tbody = dom.tbody()
 
@@ -4194,7 +4178,7 @@ const hooksList = async () => {
 					dom.td(h.URL),
 					dom.td(
 						dom.clickbutton('Details', function click() {
-							popupDetails(h)
+							webhookDetails(h)
 						}),
 					),
 				)
@@ -4295,25 +4279,37 @@ const hooksList = async () => {
 				dom.tr(
 					dom.td(
 						attr.colspan('15'),
-						dom.clickbutton('Load more', attr.title('Try to load more entries. You can still try to load more entries when at the end of the list, new entries may have been appended since the previous call.'), async function click(e: MouseEvent) {
+						loadMore=dom.clickbutton(loadMoreLabel, attr.title('Loads the next page of matching webhooks.'), async function click(e: MouseEvent) {
 							if (hooks.length === 0) {
 								sort.LastID = 0
 								sort.Last = null
 							} else {
 								const last = hooks[hooks.length-1]
 								sort.LastID = last.ID
-								if (sort.Field === "Submitted") {
-									sort.Last = last.Submitted
-								} else {
-									sort.Last = last.NextAttempt
-								}
+								sort.Last = queueCursor(last)
 							}
 
-							tbody.classList.add('loadstart')
-							const l = await check(e.target! as HTMLButtonElement, client.HookList(filter, sort)) || []
-							hooks.push(...l)
-							render()
+							const requestedSort = sort
+							try {
+								const l = await check(e.currentTarget! as HTMLButtonElement, queuePage(client.withOptions({skipReturnCheck: true}).HookList(filter, sort), api.parser.Hook, sort.Field))
+								if (sort !== requestedSort) {
+									return
+								}
+								endReached = l.length < filter.Max
+								if (l.length > 0) {
+									hooks.push(...l)
+									render()
+								}
+								updatePageStatus()
+								loadMore.textContent = 'Load more'
+								if (endReached) {
+									loadMore.textContent = 'Check for more'
+								}
+							} finally {
+								tbody.classList.remove('loadstart')
+							}
 						}),
+						pageStatus,
 					),
 				),
 			),
@@ -4341,7 +4337,13 @@ const hooksList = async () => {
 					Asc: sortElem.value.endsWith('asc'),
 				}
 				tbody.classList.add('loadstart')
-				hooks = await check({disabled: false}, client.HookList(filter, sort)) || []
+				hooks = await check({disabled: false}, queuePage(client.withOptions({skipReturnCheck: true}).HookList(filter, sort), api.parser.Hook, sort.Field)) || []
+				endReached = hooks.length < filter.Max
+				updatePageStatus()
+				loadMore.textContent = 'Load more'
+				if (endReached) {
+					loadMore.textContent = 'Check for more'
+				}
 				render()
 			},
 		),
@@ -4389,7 +4391,7 @@ const hooksList = async () => {
 				),
 				dom.div(
 					dom.div('Delivery'),
-					dom.clickbutton('Cancel', attr.title('Retires webhooks, preventing further delivery attempts.'), async function click(e: MouseEvent) {
+					dom.clickbutton('Cancel', dom._class('dangerButton'), attr.title('Retires webhooks, preventing further delivery attempts.'), async function click(e: MouseEvent) {
 						e.preventDefault()
 						if (!window.confirm('Are you sure you want to cancel these webhooks?')) {
 							return
@@ -4407,7 +4409,23 @@ const hooksList = async () => {
 const hooksRetiredList = async () => {
 	let filter: api.HookRetiredFilter = {Max: parseInt(localStorageGet('adminpaginationsize') || '') || 100, IDs: [], Account: '', Submitted: '', LastActivity: '', Event: ''}
 	let sort: api.HookRetiredSort = {Field: "LastActivity", LastID: 0, Last: null, Asc: false}
-	let hooks = await client.HookRetiredList(filter, sort) || []
+	let hooks = await queuePage(client.withOptions({skipReturnCheck: true}).HookRetiredList(filter, sort), api.parser.HookRetired, sort.Field) || []
+
+	let endReached = hooks.length < filter.Max
+	const pageStatus = dom.span(dom._attrs({'role': 'status'}), style({marginLeft: '12px'}))
+	let loadMore: HTMLButtonElement
+	let loadMoreLabel = 'Load more'
+	if (endReached) {
+		loadMoreLabel = 'Check for more'
+	}
+	const updatePageStatus = () => {
+		let message = hooks.length + ' webhooks shown'
+		if (endReached) {
+			message += ' · No more results'
+		}
+		dom._kids(pageStatus, message)
+	}
+	updatePageStatus()
 
 	const nowSecs = new Date().getTime()/1000
 
@@ -4418,49 +4436,6 @@ const hooksRetiredList = async () => {
 	let filterEvent: HTMLSelectElement
 	let filterLastActivity: HTMLInputElement
 
-	const popupDetails = (h: api.HookRetired) => {
-		const nowSecs = new Date().getTime()/1000
-		popup(
-			dom.h1('Details'),
-			dom.div(
-				dom._class('twocols'),
-				dom.div(
-					dom.table(
-						dom.tr(dom.td('Message subject'), dom.td(h.Subject)),
-						h.SupersededByID != 0 ? dom.tr(dom.td('Superseded by webhook ID'), dom.td(''+h.SupersededByID)) : [],
-					),
-					dom.br(),
-					dom.h2('Results'),
-					dom.table(
-						dom.thead(
-							dom.tr(
-								dom.th('Start'), dom.th('Duration'), dom.th('Success'), dom.th('Code'), dom.th('Error'), dom.th('URL'), dom.th('Response'),
-							),
-						),
-						dom.tbody(
-							(h.Results || []).length === 0 ? dom.tr(dom.td(attr.colspan('7'), 'No results.')) : [],
-							(h.Results || []).map(r =>
-								dom.tr(
-									dom.td(age(r.Start, false, nowSecs)),
-									dom.td(Math.round(r.Duration/1000000)+'ms'),
-									dom.td(r.Success ? '✓' : ''),
-									dom.td(''+ (r.Code || '')),
-									dom.td(r.Error),
-									dom.td(r.URL),
-									dom.td(r.Response),
-								)
-							),
-						),
-					),
-					dom.br(),
-				),
-				dom.div(
-					dom.h2('Webhook JSON body'),
-					dom.pre(dom._class('literal'), JSON.stringify(JSON.parse(h.Payload), undefined, '\t')),
-				),
-			),
-		)
-	}
 
 	let tbody = dom.tbody()
 
@@ -4487,7 +4462,7 @@ const hooksRetiredList = async () => {
 					dom.td(h.URL),
 					dom.td(
 						dom.clickbutton('Details', function click() {
-							popupDetails(h)
+							webhookDetails(h)
 						}),
 					),
 				)
@@ -4531,8 +4506,8 @@ const hooksRetiredList = async () => {
 					function change() {
 						filterForm.requestSubmit()
 					},
-					dom.option('Last activity ↓', attr.value('nextattempt-desc')),
-					dom.option('Last activity ↑', attr.value('nextattempt-asc')),
+					dom.option('Last activity ↓', attr.value('lastactivity-desc')),
+					dom.option('Last activity ↑', attr.value('lastactivity-asc')),
 					dom.option('Submitted ↓', attr.value('submitted-desc')),
 					dom.option('Submitted ↑', attr.value('submitted-asc')),
 				)),
@@ -4568,24 +4543,36 @@ const hooksRetiredList = async () => {
 				dom.tr(
 					dom.td(
 						attr.colspan('14'),
-						dom.clickbutton('Load more', attr.title('Try to load more entries. You can still try to load more entries when at the end of the list, new entries may have been appended since the previous call.'), async function click(e: MouseEvent) {
+						loadMore=dom.clickbutton(loadMoreLabel, attr.title('Loads the next page of matching webhooks.'), async function click(e: MouseEvent) {
 							if (hooks.length === 0) {
 								sort.LastID = 0
 								sort.Last = null
 							} else {
 								const last = hooks[hooks.length-1]
 								sort.LastID = last.ID
-								if (sort.Field === "Submitted") {
-									sort.Last = last.Submitted
-								} else {
-									sort.Last = last.LastActivity
-								}
+								sort.Last = queueCursor(last)
 							}
-							tbody.classList.add('loadstart')
-							const l = await check(e.target! as HTMLButtonElement, client.HookRetiredList(filter, sort)) || []
-							hooks.push(...l)
-							render()
+							const requestedSort = sort
+							try {
+								const l = await check(e.currentTarget! as HTMLButtonElement, queuePage(client.withOptions({skipReturnCheck: true}).HookRetiredList(filter, sort), api.parser.HookRetired, sort.Field))
+								if (sort !== requestedSort) {
+									return
+								}
+								endReached = l.length < filter.Max
+								if (l.length > 0) {
+									hooks.push(...l)
+									render()
+								}
+								updatePageStatus()
+								loadMore.textContent = 'Load more'
+								if (endReached) {
+									loadMore.textContent = 'Check for more'
+								}
+							} finally {
+								tbody.classList.remove('loadstart')
+							}
 						}),
+						pageStatus,
 					),
 				),
 			),
@@ -4612,7 +4599,13 @@ const hooksRetiredList = async () => {
 					Asc: sortElem.value.endsWith('asc'),
 				}
 				tbody.classList.add('loadstart')
-				hooks = await check({disabled: false}, client.HookRetiredList(filter, sort)) || []
+				hooks = await check({disabled: false}, queuePage(client.withOptions({skipReturnCheck: true}).HookRetiredList(filter, sort), api.parser.HookRetired, sort.Field)) || []
+				endReached = hooks.length < filter.Max
+				updatePageStatus()
+				loadMore.textContent = 'Load more'
+				if (endReached) {
+					loadMore.textContent = 'Check for more'
+				}
 				render()
 			},
 		),
@@ -4654,7 +4647,7 @@ const webserver = async () => {
 				to=dom.input(attr.required(''), attr.value(domainName(t[1]))),
 			),
 			dom.td(
-				dom.clickbutton('Remove', function click() {
+				dom.clickbutton('Remove', dom._class('dangerButton'), function click() {
 					redirectRows = redirectRows.filter(r => r !== row)
 					row.root.remove()
 					noredirect.style.display = redirectRows.length ? 'none' : ''
@@ -4703,7 +4696,7 @@ const webserver = async () => {
 					value=dom.input(attr.required(''), attr.value(v)),
 				),
 				dom.td(
-					dom.clickbutton('Remove', function click() {
+					dom.clickbutton('Remove', dom._class('dangerButton'), function click() {
 						rows = rows.filter(x => x !== row)
 						row.root.remove()
 						norow.style.display = rows.length ? 'none' : ''
@@ -5139,7 +5132,7 @@ const webserver = async () => {
 			),
 			dom.td(
 				dom.td(
-					dom.clickbutton('Remove', function click() {
+					dom.clickbutton('Remove', dom._class('dangerButton'), function click() {
 						handlerRows = handlerRows.filter(r => r !== row)
 						row.root.remove()
 						nohandler.style.display = handlerRows.length ? 'none' : ''
@@ -5365,6 +5358,25 @@ const init = async () => {
 	let curhash: string | undefined
 
 	[moxversion, moxgoos, moxgoarch] = await client.Version()
+
+	document.getElementById('adminWebmail')!.before(
+		dom.clickbutton('Logout', attr.title('Logout, invalidating this session.'), async function click(e: MouseEvent) {
+			const b = e.target! as HTMLButtonElement
+			try {
+				b.disabled = true
+				await client.Logout()
+			} catch (err) {
+				console.log('logout', err)
+				window.alert('Error: ' + errmsg(err))
+			} finally {
+				b.disabled = false
+			}
+
+			localStorageRemove('webadmincsrftoken')
+			// Reload so all state is cleared from memory.
+			window.location.reload()
+		})
+	)
 
 	const hashChange = async () => {
 		if (curhash === window.location.hash) {
