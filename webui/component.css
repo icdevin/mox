@@ -1,0 +1,22 @@
+:root { --danger: #a52b27; --dangerBackground: #fce9e6; --dangerBorder: #d8a5a0; }
+:root[data-theme="dark"] { --danger: #f2a099; --dangerBackground: #472a26; --dangerBorder: #90544d; }
+button.dangerButton { color: var(--danger); border-color: var(--dangerBorder); background: transparent; }
+button.dangerButton:hover:not(:disabled) { background: var(--dangerBackground); border-color: var(--danger); }
+button.dangerButton:focus-visible { outline-color: var(--danger); }
+
+.uiOverlay { position: fixed; inset: 0; background: #28252055; display: flex; align-items: center; justify-content: center; z-index: 50; padding: 16px; }
+.uiDialog { background: var(--bg); border: 1px solid var(--border); border-radius: 10px; padding: 24px; box-shadow: 0 12px 36px #0002; max-width: 95vw; max-height: 95vh; overflow: auto; }
+.uiSection { min-width: 0; margin: 0 0 24px; padding: 20px; border: 1px solid var(--border); border-radius: 8px; background: var(--panel); scroll-margin-top: 20px; }
+.uiSection > h2:first-child { margin-top: 0; }
+.uiSection > :last-child { margin-bottom: 0; }
+.uiCallout { padding: 12px 14px; border: 1px solid var(--border); border-radius: 6px; margin: 12px 0; line-height: 1.5; overflow-wrap: anywhere; }
+.uiCallout p:last-child { margin-bottom: 0; }
+.uiActions { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-top: 16px; }
+.uiHelp { padding: 12px 14px; border: 1px solid var(--border); border-radius: 6px; margin: 16px 0; }
+.uiHelp summary { cursor: pointer; color: var(--muted); }
+.uiHelp[open] summary { margin-bottom: 12px; }
+.uiScroll { max-width: 100%; overflow: auto; }
+.uiDialog { min-width: min(340px, 100%); }
+.uiDialog:focus { outline: none; }
+.uiDialog > h1:first-child { margin-top: 0; }
+

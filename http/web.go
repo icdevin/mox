@@ -820,17 +820,7 @@ func portServes(name string, l config.Listener) map[int]*serve {
 		srv := ensureServe(false, false, false, port, "metrics-http", false)
 		srv.SystemHandle("metrics", nil, "/metrics", mox.SafeHeaders(promhttp.Handler()))
 		srv.SystemHandle("health", nil, "/health", mox.SafeHeaders(http.HandlerFunc(healthHandle)))
-		srv.SystemHandle("metrics", nil, "/", mox.SafeHeaders(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			if r.URL.Path != "/" {
-				http.NotFound(w, r)
-				return
-			} else if r.Method != "GET" {
-				http.Error(w, http.StatusText(http.StatusMethodNotAllowed), http.StatusMethodNotAllowed)
-				return
-			}
-			w.Header().Set("Content-Type", "text/html")
-			fmt.Fprint(w, `<html><body>see <a href="metrics">metrics</a></body></html>`)
-		})))
+		srv.SystemHandle("metrics", nil, "/", mox.SafeHeaders(http.HandlerFunc(metricsIndex)))
 	}
 	if l.AutoconfigHTTPS.Enabled {
 		port := config.Port(l.AutoconfigHTTPS.Port, 443)
@@ -886,7 +876,7 @@ func portServes(name string, l config.Listener) map[int]*serve {
 		}
 		srv := &serve{[]string{"pprof-http"}, nil, nil, false, false, false, nil, false, nil}
 		portServe[port] = srv
-		srv.SystemHandle("pprof", nil, "/", http.DefaultServeMux)
+		srv.SystemHandle("pprof", nil, "/", mox.SafeHeaders(http.HandlerFunc(profilingHandler)))
 	}
 	if l.WebserverHTTP.Enabled {
 		port := config.Port(l.WebserverHTTP.Port, 80)

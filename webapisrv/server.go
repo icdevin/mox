@@ -9,6 +9,7 @@ import (
 	"bytes"
 	"context"
 	cryptorand "crypto/rand"
+	_ "embed"
 	"encoding/base64"
 	"encoding/json"
 	"errors"
@@ -46,6 +47,7 @@ import (
 	"github.com/mjl-/mox/webapi"
 	"github.com/mjl-/mox/webauth"
 	"github.com/mjl-/mox/webops"
+	"github.com/mjl-/mox/webui"
 )
 
 var pkglog = mlog.New("webapi", nil)
@@ -102,157 +104,56 @@ type requestInfo struct {
 	Request      *http.Request       // For Proto and TLS connection state during message submit.
 }
 
-// todo: show a curl invocation on the method pages
+//go:embed docs.html
+var docsHTML string
 
-var docsMethodTemplate = htmltemplate.Must(htmltemplate.New("method").Parse(`<!doctype html>
-	<head>
-		<meta charset="utf-8" />
-		<meta name="robots" content="noindex,nofollow" />
-		<title>Method {{ .Method }} - WebAPI - Mox</title>
-		<style>
-body, html { padding: 1em; font-size: 16px; }
-* { font-size: inherit; font-family: ubuntu, lato, sans-serif; margin: 0; padding: 0; box-sizing: border-box; }
-h1, h2, h3, h4 { margin-bottom: 1ex; }
-h1 { font-size: 1.2rem; }
-h2 { font-size: 1.1rem; }
-h3, h4 { font-size: 1rem; }
-ul { padding-left: 1rem; }
-p { margin-bottom: 1em; max-width: 50em; }
-[title] { text-decoration: underline; text-decoration-style: dotted; }
-fieldset { border: 0; }
-textarea { width: 100%; max-width: 50em; }
-		</style>
-	</head>
-	<body>
-		<h1><a href="../">WebAPI</a> - Method {{ .Method }}</h1>
-		<form id="webapicall" method="POST">
-			<fieldset id="webapifieldset">
-				<h2>Request JSON</h2>
-				<div><textarea id="webapirequest" name="request" required rows="20">{{ .Request }}</textarea></div>
-				<br/>
-				<div>
-					<button type="reset">Reset</button>
-					<button type="submit">Call</button>
-				</div>
-				<br/>
-{{ if .ReturnsBytes }}
-				<p>Method has a non-JSON response.</p>
-{{ else }}
-				<h2>Response JSON</h2>
-				<div><textarea id="webapiresponse" rows="20">{{ .Response }}</textarea></div>
-{{ end }}
-			</fieldset>
-		</form>
-		<script>
-window.addEventListener('load', () => {
-	window.webapicall.addEventListener('submit', async (e) => {
-		const stop = () => {
-			e.stopPropagation()
-			e.preventDefault()
-		}
+var docsTemplate = htmltemplate.Must(htmltemplate.New("docs").Parse(`{{define "head"}}` + webui.Head() + `{{end}}{{define "header"}}` + webui.Header("Web API") + `{{end}}` + docsHTML))
 
-		let req
-		try {
-			req = JSON.parse(window.webapirequest.value)
-		} catch (err) {
-			window.alert('Error parsing request: ' + err.message)
-			stop()
-			return
-		}
-		if (!req) {
-			window.alert('Empty request')
-			stop()
-			return
-		}
+var methodDescriptions = map[string]string{
+	"Send":               "Compose and send a message.",
+	"MessageGet":         "Read a parsed message and its metadata.",
+	"MessageRawGet":      "Download the original message source.",
+	"MessagePartGet":     "Download a message part or attachment.",
+	"MessageDelete":      "Permanently delete a message.",
+	"MessageMove":        "Move a message to another mailbox.",
+	"MessageFlagsAdd":    "Add flags to a message.",
+	"MessageFlagsRemove": "Remove flags from a message.",
+	"SuppressionList":    "List suppressed recipient addresses.",
+	"SuppressionAdd":     "Suppress delivery to a recipient.",
+	"SuppressionRemove":  "Remove a recipient suppression.",
+	"SuppressionPresent": "Check whether a recipient is suppressed.",
+}
 
-		if ({{ .ReturnsBytes }}) {
-			// Just POST to this URL.
-			return
-		}
-
-		stop()
-		// Do call ourselves, get response and put it in the response textarea.
-		window.webapifieldset.disabled = true
-		let data = new window.FormData()
-		data.append("request", window.webapirequest.value)
-		try {
-			const response = await fetch("{{ .Method }}", {body: data, method: "POST"})
-			const text = await response.text()
-			try {
-				window.webapiresponse.value = JSON.stringify(JSON.parse(text), undefined, '\t')
-			} catch (err) {
-				window.webapiresponse.value = text
-			}
-		} catch (err) {
-			window.alert('Error: ' + err.message)
-		} finally {
-			window.webapifieldset.disabled = false
-		}
-	})
-})
-		</script>
-	</body>
-</html>
-`))
-
+var methodNames []string
 var docsIndex []byte
 
+type docsPage struct {
+	Method         string
+	Request        string
+	Response       string
+	ReturnsBytes   bool
+	Methods        []string
+	Descriptions   map[string]string
+	WebapiDocsURL  string
+	WebhookDocsURL string
+}
+
 func init() {
-	var methods []string
 	mt := reflect.TypeFor[webapi.Methods]()
-	n := mt.NumMethod()
-	for i := range n {
-		methods = append(methods, mt.Method(i).Name)
+	for i := 0; i < mt.NumMethod(); i++ {
+		methodNames = append(methodNames, mt.Method(i).Name)
 	}
-	docsIndexTmpl := htmltemplate.Must(htmltemplate.New("index").Parse(`<!doctype html>
-<html>
-	<head>
-		<meta charset="utf-8" />
-		<meta name="robots" content="noindex,nofollow" />
-		<title>Webapi - Mox</title>
-		<style>
-body, html { padding: 1em; font-size: 16px; }
-* { font-size: inherit; font-family: ubuntu, lato, sans-serif; margin: 0; padding: 0; box-sizing: border-box; }
-h1, h2, h3, h4 { margin-bottom: 1ex; }
-h1 { font-size: 1.2rem; }
-h2 { font-size: 1.1rem; }
-h3, h4 { font-size: 1rem; }
-ul { padding-left: 1rem; }
-p { margin-bottom: 1em; max-width: 50em; }
-[title] { text-decoration: underline; text-decoration-style: dotted; }
-fieldset { border: 0; }
-		</style>
-	</head>
-	<body>
-		<h1>Webapi and webhooks</h1>
-		<p>The mox webapi is a simple HTTP/JSON-based API for sending messages and processing incoming messages.</p>
-		<p>Configure webhooks in mox to receive notifications about outgoing delivery event, and/or incoming deliveries of messages.</p>
-		<p>Documentation and examples:</p>
-		<p><a href="{{ .WebapiDocsURL }}">{{ .WebapiDocsURL }}</a></p>
-		<h2>Methods</h2>
-		<p>The methods below are available in this version of mox. Follow a link for an example request/response JSON, and a button to make an API call.</p>
-		<ul>
-{{ range $i, $method := .Methods }}
-			<li><a href="{{ $method }}">{{ $method }}</a></li>
-{{ end }}
-		</ul>
-	</body>
-</html>
-`))
-	webapiDocsURL := "https://pkg.go.dev/github.com/mjl-/mox@" + moxvar.VersionBare + "/webapi/"
-	webhookDocsURL := "https://pkg.go.dev/github.com/mjl-/mox@" + moxvar.VersionBare + "/webhook/"
-	indexArgs := struct {
-		WebapiDocsURL  string
-		WebhookDocsURL string
-		Methods        []string
-	}{webapiDocsURL, webhookDocsURL, methods}
+	args := docsPage{
+		Methods:        methodNames,
+		Descriptions:   methodDescriptions,
+		WebapiDocsURL:  "https://pkg.go.dev/github.com/mjl-/mox/webapi/",
+		WebhookDocsURL: "https://pkg.go.dev/github.com/mjl-/mox/webhook/",
+	}
 	var b bytes.Buffer
-	err := docsIndexTmpl.Execute(&b, indexArgs)
-	if err != nil {
+	if err := docsTemplate.ExecuteTemplate(&b, "page", args); err != nil {
 		panic("executing api docs index template: " + err.Error())
 	}
 	docsIndex = b.Bytes()
-
 	mox.NewWebapiHandler = func(maxMsgSize int64, basePath string, isForwarded bool) http.Handler {
 		return NewServer(maxMsgSize, basePath, isForwarded)
 	}
@@ -337,14 +238,9 @@ func (s server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 				return
 			}
 		}
-		args := struct {
-			Method       string
-			Request      string
-			Response     string
-			ReturnsBytes bool
-		}{fn, req, resp, returnsBytes}
+		args := docsPage{Method: fn, Request: req, Response: resp, ReturnsBytes: returnsBytes, Methods: methodNames, Descriptions: methodDescriptions}
 		w.Header().Set("Content-Type", "text/html; charset=utf-8")
-		err = docsMethodTemplate.Execute(w, args)
+		err = docsTemplate.ExecuteTemplate(w, "page", args)
 		log.Check(err, "executing webapi method template")
 		return
 	} else if r.Method != "POST" {

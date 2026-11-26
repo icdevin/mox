@@ -1,0 +1,112 @@
+{{define "navigation"}}
+<nav class="uiNav" aria-label="Web API">
+<a href="./" {{if not .Method}}aria-current="page"{{end}}>Overview</a>
+<strong>Methods</strong>
+{{range .Methods}}<a href="{{.}}" {{if eq . $.Method}}aria-current="page"{{end}}>{{.}}</a>{{end}}
+</nav>
+{{end}}
+{{define "page"}}<!doctype html>
+<html><head><meta charset="utf-8"><meta name="robots" content="noindex,nofollow">
+<title>{{if .Method}}{{.Method}} · {{end}}devn Web API</title>
+{{template "head"}}
+<style>
+.apiLayout { min-height: calc(100dvh - 74px); }
+.apiLayout .uiNav { overflow-wrap: anywhere; }
+.apiIntro { color: var(--muted); }
+.apiMethods { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr)); gap: 12px; }
+.apiMethod { display: block; border: 1px solid var(--border); border-radius: 8px; padding: 16px; text-decoration: none; background: var(--bg); }
+.apiMethod:hover { background: var(--hover); }
+.apiMethod strong { display: block; margin-bottom: 6px; }
+.apiMethod span { color: var(--muted); font-size: 13px; }
+.apiEditor { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; }
+.apiEditor .uiSection { margin: 0; }
+.apiEditor textarea { display: block; width: 100%; min-height: 400px; resize: vertical; font: 13px/1.6 ui-monospace, monospace; tab-size: 2; }
+.apiEditor label { display: block; font-weight: 600; font-size: 19px; margin-bottom: 12px; }
+.apiStatus { margin: 16px 0; }
+.apiStatus[data-intent=error] { background: var(--error); }
+.apiStatus[data-intent=success] { background: var(--success); }
+.apiStatus[hidden] { display: none; }
+.apiEndpoint { font: 13px ui-monospace, monospace; background: var(--selected); padding: 4px 8px; border-radius: 4px; }
+@media (min-width: 761px) { body { height: 100dvh; display: flex; flex-direction: column; } .uiHeader { flex-shrink: 0; } .apiLayout { flex: 1; min-height: 0; } .uiNav, #page { overflow: auto; } }
+@media (max-width: 1000px) { .apiEditor { grid-template-columns: minmax(0, 1fr); } }
+</style></head><body>
+{{template "header"}}
+<div class="uiLayout apiLayout">
+{{template "navigation" .}}
+<main id="page"><div>
+{{if .Method}}
+<h1>{{.Method}}</h1>
+<p class="apiIntro">{{index .Descriptions .Method}}</p>
+<p><span class="apiEndpoint">POST {{.Method}}</span></p>
+<div class="uiCallout">Calls run against this server. Authenticate with your email address and password using HTTP Basic authentication.</div>
+<form id="webapicall" method="POST">
+<fieldset id="webapifieldset">
+<div class="apiEditor">
+<section class="uiSection"><label for="webapirequest">Request JSON</label>
+<textarea id="webapirequest" name="request" required rows="18" spellcheck="false">{{.Request}}</textarea>
+<div class="uiActions"><button type="submit" {{if eq .Method "MessageDelete"}}class="dangerButton"{{end}}>Call {{.Method}}</button><button type="reset">Reset example</button></div>
+</section>
+<section class="uiSection">
+{{if .ReturnsBytes}}<h2>Response</h2><p>This method returns a file or message content. The browser opens or downloads the response.</p>
+{{else}}<label for="webapiresponse">Response JSON</label><textarea id="webapiresponse" rows="18" readonly spellcheck="false" aria-describedby="responseHelp">{{.Response}}</textarea><p id="responseHelp" class="apiIntro">Example response. Replaced with the result when you make a call.</p>{{end}}
+</section>
+</div></fieldset>
+<div id="apiStatus" class="uiCallout apiStatus" role="status" hidden></div>
+</form>
+{{else}}
+<h1>Web API</h1>
+<p class="apiIntro">Send mail, work with messages, and manage recipient suppressions through HTTP and JSON.</p>
+<section class="uiSection"><h2>Getting started</h2><p>Choose a method to inspect its request and response, or make a call with your account credentials.</p><div class="uiActions"><a href="{{.WebapiDocsURL}}">API documentation ↗</a><a href="{{.WebhookDocsURL}}">Webhook documentation ↗</a></div></section>
+<section class="uiSection"><h2>Methods</h2><div class="apiMethods">{{range .Methods}}<a class="apiMethod" href="{{.}}"><strong>{{.}}</strong><span>{{index $.Descriptions .}}</span></a>{{end}}</div></section>
+<section class="uiSection"><h2>Webhooks</h2><p>Receive delivery updates and incoming message notifications. Configure webhook endpoints in Account settings.</p></section>
+{{end}}
+</div></main></div>
+{{if .Method}}<script>
+const form = document.getElementById('webapicall');
+const request = document.getElementById('webapirequest');
+const response = document.getElementById('webapiresponse');
+const status = document.getElementById('apiStatus');
+const showStatus = (message, intent) => {
+ status.textContent = message;
+ status.dataset.intent = intent;
+ status.hidden = false;
+};
+form.addEventListener('reset', () => {
+ status.hidden = true;
+ const help = document.getElementById('responseHelp');
+ if (help) { help.textContent = 'Example response. Replaced with the result when you make a call.'; }
+});
+form.addEventListener('submit', async (event) => {
+ try {
+  const value = JSON.parse(request.value);
+  if (!value || typeof value !== 'object' || Array.isArray(value)) { throw new Error('Enter a JSON object.'); }
+ } catch (error) {
+  event.preventDefault();
+  showStatus('Invalid request: ' + error.message, 'error');
+  request.focus();
+  return;
+ }
+ if ({{.ReturnsBytes}}) { return; }
+ event.preventDefault();
+ const fields = document.getElementById('webapifieldset');
+ fields.disabled = true;
+ showStatus('Calling {{.Method}}…', 'pending');
+ try {
+  const data = new FormData();
+  data.append('request', request.value);
+  const result = await fetch(form.action, {body: data, method: 'POST'});
+  const text = await result.text();
+  try { response.value = JSON.stringify(JSON.parse(text), null, 2); }
+  catch (_) { response.value = text; }
+  document.getElementById('responseHelp').textContent = 'Response from the latest call.';
+  let intent = 'error';
+  if (result.ok) { intent = 'success'; }
+  showStatus('HTTP ' + result.status + ' ' + result.statusText, intent);
+ } catch (error) {
+  showStatus('Request failed: ' + error.message, 'error');
+ } finally {
+  fields.disabled = false;
+ }
+});
+</script>{{end}}
+</body></html>{{end}}

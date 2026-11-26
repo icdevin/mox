@@ -29,6 +29,7 @@ import (
 	"github.com/mjl-/mox/dns"
 	"github.com/mjl-/mox/mlog"
 	"github.com/mjl-/mox/mox-"
+	"github.com/mjl-/mox/webui"
 )
 
 func recvid(r *http.Request) string {
@@ -111,22 +112,15 @@ var lsTemplate = htmltemplate.Must(htmltemplate.New("ls").Parse(`<!doctype html>
 	<head>
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
-		<title>ls</title>
-		<style>
-body, html { padding: 1em; font-size: 16px; }
-* { font-size: inherit; font-family: ubuntu, lato, sans-serif; margin: 0; padding: 0; box-sizing: border-box; }
-h1 { margin-bottom: 1ex; font-size: 1.2rem; }
-table td, table th { padding: .2em .5em; }
-table > tbody > tr:nth-child(odd) { background-color: #f8f8f8; }
-[title] { text-decoration: underline; text-decoration-style: dotted; }
-		</style>
-	</head>
-	<body>
-		<h1>ls</h1>
+        <title>{{.Path}} · devn Files</title>
+` + webui.Head() + `
+ </head><body>
+` + webui.Header("Files") + `
+ <main class="uiDocument"><h1>{{.Path}}</h1><section class="uiSection"><h2>Directory contents</h2><div class="uiScroll">
 		<table>
 			<thead>
 				<tr>
-					<th>Size in MB</th>
+					<th class="alignRight">Size in MB</th>
 					<th>Modified (UTC)</th>
 					<th>Name</th>
 				</tr>
@@ -143,7 +137,7 @@ table > tbody > tr:nth-child(odd) { background-color: #f8f8f8; }
 				</tr>
 			{{ end }}
 			</tbody>
-		</table>
+		</table></div></section></main>
 	</body>
 </html>
 `))
@@ -350,7 +344,7 @@ func HandleStatic(h *config.WebStatic, compress bool, w http.ResponseWriter, r *
 				hdr.Add(k, v)
 			}
 		}
-		err = lsTemplate.Execute(w, map[string]any{"Files": files})
+		err = lsTemplate.Execute(w, map[string]any{"Files": files, "Path": r.URL.Path})
 		if err != nil {
 			log().Check(err, "executing directory listing template")
 		}
